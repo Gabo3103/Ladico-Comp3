@@ -12,19 +12,49 @@ import React, {
 type Dir = 0 | 1 | 2 | 3
 type Step = { type: "move" | "left" | "right" }
 
-export type MazeHandle = {
+const INITIAL_PROPOSALS: string[] = [
+    `
+        <xml xmlns="https://developers.google.com/blockly/xml">
+            <block type="controls_repeat" x="24" y="24"><field name="TIMES">5</field><statement name="DO"><block type="move_forward"></block></statement><next><block type="turn_left"><next><block type="move_forward"><next><block type="move_forward"><next><block type="turn_left"></block></next></block></next></block></next></block></next></block>
+        </xml>`,
+    `
+        <xml xmlns="https://developers.google.com/blockly/xml">
+            <block type="controls_repeat" x="24" y="24"><field name="TIMES">5</field><statement name="DO"><block type="move_forward"></block></statement><next><block type="turn_left"><next><block type="move_forward"><next><block type="move_forward"><next><block type="move_forward"></block></next></block></next></block></next></block></next></block>
+        </xml>`,
+    `
+        <xml xmlns="https://developers.google.com/blockly/xml">
+            <block type="turn_left" x="24" y="24"><next><block type="move_forward"><next><block type="move_forward"><next><block type="turn_right">
+        </xml>`,
+    `
+        <xml xmlns="https://developers.google.com/blockly/xml">
+            <block type="turn_left" x="24" y="24"><next><block type="move_forward"><next><block type="move_forward"><next><block type="move_forward"><next><block type="turn_right"></block></next></block></next></block></next></block></next></block>
+        </xml>`,
+]
+
+export type ProgrammingExerciseA1Handle = {
     check: () => boolean
     finish: () => boolean
     }
 
     type Props = {
     onFinish?: (point: 0 | 1) => void
+    onAttemptsExhausted?: () => void
     }
 
     /** Carga Blockly y aplica locale ES de forma robusta (soporta distintas distros/versiones) */
     const getBlockly = async () => {
     const mod: any = await import("blockly")
     const Blockly = mod?.default ?? mod
+    try {
+        const audioProto = Blockly.WorkspaceAudio?.prototype
+        if (audioProto) {
+        audioProto.load = function () {}
+        audioProto.preload = function () {}
+        audioProto.play = function () {}
+        audioProto.setMuted = function () {}
+        audioProto.getMuted = function () { return true }
+        }
+    } catch {}
     try {
         const esMod: any = await import("blockly/msg/es")
         const locale = esMod?.default ?? esMod
@@ -60,10 +90,12 @@ export type MazeHandle = {
     return Math.max(1, Math.floor(size / grid))
     }
 
-    const BlocklyMaze = forwardRef<MazeHandle, Props>(function BlocklyMaze(
-    { onFinish },
+    const ProgrammingExerciseA1 = forwardRef<ProgrammingExerciseA1Handle, Props>(function ProgrammingExerciseA1(
+    { onFinish, onAttemptsExhausted },
     ref
     ) {
+    const MAX_ATTEMPTS = 3
+    const [attempts, setAttempts] = useState(0)
     const blocklyDivRef = useRef<HTMLDivElement | null>(null)
     const workspaceRef = useRef<any>(null)
 
@@ -96,42 +128,43 @@ export type MazeHandle = {
 
     const LABYRINTHS: boolean[][][] = [
         [
-        [true, true, true, true, true, false],
-        [true, true, true, true, true, false],
-        [true, true, true, false, false, false],
-        [true, true, true, false, true, true],
-        [true, true, false, false, true, true],
-        [false, false, false, true, true, true],
-        ],
-        [
-        [true, true, true, true, true, false],
-        [true, true, true, true, false, false],
-        [true, true, true, true, false, true],
-        [true, true, true, false, false, true],
-        [true, true, true, false, true, true],
-        [false, false, false, false, true, true],
-        ],
-        [
-        [true, true, true, true, true, false],
-        [true, true, true, true, true, false],
-        [true, true, false, false, false, false],
-        [false, false, false, true, true, true],
+        [false, false, false, false, false, false],
         [false, true, true, true, true, true],
         [false, true, true, true, true, true],
+        [false, false, false, false, false, false],
+        [true, true, true, true, true, false],
+        [false, false, false, false, false, false],
         ],
         [
+        [false, false, false, false, false, false],
+        [false, true, true, true, true, true],
+        [false, false, false, false, false, false],
         [true, true, true, true, true, false],
-        [true, true, false, false, false, false],
-        [true, true, false, true, true, true],
-        [true, true, false, true, true, true],
-        [true, true, false, true, true, true],
-        [false, false, false, true, true, true],
+        [true, true, true, true, true, false],
+        [false, false, false, false, false, false],
+        ],
+        [
+        [false, false, false, false, false, false],
+        [true, true, true, true, true, false],
+        [true, true, true, true, true, false],
+        [false, false, false, false, false, false],
+        [false, true, true, true, true, true],
+        [false, false, false, false, false, false],
+        ],
+        [
+        [false, false, false, false, false, false],
+        [true, true, true, true, true, false],
+        [false, false, false, false, false, false],
+        [false, true, true, true, true, true],
+        [false, true, true, true, true, true],
+        [false, false, false, false, false, false],
         ],
     ]
 
-    const [walls] = useState<boolean[][]>(
-        LABYRINTHS[Math.floor(Math.random() * LABYRINTHS.length)]
+    const [labyrinthIndex] = useState<number>(() =>
+        Math.floor(Math.random() * LABYRINTHS.length)
     )
+    const [walls] = useState<boolean[][]>(() => LABYRINTHS[labyrinthIndex])
 
     const isWall = (x: number, y: number) => {
         if (y < 0 || y >= GRID || x < 0 || x >= GRID) return true
@@ -305,15 +338,25 @@ export type MazeHandle = {
 
         if (!blocklyDivRef.current || disposed) return
 
-        const MAX_BLOCKS = 15
+        const MAX_BLOCKS = 16
         workspace = Blockly.inject(blocklyDivRef.current, {
             toolbox: toolboxXml,
             trashcan: true,
             scrollbars: true,
             zoom: { controls: true },
-            media: "https://unpkg.com/blockly/media/",
+            media: "/blockly-media/",
+            sounds: false,
             maxBlocks: MAX_BLOCKS,
         })
+        try {
+            const audioManager = workspace.getAudioManager?.()
+            if (audioManager) {
+            audioManager.setMuted?.(true)
+            audioManager.load = () => undefined
+            audioManager.preload = () => undefined
+            audioManager.play = () => undefined
+            }
+        } catch {}
         workspaceRef.current = workspace
         setRemaining(workspace.remainingCapacity())
 
@@ -328,6 +371,17 @@ export type MazeHandle = {
         }
         resizeBlockly()
         window.addEventListener("resize", resizeBlockly)
+
+        try {
+            const initialXml = INITIAL_PROPOSALS[labyrinthIndex]
+            if (initialXml) {
+                const xmlDom = Blockly.utils?.xml?.textToDom
+                    ? Blockly.utils.xml.textToDom(initialXml)
+                    : Blockly.Xml.textToDom(initialXml)
+                Blockly.Xml.domToWorkspace(xmlDom, workspace)
+                setRemaining(workspace.remainingCapacity())
+            }
+        } catch {}
 
         setIsReady(true)
         draw()
@@ -362,8 +416,20 @@ export type MazeHandle = {
         setIsRunning(false)
     }
 
+    const attemptsExhausted = attempts >= MAX_ATTEMPTS
+
+    const registerFailedAttempt = () => {
+        setAttempts((prev) => {
+            const next = prev + 1
+            if (next >= MAX_ATTEMPTS) {
+                onAttemptsExhausted?.()
+            }
+            return next
+        })
+    }
+
     const run = async () => {
-        if (!workspaceRef.current) return
+        if (!workspaceRef.current || attemptsExhausted) return
         stop()
         setMsg("")
         setReached(false)
@@ -394,6 +460,7 @@ export type MazeHandle = {
             setReached(true)
             onFinish?.(1)
             } else {
+            registerFailedAttempt()
             setMsg("No llegaste a la meta. Reiniciando...")
             onFinish?.(0)
             setTimeout(() => resetWorld(), 2000)
@@ -411,6 +478,7 @@ export type MazeHandle = {
             if (nd === 3) ny = r.y - 1
             if (nx < 0 || nx >= GRID || ny < 0 || ny >= GRID || isWall(nx, ny)) {
                 stop()
+                registerFailedAttempt()
                 setMsg("Te chocaste con una pared o borde. Reiniciando...")
                 onFinish?.(0)
                 setTimeout(() => resetWorld(), 1500)
@@ -457,9 +525,16 @@ export type MazeHandle = {
                 <span className="text-sm text-gray-600">
                 Bloques restantes: <b>{remaining}</b>
                 </span>
+                <span
+                    className={`text-sm ${
+                        attemptsExhausted ? "text-rose-600 font-semibold" : "text-gray-600"
+                    }`}
+                >
+                Intentos: <b>{attempts}/{MAX_ATTEMPTS}</b>
+                </span>
                 <button
                 onClick={run}
-                disabled={!isReady || isRunning}
+                disabled={!isReady || isRunning || attemptsExhausted}
                 className="px-3 py-2 rounded-xl bg-[#3a7d89] text-white disabled:opacity-50"
                 >
                 Ejecutar
@@ -491,6 +566,11 @@ export type MazeHandle = {
             </div>
 
             <p className="text-sm text-gray-600 mt-3 min-h-[24px]">{msg}</p>
+            {attemptsExhausted && !reached && (
+                <p className="text-sm font-medium text-rose-600 mt-1">
+                    Agotaste los 3 intentos disponibles. Pasando al siguiente ejercicio...
+                </p>
+            )}
             <ul className="text-xs text-gray-500 mt-2 list-disc ml-5">
             <li>El robot inicia en A (celda celeste). Debe llegar a B (celda verde)</li>
             <li>No puede atravesar paredes (bloques negros) ni salir del tablero</li>
@@ -501,4 +581,6 @@ export type MazeHandle = {
     )
 })
 
-export default BlocklyMaze
+ProgrammingExerciseA1.displayName = "ProgrammingExerciseA1"
+
+export default ProgrammingExerciseA1

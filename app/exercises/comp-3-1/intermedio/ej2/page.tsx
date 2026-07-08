@@ -4,16 +4,16 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
-import DevelopExerciseI2Sequence, {
-    type DevelopExerciseI2SequenceHandle,
-} from "@/components/DevelopExerciseI2Sequence";
+import DevelopExerciseI2, {
+    type DevelopExerciseI2Handle,
+} from "@/components/DevelopExerciseI2";
 
 const COMPETENCE = "3.1";
 const LEVEL = "intermedio";
 
 export default function PageEj2_31_Intermedio() {
     const progressPct = (2 / 3) * 100;
-    const exRef = useRef<DevelopExerciseI2SequenceHandle>(null);
+    const exRef = useRef<DevelopExerciseI2Handle>(null);
     const [done, setDone] = useState(false);
 
     return (
@@ -65,37 +65,46 @@ export default function PageEj2_31_Intermedio() {
             <CardContent className="p-6 lg:p-8 space-y-6">
                 <div className="bg-gray-50 p-6 rounded-2xl border-l-4 border-[#286575]">
                 <p className="text-gray-700">
-                    Debes diseñar, crear y publicar un contenido digital en cierto contexto.
+                    Debes crear un producto digital de forma eficiente, usando herramientas de apoyo para organizar, editar, revisar y publicar el contenido sin perder control sobre el resultado final.
                 </p>
                 </div>
                 <p className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full inline-block">
-                    <b>Indica</b> y ordena la forma de crear y editar una rutina bien definida
+                    <b>Ordena</b> las etapas del flujo de producción en la secuencia más adecuada.
                 </p>
-                <DevelopExerciseI2Sequence
+                <DevelopExerciseI2
                 ref={exRef}
                 countScenarios={1}
                 onEvaluate={(pt) => setDone(pt === 1)}
                 />
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                 <Button
+                    asChild
+                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                >
+                    <Link href="/dashboard">Terminar</Link>
+                </Button>
+
+                <div className="flex gap-3">
+                    <Button
                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
                     onClick={() => {
                     if (!exRef.current) return;
                     const ok = exRef.current.check();
                     setDone(ok);
                     }}
-                >
-                    Verificar
-                </Button>
+                    >
+                    Comprobar
+                    </Button>
 
-                <Button
+                    <Button
                     asChild
                     disabled={!done}
                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                >
-                    <Link href="/exercises/3.1/intermedio/ex3">Siguiente</Link>
-                </Button>
+                    >
+                    <Link href="/exercises/comp-3-1/intermedio/ej3">Siguiente</Link>
+                    </Button>
+                </div>
                 </div>
             </CardContent>
             </Card>
