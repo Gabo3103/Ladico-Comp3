@@ -4,15 +4,16 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
-import DevelopExerciseI3Drag, { DevelopExerciseI3DragHandle } from "@/components/DevelopExerciseI3Drag";
+import DevelopExerciseI3, { DevelopExerciseI3Handle } from "@/components/DevelopExerciseI3";
 
 const COMPETENCE = "3.1";
 const LEVEL = "intermedio";
 
 export default function PageEj3_31_Intermedio() {
     const progressPct = (3 / 3) * 100; // ejercicio 3 de 3
-    const exRef = useRef<DevelopExerciseI3DragHandle>(null);
-    const [done, setDone] = useState(false);
+    const exRef = useRef<DevelopExerciseI3Handle>(null);
+    const [, setDone] = useState(false);
+    const [ready, setReady] = useState(false);
 
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
@@ -62,42 +63,40 @@ export default function PageEj3_31_Intermedio() {
             <CardContent className="p-6 lg:p-8 space-y-6">
                 <div className="bg-gray-50 p-6 rounded-2xl border-l-4 border-[#286575]">
                 <p className="text-gray-700">
-                    Estás ayudando a compañeros a elegir el formato correcto para su actividad digital respectiva.
+                    Se te presentará un recurso digital en revisión. Analiza el caso y decide qué cambios conviene aplicar antes de compartirlo.
                 </p>
                 </div>
                 <p className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full inline-block">
-                    <b>Elige</b> y <b>arrastra</b> las extensiones que correspondan al caso
+                    <b>Selecciona</b> las acciones más adecuadas para el contexto presentado.
                 </p>
-                <DevelopExerciseI3Drag
+                <DevelopExerciseI3
                 ref={exRef}
-                countTargets={4}
                 onEvaluate={(pt) => setDone(pt === 1)}
+                onReadyChange={setReady}
                 />
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <span />
+
                 <div className="flex gap-3">
                     <Button
-                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                    disabled={!ready}
+                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                     onClick={() => {
                         if (!exRef.current) return;
-                        if (!exRef.current.isReady()) {
-                        alert("Completa todas las asignaciones antes de verificar.");
-                        return;
-                        }
                         exRef.current.check();
                     }}
                     >
-                    Verificar
+                    Comprobar
+                    </Button>
+
+                    <Button
+                    asChild
+                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                    >
+                    <Link href="/exercises/comp-3-1/avanzado/ej1">Siguiente</Link>
                     </Button>
                 </div>
-
-                <Button
-                    asChild
-                    disabled={!done}
-                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
-                >
-                    <Link href="/dashboard">Terminar</Link>
-                </Button>
                 </div>
             </CardContent>
             </Card>

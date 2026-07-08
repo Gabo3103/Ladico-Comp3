@@ -3,25 +3,31 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import React, { useMemo, useRef, useState } from "react";
-import DevelopExerciseI1, { DevelopExerciseI1Handle, Mode } from "@/components/DevelopExerciseI1";
+import React, { useEffect, useRef, useState } from "react";
+import DevelopExerciseI1, { DevelopExerciseI1Handle } from "@/components/DevelopExerciseI1";
 
 const COMPETENCE = "3.1";
 const LEVEL = "intermedio";
 
-function randomMode(): Mode {
-    return Math.random() < 0.5 ? "image" : "text";
-}
+const SCENARIOS = [
+    "Estás preparando una infografía para una campaña de reciclaje en tu comunidad. Para avanzar más rápido, usas una herramienta de IA que propone una distribución visual, frases breves y algunos datos para incluir en el diseño.",
+    "Debes crear el guion de un video corto sobre hábitos de estudio para estudiantes de enseñanza media. Después de escribir una idea inicial, usas IA para obtener ejemplos, ordenar las secciones y probar un tono más cercano.",
+    "Un equipo está diseñando una publicación para redes sociales sobre prevención de estafas digitales. La IA entrega varias frases llamativas, recomendaciones y una propuesta de imagen para acompañar el mensaje.",
+    "Estás elaborando una ficha interactiva para explicar una receta saludable en un taller escolar. Usas IA para sugerir pasos, títulos, imágenes de referencia y una versión resumida para estudiantes más pequeños.",
+    "Te piden crear una presentación breve para una feria científica. Usas IA para organizar ideas, resumir conceptos y proponer ejemplos que podrían aparecer en las diapositivas.",
+    "Estás diseñando un afiche digital para invitar a una actividad cultural local. La IA propone textos, estilos visuales y llamados a la acción que podrías combinar con fotografías del evento.",
+] as const;
 
 export default function PageEj1_31_Intermedio() {
     const progressPct = (1 / 3) * 100;
-    // modo aleatorio al montar (memo para no recalcular en re-renders)
-    const mode = useMemo<Mode>(() => randomMode(), []);
     const exRef = useRef<DevelopExerciseI1Handle>(null);
     const [done, setDone] = useState(false);
+    const [ready, setReady] = useState(false);
+    const [scenario, setScenario] = useState<string>(SCENARIOS[0]);
 
-    const modeLabel =
-        mode === "image" ? "IMAGEN" : "TEXTO / DOCUMENTO";
+    useEffect(() => {
+        setScenario(SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)]);
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
@@ -69,48 +75,48 @@ export default function PageEj1_31_Intermedio() {
 
             <Card className="bg-white shadow-2xl rounded-3xl border-0 ring-2 ring-[#286575] ring-opacity-30">
             <CardContent className="p-6 lg:p-8 space-y-6">
-                {/* Escenario con tipo dinámico */}
                 <div className="bg-gray-50 p-6 rounded-2xl border-l-4 border-[#286575]">
                 <p className="text-gray-700">
-                    Se te presentan distintos tipos de archivos digitales que debes ordenar en una carpeta. Selecciona los que{" "}
-                    pertenecen al tipo {" "} <b className="text-[#286575]">{modeLabel}</b>.
-                    
+                    {scenario}
                 </p>
                 </div>
                 <p className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full inline-block">
-                    <b>Elige</b> las extensiones correctas
+                    <b>Selecciona</b> las afirmaciones correctas sobre el uso de IA en la creación de contenido.
                 </p>
                 <DevelopExerciseI1
                 ref={exRef}
-                mode={mode}
                 onEvaluate={(pt) => setDone(pt === 1)}
+                onReadyChange={setReady}
                 />
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <Button
+                    asChild
+                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                >
+                    <Link href="/dashboard">Terminar</Link>
+                </Button>
+
                 <div className="flex gap-3">
                     <Button
-                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                    disabled={!ready}
+                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                     onClick={() => {
                         if (!exRef.current) return;
-                        if (!exRef.current.isReady()) {
-                        alert("Selecciona al menos una opción antes de verificar.");
-                        return;
-                        }
                         exRef.current.check();
                     }}
                     >
-                    Verificar
+                    Comprobar
                     </Button>
 
-                </div>
-
-                <Button
+                    <Button
                     asChild
                     disabled={!done}
                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
-                >
-                    <Link href="/exercises/3.1/intermedio/ex2">Siguiente</Link>
-                </Button>
+                    >
+                    <Link href="/exercises/comp-3-1/intermedio/ej2">Siguiente</Link>
+                    </Button>
+                </div>
                 </div>
             </CardContent>
             </Card>
