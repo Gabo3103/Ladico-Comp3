@@ -13,6 +13,26 @@ import { saveUserResult } from "@/utils/results-manager"
 import { loadQuestionsByCompetence, updateQuestionStats, loadCompetences } from "@/services/questionsService"
 import { getOrCreateActiveSession, updateSessionAnswer, completeSession } from "@/services/simpleSessionService"
 
+type Answer = number | number[] | null
+
+function answersAreEqual(left: Answer, right: number | number[]): boolean {
+  if (Array.isArray(left) && Array.isArray(right)) {
+    if (left.length !== right.length) return false
+    const sortedLeft = [...left].sort((a, b) => a - b)
+    const sortedRight = [...right].sort((a, b) => a - b)
+    return sortedLeft.every((value, index) => value === sortedRight[index])
+  }
+  return left === right
+}
+
+function formatAnswer(answer: Answer, options: string[]): string {
+  if (answer === null) return "No respondió"
+  const indexes = Array.isArray(answer) ? answer : [answer]
+  return indexes
+    .map((index) => `Opción ${index + 1} (índice ${index}) - "${options[index] ?? "Sin opción"}"`)
+    .join(", ")
+}
+
 export default function TestPage() {
   const params = useParams()
   const router = useRouter()
@@ -34,6 +54,10 @@ export default function TestPage() {
   }, [user, userData])
 
   const bootstrap = async () => {
+    const currentUser = user
+    const currentUserData = userData
+    if (!currentUser || !currentUserData) return
+
     try {
       const competenceId = params.competenceId as string
       const levelParam = (searchParams.get("level") || "basico").toLowerCase()
@@ -41,7 +65,7 @@ export default function TestPage() {
 
       const comps = await loadCompetences()
 
-      if (userData.completedCompetences.includes(competenceId)) {
+      if (currentUserData.completedCompetences.includes(competenceId)) {
         router.push(`/test/${competenceId}/results?completed=true&score=100&passed=true&correct=3&level=${levelParam}`)
         return
       }
@@ -51,7 +75,7 @@ export default function TestPage() {
         competenceId,
         levelName,
         3,
-        { country: userData?.country ?? null } // ⬅️ filtra por país + fallback “global” / “all”
+        { country: currentUserData.country ?? null } // ⬅️ filtra por país + fallback “global” / “all”
       )
       // 🔼🔼🔼
 
@@ -60,7 +84,7 @@ export default function TestPage() {
       }
       setQuestions(loadedQuestions)
 
-      const { session } = await getOrCreateActiveSession(user!.uid, competenceId, levelParam, loadedQuestions)
+      const { session } = await getOrCreateActiveSession(currentUser.uid, competenceId, levelParam, loadedQuestions)
       setTestSession(session)
     } catch (e) {
       console.error("Error inicializando test:", e)
@@ -75,7 +99,7 @@ export default function TestPage() {
     }
   }
 
-  const handleAnswerSubmit = async (answerIndex: number, questionIndex: number) => {
+  const handleAnswerSubmit = async (answerIndex: number | number[], questionIndex: number) => {
     if (!testSession) return
     try {
       const updated = await updateSessionAnswer(testSession, questionIndex, answerIndex)
@@ -91,11 +115,11 @@ export default function TestPage() {
 
       await Promise.all(finalSession.questions.map(async (question, index) => {
         const userAnswer = finalSession.answers[index]
-        const wasCorrect = userAnswer === question.correctAnswerIndex
+        const wasCorrect = answersAreEqual(userAnswer, question.correctAnswerIndex)
 
         console.log(`Pregunta ${index + 1}: ${question.title}`)
-        console.log(`  Usuario respondió: ${userAnswer !== null ? `Opción ${userAnswer + 1} (índice ${userAnswer}) - "${question.options[userAnswer]}"` : "No respondió"}`)
-        console.log(`  Respuesta correcta: Opción ${question.correctAnswerIndex + 1} (índice ${question.correctAnswerIndex}) - "${question.options[question.correctAnswerIndex]}"`)
+        console.log(`  Usuario respondió: ${formatAnswer(userAnswer, question.options)}`)
+        console.log(`  Respuesta correcta: ${formatAnswer(question.correctAnswerIndex, question.options)}`)
         console.log(`  ¿Correcta?: ${wasCorrect ? "SÍ" : "NO"}`)
         console.log(`  🔍 DEBUG: userAnswer=${userAnswer}, correctAnswerIndex=${question.correctAnswerIndex}, comparison=${userAnswer} === ${question.correctAnswerIndex} = ${wasCorrect}`)
         console.log("---")

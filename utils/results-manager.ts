@@ -3,6 +3,16 @@ import { collection, addDoc, query, where, getDocs, updateDoc, doc } from "fireb
 import { db } from "@/lib/firebase"
 import type { UserResult, TestSession } from "@/types"
 
+function answersAreEqual(left: number | number[] | null, right: number | number[]): boolean {
+  if (Array.isArray(left) && Array.isArray(right)) {
+    if (left.length !== right.length) return false
+    const sortedLeft = [...left].sort((a, b) => a - b)
+    const sortedRight = [...right].sort((a, b) => a - b)
+    return sortedLeft.every((value, index) => value === sortedRight[index])
+  }
+  return left === right
+}
+
 export async function saveUserResult(testSession: TestSession): Promise<void> {
   if (!db) {
     const error = new Error("Firestore no está inicializado. Por favor, comprueba tu conexión a Internet.")
@@ -18,8 +28,15 @@ export async function saveUserResult(testSession: TestSession): Promise<void> {
         preguntaId: question.id,
         competence: question.competence,
         respuestaUsuario: testSession.answers[index] ?? -1,
-        correcta: testSession.answers[index] === question.correctAnswerIndex,
-        tiempoSegundos: Math.floor((testSession.endTime?.getTime() || 0 - testSession.startTime.getTime()) / 1000 / testSession.questions.length), 
+        correcta: answersAreEqual(testSession.answers[index], question.correctAnswerIndex),
+        tiempoSegundos: Math.max(
+          0,
+          Math.floor(
+            ((testSession.endTime?.getTime() ?? Date.now()) - testSession.startTime.getTime()) /
+              1000 /
+              testSession.questions.length
+          )
+        ),
       })),
       puntajeTotal: testSession.score,
       nivelDigComp: determineDigCompLevel(testSession.score),

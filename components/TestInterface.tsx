@@ -12,7 +12,7 @@ import { AlertTriangle, X } from "lucide-react"
 
 interface TestInterfaceProps {
   testSession: TestSession
-  onAnswerSubmit: (answerIndex: number, questionIndex: number) => void
+  onAnswerSubmit: (answerIndex: number | number[], questionIndex: number) => void
   onTestComplete: (session: TestSession) => void
   questionTimeSeconds?: number // opcional: override del tiempo por pregunta (default 60)
 }
@@ -118,6 +118,18 @@ export default function TestInterface({
   const competenceName = getCompetenceTitle(competenceCode)
 
   const handleAnswerSelect = (answerIndex: number) => {
+    if (currentQuestion?.type === "multiple-response") {
+      setSelectedAnswer((current) => {
+        const selected = Array.isArray(current) ? current : []
+        const next = selected.includes(answerIndex)
+          ? selected.filter((index) => index !== answerIndex)
+          : [...selected, answerIndex]
+        onAnswerSubmit(next, currentIndex)
+        return next
+      })
+      return
+    }
+
     setSelectedAnswer(answerIndex)
     onAnswerSubmit(answerIndex, currentIndex)
   }
@@ -416,40 +428,45 @@ export default function TestInterface({
             {/* Título e instrucciones */}
             <div className="mb-6 sm:mb-8">
               <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 bg-blue-50 px-3 sm:px-4 py-2 rounded-full inline-block">
-                Selección única
+                {currentQuestion?.type === "multiple-response" ? "Selección múltiple" : "Selección única"}
               </p>
 
               {/* Opciones */}
               <div className="space-y-3 sm:space-y-4">
-                {currentQuestion?.options?.map((option: string, index: number) => (
+                {currentQuestion?.options?.map((option: string, index: number) => {
+                  const isSelected = Array.isArray(selectedAnswer)
+                    ? selectedAnswer.includes(index)
+                    : selectedAnswer === index
+
+                  return (
                   <label
                     key={index}
                     className={`flex items-start space-x-3 sm:space-x-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 ${
                       invalidated
                         ? "border-gray-200 bg-gray-100 opacity-60 cursor-not-allowed"
-                        : selectedAnswer === index
+                        : isSelected
                         ? "border-[#286575] bg-[#e6f2f3] shadow-md transform scale-[1.01] sm:scale-[1.02] cursor-pointer"
                         : "border-gray-200 hover:border-[#286575] hover:bg-gray-50 hover:shadow-sm cursor-pointer"
                     }`}
                   >
                     <div className="relative mt-1">
                       <input
-                        type="radio"
+                        type={currentQuestion.type === "multiple-response" ? "checkbox" : "radio"}
                         name="answer"
                         value={index}
-                        checked={selectedAnswer === index}
+                        checked={isSelected}
                         onChange={() => handleAnswerSelect(index)}
                         disabled={invalidated}
                         className="sr-only"
                       />
                       <div
                         className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 transition-all ${
-                          selectedAnswer === index
+                           isSelected
                             ? "border-[#286575] bg-[#286575]"
                             : "border-gray-300"
                         }`}
                       >
-                        {selectedAnswer === index && (
+                        {isSelected && (
                           <div className="w-2 h-2 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                         )}
                       </div>
@@ -458,7 +475,8 @@ export default function TestInterface({
                       {option}
                     </span>
                   </label>
-                ))}
+                  )
+                })}
               </div>
             </div>
 

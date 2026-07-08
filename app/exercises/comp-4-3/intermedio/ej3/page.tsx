@@ -212,7 +212,7 @@ export default function Page() {
       console.warn("No se pudo (re)asegurar la sesión al guardar P3:", e);
     }
 
-    if (typeof window !== "undefined") {
+    if (user && typeof window !== "undefined") {
       localStorage.removeItem(sessionKeyFor(user.uid))
     }
 

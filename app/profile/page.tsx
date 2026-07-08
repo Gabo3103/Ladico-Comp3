@@ -64,7 +64,7 @@ export default function AccountPage() {
 
       const ageNum =
         age.trim() === "" ? null : Number.isFinite(Number(age)) ? Number(age) : NaN
-      if (ageNum as number as any === NaN) {
+      if (Number.isNaN(ageNum)) {
         alert("Edad debe ser un número válido.")
         return
       }

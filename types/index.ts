@@ -44,7 +44,7 @@ export interface UserResult {
   respuestas: Array<{
     preguntaId: string
     competence: string
-    respuestaUsuario: number
+    respuestaUsuario: number | number[]
     correcta: boolean
     tiempoSegundos: number
   }>
