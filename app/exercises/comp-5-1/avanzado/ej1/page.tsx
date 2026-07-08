@@ -1,7 +1,7 @@
 "use client"
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageIcon, MessageCircle, Gamepad2, Film, Wifi, Signal, BatteryFull, X } from "lucide-react"
+import { Bell, Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageIcon, MessageCircle, Gamepad2, Film, Wifi, Signal, BatteryFull, X } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
@@ -66,6 +66,15 @@ export default function Page() {
         <div className="h-[480px] overflow-y-auto bg-gradient-to-b from-[#dfeaf0] to-[#eef3f6]">
           {screen === "home" && (
             <div className="p-6">
+              <button onClick={() => setScreen("storage")} className="mb-5 w-full rounded-2xl border border-amber-200 bg-amber-50 p-3 text-left shadow-sm hover:bg-amber-100 transition">
+                <span className="flex items-start gap-2">
+                  <Bell className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                  <span>
+                    <span className="block text-xs font-semibold text-amber-900">Almacenamiento casi lleno</span>
+                    <span className="block text-[11px] text-amber-700">Libere espacio para poder usar la cámara.</span>
+                  </span>
+                </span>
+              </button>
               <div className="grid grid-cols-4 gap-5 mt-2">
                 <HomeIcon label="Cámara" icon={Camera} onClick={() => setScreen("camera")} />
                 <HomeIcon label="Ajustes" icon={Settings} onClick={() => setScreen("settings")} />

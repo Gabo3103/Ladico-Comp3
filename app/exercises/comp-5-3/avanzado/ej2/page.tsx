@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Monitor, ChevronRight, Check, Globe, Mail, Folder, Lock, Plus, FileText } from "lucide-react"
+import { Monitor, ChevronRight, Check, Globe, Mail, Folder, Lock, Plus, FileText, Video, MessageCircle } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
@@ -203,6 +203,22 @@ export default function Page() {
 
         <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 flex flex-col">
           {!done ? (<>
+            <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
+                  <Video className="w-4 h-4 text-[#286575]" /> Videollamada con dirigente vecinal
+                </span>
+                <span className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">En línea</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div className="h-16 rounded-lg bg-gradient-to-br from-[#286575] to-[#7fb0bb] flex items-center justify-center text-white text-sm font-semibold">Dirigente</div>
+                <div className="h-16 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-semibold">Tú</div>
+              </div>
+              <p className="rounded-lg bg-white border px-3 py-2 text-xs text-gray-600 flex items-start gap-2">
+                <MessageCircle className="w-3.5 h-3.5 text-[#286575] mt-0.5 shrink-0" />
+                “No sé cómo enviar la encuesta a todos los vecinos. ¿Qué hago primero?”
+              </p>
+            </div>
             <div className="flex items-center justify-between mb-3">
               <p className="text-base font-semibold text-gray-800">{cur.title}</p>
               <span className="text-xs text-gray-400 shrink-0">Paso {step + 1} de {STEPS.length}</span>

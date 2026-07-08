@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { getCompetenceTitle } from "@/components/data/digcompSkills"
 import Link from "next/link"
-import { AlertTriangle, X } from "lucide-react"
+import { AlertTriangle, Bot, FileText, Image as ImageIcon, Presentation, Sparkles, Wand2, X } from "lucide-react"
 
 interface TestInterfaceProps {
   testSession: TestSession
@@ -66,6 +66,70 @@ function CircularTimer({
       </div>
     </div>
   );
+}
+
+function GenerativePresentationDemo() {
+  return (
+    <div className="mb-5 rounded-2xl border border-[#286575]/20 bg-gradient-to-br from-[#eef8f8] via-white to-[#f6f1ff] p-3 sm:p-4">
+      <div className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+        <div className="bg-gray-100 border-b px-3 py-2 flex items-center gap-2">
+          <span className="flex gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+            <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+            <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
+          </span>
+          <span className="flex-1 rounded-full bg-white border px-3 py-1 text-[11px] text-gray-500">
+            ia-presentaciones.demo/crear
+          </span>
+        </div>
+
+        <div className="grid sm:grid-cols-[1fr_220px] gap-3 p-3">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-2">
+              <Bot className="w-4 h-4 text-[#286575]" />
+              Asistente de IA generativa
+            </div>
+            <div className="rounded-lg bg-white border border-gray-200 p-3 text-xs text-gray-600 leading-relaxed">
+              “Crea una presentación de 5 diapositivas sobre reciclaje en la comunidad,
+              con títulos claros, imágenes sugeridas y una conclusión.”
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2 text-[11px] text-gray-600">
+              <span className="rounded-lg bg-white border px-2 py-2 flex items-center gap-1">
+                <Presentation className="w-3.5 h-3.5 text-[#286575]" /> Diapositivas
+              </span>
+              <span className="rounded-lg bg-white border px-2 py-2 flex items-center gap-1">
+                <ImageIcon className="w-3.5 h-3.5 text-[#286575]" /> Imágenes
+              </span>
+              <span className="rounded-lg bg-white border px-2 py-2 flex items-center gap-1">
+                <Wand2 className="w-3.5 h-3.5 text-[#286575]" /> Estilo
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-gray-700">Vista previa</span>
+              <Sparkles className="w-4 h-4 text-amber-500" />
+            </div>
+            <div className="space-y-2">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="rounded-lg border bg-gray-50 p-2 flex gap-2">
+                  <span className="w-10 h-8 rounded bg-gradient-to-br from-[#286575] to-[#7fb0bb]" />
+                  <span className="flex-1 space-y-1">
+                    <span className="block h-2 rounded bg-gray-300 w-4/5" />
+                    <span className="block h-2 rounded bg-gray-200 w-3/5" />
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] text-gray-400 flex items-center gap-1">
+              <FileText className="w-3.5 h-3.5" /> Borrador editable generado por IA
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 
@@ -291,6 +355,14 @@ export default function TestInterface({
 
   // ------- Render -------
   const isLastQuestion = currentIndex === totalQuestions - 1
+  const isBasicLevel = testSession.level?.toString().toLowerCase?.().startsWith("b")
+  const questionText = `${currentQuestion?.title ?? ""} ${currentQuestion?.scenario ?? ""}`.toLowerCase()
+  const isPresentationAiQuestion =
+    questionText.includes("presentaci") ||
+    questionText.includes("diapositiv") ||
+    questionText.includes("ia generativa") ||
+    questionText.includes("inteligencia artificial")
+  const showGenerativePresentationDemo = competenceCode === "5.3" && isBasicLevel && isPresentationAiQuestion
 
   return (
     <div className="min-h-screen bg-[#f3fbfb]">
@@ -427,6 +499,8 @@ export default function TestInterface({
                 </p>
               </div>
             </div>
+
+            {showGenerativePresentationDemo && <GenerativePresentationDemo />}
 
             {/* Título e instrucciones */}
             <div className="mb-5 sm:mb-6">

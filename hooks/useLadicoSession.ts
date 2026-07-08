@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { ensureSession, markAnswered, type LevelName } from "@/lib/testSession"
 import { useAuth } from "@/contexts/AuthContext"
 
-export function useLadicoSession(competence: string, level: LevelName, prefix: string) {
+export function useLadicoSession(competence: string, level: LevelName, prefix: string, totalQuestions = 3) {
   const { user } = useAuth()
   const [sessionId, setSessionId] = useState<string | null>(null)
   const ensuringRef = useRef(false)
@@ -18,7 +18,7 @@ export function useLadicoSession(competence: string, level: LevelName, prefix: s
     ensuringRef.current = true
     ;(async () => {
       try {
-        const { id } = await ensureSession({ userId: user.uid, competence, level, totalQuestions: 3 })
+        const { id } = await ensureSession({ userId: user.uid, competence, level, totalQuestions })
         setSessionId(id)
         if (typeof window !== "undefined") localStorage.setItem(k, id)
       } catch (e) { console.error("No se pudo asegurar la sesión:", e) } finally { ensuringRef.current = false }
@@ -34,7 +34,7 @@ export function useLadicoSession(competence: string, level: LevelName, prefix: s
       if (cached) sid = cached
       else {
         try {
-          const { id } = await ensureSession({ userId: user.uid, competence, level, totalQuestions: 3 })
+          const { id } = await ensureSession({ userId: user.uid, competence, level, totalQuestions })
           sid = id; setSessionId(id)
           if (typeof window !== "undefined") localStorage.setItem(k, id)
         } catch (e) { console.warn(e) }

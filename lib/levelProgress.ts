@@ -22,7 +22,11 @@ function toProgress(parsed: unknown): Progress {
   const p1 = (obj["1"] ?? obj[1] ?? 0) as Point
   const p2 = (obj["2"] ?? obj[2] ?? 0) as Point
   const p3 = (obj["3"] ?? obj[3] ?? 0) as Point
-  return { 1: (p1 === 1 ? 1 : 0), 2: (p2 === 1 ? 1 : 0), 3: (p3 === 1 ? 1 : 0) }
+  return {
+    1: (p1 === 1 ? 1 : 0),
+    2: (p2 === 1 ? 1 : 0),
+    3: (p3 === 1 ? 1 : 0),
+  }
 }
 
 export function getProgress(competence: string, level: Level): Progress {

@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ShoppingBag, Palette, Table, MessageCircle, Calendar, Share2, Check, ChevronDown, X } from "lucide-react"
+import { ShoppingBag, Palette, Table, MessageCircle, Calendar, Share2, Check, ChevronDown, X, Monitor } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
@@ -93,7 +93,25 @@ export default function Page() {
         ))}
       </div>
 
-      <div className="max-w-3xl mx-auto grid sm:grid-cols-2 gap-3">
+      <div className="max-w-3xl mx-auto rounded-2xl border-8 border-gray-800 bg-white overflow-hidden shadow-xl">
+        <div className="bg-gray-800 text-white/80 text-xs px-3 py-1.5 flex items-center gap-2">
+          <Monitor className="w-4 h-4" /> Computador de la emprendedora
+        </div>
+        <div className="bg-[#dbe7ef] p-4">
+          <div className="mb-3 flex flex-wrap gap-2 text-[11px] text-gray-700">
+            {[
+              ["Venta", ShoppingBag],
+              ["Diseño", Palette],
+              ["Redes", Share2],
+              ["Mensajería", MessageCircle],
+              ["Planilla", Table],
+            ].map(([label, Icon]: any) => (
+              <span key={label} className="rounded-xl bg-white border px-3 py-2 flex items-center gap-1.5 shadow-sm">
+                <Icon className="w-3.5 h-3.5 text-[#286575]" /> {label}
+              </span>
+            ))}
+          </div>
+      <div className="grid sm:grid-cols-2 gap-3">
         {TOOLS.map(t => {
           const act = actionOf(t)
           const Icon = t.icon
@@ -109,6 +127,8 @@ export default function Page() {
             </button>
           )
         })}
+      </div>
+        </div>
       </div>
 
       {open && (() => {

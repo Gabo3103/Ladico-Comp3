@@ -63,8 +63,11 @@ export default function Page() {
         <div className="space-y-4">
                 {/* IZQUIERDA: Smart TV (imagen + config) */}
         <InfoCard title="Smart TV"
-          screen={<div className="h-28 bg-gray-900 border-4 border-gray-800 flex flex-col items-center justify-center text-white/80"><Tv className="w-9 h-9" /><span className="text-[10px] mt-1 text-white/60">MiRedCasa</span></div>}
+          screen={<div className="h-28 bg-gray-900 border-4 border-gray-800 flex flex-col items-center justify-center text-white/80 text-center px-3"><Tv className="w-9 h-9" /><span className="text-[10px] mt-1 text-white/70">No se encontraron dispositivos disponibles para transmitir</span><span className="text-[10px] mt-1 text-white/40">Red: MiRedCasa</span></div>}
           note='Encendida. Conectada a la red "MiRedCasa". Pantalla compartida activa: esperando un dispositivo en la misma red.' />
+        <InfoCard title="Control remoto"
+          screen={<div className="h-28 bg-gray-100 border flex items-center justify-center"><div className="w-12 h-24 rounded-2xl bg-gray-800 shadow-inner flex flex-col items-center gap-2 pt-3"><span className="w-5 h-5 rounded-full bg-red-500" /><span className="w-7 h-7 rounded-full bg-gray-600" /><span className="w-6 h-2 rounded bg-gray-600" /><span className="w-6 h-2 rounded bg-gray-600" /></div></div>}
+          note='Permite revisar Ajustes > Red de la TV para confirmar a qué WiFi está conectada.' />
                 {/* DERECHA: Router (imagen + config) */}
         <InfoCard title="Router WiFi"
           screen={<div className="h-28 bg-gray-100 border flex flex-col items-center justify-center text-[#286575]"><RouterIcon className="w-9 h-9" /><span className="text-[10px] mt-1 text-gray-500">2 redes activas</span></div>}

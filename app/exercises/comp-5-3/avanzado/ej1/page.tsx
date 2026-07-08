@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Share2, DollarSign, Table, MessageCircle, Palette, Mail, Check, ChevronDown, X } from "lucide-react"
+import { Share2, DollarSign, Table, MessageCircle, Palette, Mail, Check, ChevronDown, X, Monitor, Globe } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
@@ -31,7 +31,7 @@ const TOOLS: Tool[] = [
   { id: "mensajeria", name: "Mensajería grupal", icon: MessageCircle, actions: [
     { id: "coord", label: "Coordinar al equipo y mantener informada a la beneficiaria.", dim: "comunicacion" },
   ] },
-  { id: "diseno", name: "App de diseño", icon: Palette, actions: [
+  { id: "diseno", name: "Canva / app de diseño", icon: Palette, actions: [
     { id: "afiche", label: "Diseñar un afiche atractivo para difundir la campaña.", dim: "difusion" },
   ] },
   { id: "correo", name: "Correo electrónico", icon: Mail, actions: [
@@ -88,7 +88,25 @@ export default function Page() {
       </div>
 
       {/* Escritorio */}
-      <div className="max-w-3xl mx-auto grid sm:grid-cols-2 gap-3">
+      <div className="max-w-3xl mx-auto rounded-2xl border-8 border-gray-800 bg-white overflow-hidden shadow-xl">
+        <div className="bg-gray-800 text-white/80 text-xs px-3 py-1.5 flex items-center gap-2">
+          <Monitor className="w-4 h-4" /> Computador de escritorio
+        </div>
+        <div className="bg-[#dbe7ef] p-4">
+          <div className="mb-3 flex flex-wrap gap-2 text-[11px] text-gray-700">
+            {[
+              ["Navegador", Globe],
+              ["Canva", Palette],
+              ["Correo", Mail],
+              ["Planilla", Table],
+              ["Mensajería", MessageCircle],
+            ].map(([label, Icon]: any) => (
+              <span key={label} className="rounded-xl bg-white border px-3 py-2 flex items-center gap-1.5 shadow-sm">
+                <Icon className="w-3.5 h-3.5 text-[#286575]" /> {label}
+              </span>
+            ))}
+          </div>
+      <div className="grid sm:grid-cols-2 gap-3">
         {TOOLS.map(t => {
           const act = actionOf(t)
           const Icon = t.icon
@@ -104,6 +122,8 @@ export default function Page() {
             </button>
           )
         })}
+      </div>
+        </div>
       </div>
 
       {open && (() => {

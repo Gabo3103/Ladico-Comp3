@@ -5,6 +5,7 @@ import ExerciseShell from "@/components/ExerciseShell"
 import { Choice } from "@/components/Choice"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { BatteryCharging, Bell, Cloud, Smartphone } from "lucide-react"
 
 const COMPETENCE = "5.1"
 const PREFIX = "session:5.1:Intermedio"
@@ -38,6 +39,148 @@ const ENUNCIADOS = [
     ], correct: 1,
   },
 ]
+
+function PhoneSettingsPreview() {
+  const rows = [
+    { label: "Respaldo en la nube", value: "Fotos y contactos sincronizados", icon: Cloud, active: true },
+    { label: "Batería", value: "Apps en segundo plano revisadas", icon: BatteryCharging, active: true },
+    { label: "Notificaciones banco", value: "Alertas push activadas", icon: Bell, active: true },
+  ]
+
+  return (
+    <div className="mb-6 grid gap-4 lg:grid-cols-[260px_1fr] items-center rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="mx-auto w-full max-w-[230px] rounded-[2rem] border-8 border-gray-800 bg-gray-900 overflow-hidden shadow-xl">
+        <div className="bg-gray-800 text-white text-[11px] px-4 py-1 flex justify-between">
+          <span>9:41</span><span>82%</span>
+        </div>
+        <div className="bg-[#eef3f6] min-h-[300px] p-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
+            <Smartphone className="w-4 h-4 text-[#286575]" /> Ajustes del teléfono
+          </div>
+          <div className="space-y-2">
+            {rows.map(({ label, value, icon: Icon, active }) => (
+              <div key={label} className="rounded-xl border bg-white p-3 flex items-center gap-3">
+                <span className="w-9 h-9 rounded-lg bg-[#e8f3f4] text-[#286575] flex items-center justify-center">
+                  <Icon className="w-4 h-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs font-semibold text-gray-800">{label}</span>
+                  <span className="block text-[10px] text-gray-500">{value}</span>
+                </span>
+                <span className={`w-8 h-4 rounded-full ${active ? "bg-[#286575]" : "bg-gray-300"}`}>
+                  <span className="block ml-auto mr-0.5 mt-0.5 w-3 h-3 rounded-full bg-white" />
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold text-gray-800 mb-1">Entorno simulado</p>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Observe el teléfono como referencia: las preguntas se relacionan con ajustes preventivos
+          para respaldo, batería y notificaciones. Seleccione la configuración correcta en cada enunciado.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function InteractivePhoneSettings({ ans, set }: { ans: (number | null)[]; set: (i: number, v: number) => void }) {
+  const rows = [
+    {
+      label: "Almacenamiento y respaldo",
+      value: "Proteja fotos y contactos",
+      icon: Cloud,
+      question: 0,
+      options: [
+        { text: "Pendrive manual", value: 0 },
+        { text: "Sincronización automática en la nube", value: 1 },
+        { text: "Libreta física", value: 2 },
+      ],
+    },
+    {
+      label: "Batería y rendimiento",
+      value: "Optimice autonomía",
+      icon: BatteryCharging,
+      question: 1,
+      options: [
+        { text: "Brillo al máximo", value: 0 },
+        { text: "Desinstalar redes sociales", value: 1 },
+        { text: "Revisar consumo por app y limitar segundo plano", value: 2 },
+      ],
+    },
+    {
+      label: "Notificaciones de seguridad",
+      value: "Reciba alertas bancarias",
+      icon: Bell,
+      question: 2,
+      options: [
+        { text: "Revisar manualmente", value: 0 },
+        { text: "Activar push en banco y dispositivo", value: 1 },
+        { text: "Alarma diaria", value: 2 },
+      ],
+    },
+  ]
+
+  return (
+    <div className="mb-6 grid gap-4 lg:grid-cols-[320px_1fr] items-start rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="mx-auto w-full max-w-[300px] rounded-[2rem] border-8 border-gray-800 bg-gray-900 overflow-hidden shadow-xl">
+        <div className="bg-gray-800 text-white text-[11px] px-4 py-1 flex justify-between">
+          <span>9:41</span><span>82%</span>
+        </div>
+        <div className="bg-[#eef3f6] min-h-[420px] p-3 overflow-y-auto">
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
+            <Smartphone className="w-4 h-4 text-[#286575]" /> Ajustes del teléfono
+          </div>
+          <div className="space-y-2">
+            {rows.map(({ label, value, icon: Icon, question, options }) => (
+              <div key={label} className="rounded-xl border bg-white p-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="w-9 h-9 rounded-lg bg-[#e8f3f4] text-[#286575] flex items-center justify-center">
+                    <Icon className="w-4 h-4" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-xs font-semibold text-gray-800">{label}</span>
+                    <span className="block text-[10px] text-gray-500">{value}</span>
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  {options.map((option) => {
+                    const selected = ans[question] === option.value
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => set(question, option.value)}
+                        className={`w-full rounded-lg border px-2.5 py-2 text-left text-[11px] transition ${
+                          selected
+                            ? "border-[#286575] bg-[#e8f3f4] text-[#1f5562] font-medium"
+                            : "border-gray-200 bg-gray-50 text-gray-600 hover:bg-white"
+                        }`}
+                      >
+                        {option.text}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold text-gray-800 mb-1">Entorno simulado</p>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Use el teléfono simulado para ajustar configuraciones preventivas de respaldo, batería y
+          notificaciones. Las selecciones del teléfono quedan reflejadas en los enunciados de abajo.
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export default function Page() {
   const router = useRouter()
@@ -74,6 +217,7 @@ export default function Page() {
       onNext={handleNext} nextLabel="Finalizar" nextDisabled={ans.some(a => a === null)}
     >
       <div className="space-y-6">
+        <InteractivePhoneSettings ans={ans} set={set} />
         {ENUNCIADOS.map((e, i) => (
           <div key={i}>
             <p className="font-medium text-gray-800 text-sm mb-2">{e.q}</p>

@@ -91,21 +91,23 @@ export async function markAnswered(sessionId: string, index: number, correct?: b
 
   const data = snap.data() as Partial<TestSessionDoc> | undefined
   const total = (data?.total ?? 3) as number
+  const requiredTotal = Math.max(total, index + 1)
 
   // Asegura array y longitud >= total
-  const prev = Array.isArray(data?.answers) ? [...data!.answers] : Array.from({ length: total }, () => null)
-  if (prev.length < total) {
-    prev.length = total
-    for (let i = 0; i < total; i++) if (typeof prev[i] === "undefined") prev[i] = null
+  const prev = Array.isArray(data?.answers) ? [...data!.answers] : Array.from({ length: requiredTotal }, () => null)
+  if (prev.length < requiredTotal) {
+    prev.length = requiredTotal
+    for (let i = 0; i < requiredTotal; i++) if (typeof prev[i] === "undefined") prev[i] = null
   }
 
   // Ignora índices fuera de rango
-  if (index < 0 || index >= total) return
+  if (index < 0) return
 
   prev[index] = typeof correct === "boolean" ? (correct ? 1 : 0) : 1
 
   await updateDoc(ref, {
     answers: prev,
+    total: requiredTotal,
     // opcional: timestamp de actualización si quieres auditar
     // updatedAt: new Date().toISOString(),
   })

@@ -25,6 +25,7 @@ function ResultsIntermedioContent() {
   const q1 = sp.get("q1") === "1"
   const q2 = sp.get("q2") === "1"
   const q3 = sp.get("q3") === "1"
+  const passMin = 2
 
   // Id de sesión (opcional) para consolidar en Firestore si aún no se consolidó
   const sid = sp.get("sid") || null
@@ -44,12 +45,12 @@ function ResultsIntermedioContent() {
     ;(async () => {
       if (!sid) return
       try {
-        await finalizeSession(sid, { correctCount: correct, total, passMin: 2 })
+        await finalizeSession(sid, { correctCount: correct, total, passMin })
       } catch (e) {
         console.warn("No se pudo finalizar la sesión en resultados:", e)
       }
     })()
-  }, [sid, competence, level, correct, total])
+  }, [sid, competence, level, correct, total, passMin])
 
   const handleBack = () => router.push("/dashboard")
   const handleRetry = () => router.push("/exercises/comp-5-4/intermedio/ej1")
@@ -85,7 +86,7 @@ function ResultsIntermedioContent() {
                 <p className="mt-1 text-gray-600">
                   {passed
                     ? "Has completado exitosamente esta competencia"
-                    : "Necesitas al menos 2 respuestas correctas para avanzar"}
+                    : `Necesitas al menos ${passMin} respuestas correctas para avanzar`}
                 </p>
 
                 <div className="mt-2 text-xs text-gray-500">
@@ -170,6 +171,7 @@ function ResultsIntermedioContent() {
                     {q3 ? "Correcta" : "Incorrecta"}
                   </span>
                 </div>
+
               </div>
 
               {/* Acciones */}
