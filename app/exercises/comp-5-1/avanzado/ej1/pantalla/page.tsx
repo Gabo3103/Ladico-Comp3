@@ -1,7 +1,7 @@
 "use client"
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageIcon, MessageCircle, Gamepad2, Film, Wifi, Signal, BatteryFull, X } from "lucide-react"
+import { Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageIcon, Images, MessageCircle, Gamepad2, Film, Wifi, Signal, BatteryFull, X } from "lucide-react"
 import FullScreenShell from "@/components/FullScreenShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
@@ -17,7 +17,7 @@ const APPS: App[] = [
   { id: "juego", name: "Juego 3D Pro", size: 4.2, use: "hace 3 meses", icon: Gamepad2 },
   { id: "videos", name: "Videos guardados", size: 3.1, use: "hace 2 meses", icon: Film },
   { id: "whatsapp", name: "WhatsApp", size: 1.8, use: "hoy", keep: true, icon: MessageCircle },
-  { id: "fotos", name: "Fotos del viaje", size: 0.9, use: "ayer", keep: true, icon: ImageIcon },
+  { id: "fotos", name: "Fotos del viaje", size: 0.9, use: "ayer", keep: true, icon: Images },
   { id: "camara", name: "Cámara", size: 0.12, use: "hoy", system: true, keep: true, icon: Camera },
 ]
 const PHOTOS = ["from-amber-300 to-rose-300", "from-sky-300 to-indigo-300", "from-emerald-300 to-teal-300", "from-fuchsia-300 to-purple-300", "from-orange-300 to-red-300", "from-lime-300 to-green-300"]
@@ -54,7 +54,7 @@ export default function Page() {
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Avanzado"
       index={1} total={3}
       title="Liberar almacenamiento para usar la cámara"
-      instruction={'Caso práctico con entorno interactivo.\n\nSituación: Un familiar le pide tomarle una fotografía para un trámite urgente. Al abrir la cámara aparece un problema. Use el teléfono como lo haría normalmente, resuélvalo y tome la foto. Cuando termine, presione Siguiente.'}
+      instruction={'Un familiar le pide tomarle una fotografía para un trámite urgente. Al abrir la cámara aparece un problema. Use el teléfono como lo haría normalmente, resuélvalo y tome la foto.'}
       onNext={handleNext}
     >
       <div className="mx-auto w-full max-w-[360px] rounded-[2.6rem] border-[10px] border-gray-900 bg-black overflow-hidden shadow-2xl">

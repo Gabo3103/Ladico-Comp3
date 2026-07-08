@@ -46,7 +46,7 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={3} total={3}
       title="¿Qué aprender para vender en línea?"
-      instruction={'Elegir una opción en cada fila.\n\nSituación: tiene un pequeño negocio de productos caseros y quiere empezar a vender por internet y recibir pagos. Para cada necesidad, elija el tipo de aprendizaje o apoyo más proporcional a su complejidad.'}
+      instruction={'Tiene un pequeño negocio de productos caseros y quiere empezar a vender por internet y recibir pagos. Para cada necesidad, elija el tipo de aprendizaje o apoyo más proporcional a su complejidad.'}
       onNext={handleNext} nextLabel="Finalizar" nextDisabled={sel.some(s => s === null)}
     >
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} filas respondidas</p>

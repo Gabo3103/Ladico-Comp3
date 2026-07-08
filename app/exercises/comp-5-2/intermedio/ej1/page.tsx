@@ -42,7 +42,7 @@ export default function Page() {
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Intermedio"
       index={1} total={3}
       title="Elegir la función digital adecuada"
-      instruction={'Elegir una opción en cada fila. En algunas filas, las opciones pueden cambiar.\n\nInstrucción: para cada situación, elija la función digital de asistencia más adecuada. Debe marcar una opción por fila.'}
+      instruction={'Para cada situación, elija la función digital de asistencia más adecuada. Debe marcar una opción por fila.'}
       onNext={handleNext} nextDisabled={sel.some(s => s === null)}
     >
       <p className="text-sm text-gray-600 mb-3" aria-live="polite">

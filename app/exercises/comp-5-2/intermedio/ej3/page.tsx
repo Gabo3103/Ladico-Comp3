@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
-import { Choice } from "@/components/Choice"
+import MultipleSelectionGrid from "@/components/MultipleSelectionGrid"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
 
@@ -44,14 +44,10 @@ export default function Page() {
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Intermedio"
       index={3} total={3}
       title="Herramientas para tareas repetitivas"
-      instruction={'Seleccionar más de una respuesta (la persona puede marcar más de una opción).\n\nSituación: un compañero pierde tiempo en tareas repetitivas (saludos a clientes vía notificación, búsqueda de rutas, registro de gastos). Seleccione las recomendaciones que aprovechan herramientas de asistencia digital para optimizarlas.'}
+      instruction={'Un compañero pierde tiempo en tareas repetitivas (saludos a clientes vía notificación, búsqueda de rutas, registro de gastos). Seleccione las recomendaciones que aprovechan herramientas de asistencia digital para optimizarlas.'}
       onNext={handleNext} nextLabel="Finalizar" nextDisabled={sel.size === 0}
     >
-      <div className="space-y-2" role="group" aria-label="Opciones de respuesta (puede marcar más de una)">
-        {OPTIONS.map((o, i) => (
-          <Choice key={i} variant="check" selected={sel.has(i)} onClick={() => toggle(i)}>{String.fromCharCode(65 + i)}) {o}</Choice>
-        ))}
-      </div>
+      <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
     </ExerciseShell>
   )
 }

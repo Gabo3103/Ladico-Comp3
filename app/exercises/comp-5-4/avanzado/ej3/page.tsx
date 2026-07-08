@@ -56,13 +56,13 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Avanzado"
       index={3} total={3}
       title="Apoyo proporcional a un familiar mayor"
-      instruction={'Parte 1: seleccionar una sola respuesta. Parte 2: elegir una opción en cada fila.\n\nSituación: usted acompaña a un familiar mayor que quiere "hacer su vida más fácil" usando el teléfono para videollamadas y enviar fotos a la familia, ganando autonomía. Identifique la verdadera necesidad de aprendizaje y, para cada tarea, elija el tipo de apoyo proporcional a su complejidad.'}
+      instruction={'Usted acompaña a un familiar mayor que quiere "Hacer su vida más fácil" usando el teléfono para videollamadas y enviar fotos a la familia, ganando autonomía. Identifique la verdadera necesidad de aprendizaje y, para cada tarea, elija el tipo de apoyo proporcional a su complejidad.'}
       onNext={handleNext} nextLabel="Finalizar" nextDisabled={p1 === null || rows.some(s => s === null)}
     >
       <div className="space-y-6">
         <div>
           <p className="text-base font-semibold text-gray-800 mb-2">Parte 1 — ¿Cuál es la verdadera necesidad de aprendizaje?</p>
-          <div className="space-y-2" role="radiogroup" aria-label="Parte 1: verdadera necesidad de aprendizaje">
+          <div className="space-y-2" role="radiogroup" aria-label="Parte 1: Verdadera necesidad de aprendizaje">
             {P1_OPTS.map((o, j) => (
               <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={p1 === j} onClick={() => setP1(j)}>{o}</Choice>
             ))}

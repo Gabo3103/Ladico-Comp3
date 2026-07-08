@@ -18,36 +18,36 @@ const STEPS: Step[] = [
     title: "Paso 1 — Entienda primero qué está fallando",
     options: [
       { id: "1a", label: "\"Abra el navegador y busque Google Forms o una herramienta de formularios gratuita.\"", correct: true, screen: "forms" },
-      { id: "1b", label: "\"Abra un documento de Word y escriba las preguntas para imprimirlas.\"", correct: false, screen: { title: "Documento de Word", text: "Las preguntas quedan escritas para imprimir en papel; será lento contar 120 respuestas." } },
-      { id: "1c", label: "\"Envíe un correo a cada vecino preguntándole individualmente su opinión.\"", correct: false, screen: { title: "Correo electrónico", text: "Redactando un correo para cada vecino, uno por uno." } },
-      { id: "1d", label: "\"Descargue un programa de encuestas de pago.\"", correct: false, screen: { title: "Programa de pago", text: "Pide una suscripción para continuar; no es necesario." } },
+      { id: "1b", label: "\"Abra un documento de Word y escriba las preguntas para imprimirlas.\"", correct: false, screen: { title: "Documento de Word", text: "Las preguntas quedan escritas en un documento para imprimir." } },
+      { id: "1c", label: "\"Envíe un correo a cada vecino preguntándole individualmente su opinión.\"", correct: false, screen: { title: "Correo electrónico", text: "Se abre un correo nuevo para escribir a los vecinos." } },
+      { id: "1d", label: "\"Descargue un programa de encuestas de pago.\"", correct: false, screen: { title: "Programa de encuestas de pago", text: "La página pide una suscripción para descargar el programa." } },
     ],
   },
   {
     title: "Paso 2 — ¿Cómo armar el formulario?",
     options: [
       { id: "2a", label: "\"Escriba un título descriptivo y agregue las preguntas con opciones de respuesta claras.\"", correct: true, screen: "formQ" },
-      { id: "2b", label: "\"Deje el formulario sin título y agregue solo una pregunta abierta.\"", correct: false, screen: { title: "Formulario sin título", text: "Una sola pregunta abierta, sin estructura; difícil de analizar." } },
-      { id: "2c", label: "\"Copie las preguntas de otra encuesta de Internet sin adaptarlas.\"", correct: false, screen: { title: "Preguntas copiadas", text: "Preguntas de otra encuesta que no se ajustan al tema de las cámaras." } },
-      { id: "2d", label: "\"Agregue la mayor cantidad de preguntas posible para obtener más información.\"", correct: false, screen: { title: "Formulario muy largo", text: "Demasiadas preguntas; los vecinos podrían no terminarlo." } },
+      { id: "2b", label: "\"Deje el formulario sin título y agregue solo una pregunta abierta.\"", correct: false, screen: { title: "Formulario sin título", text: "El formulario queda con una sola pregunta abierta." } },
+      { id: "2c", label: "\"Copie las preguntas de otra encuesta de Internet sin adaptarlas.\"", correct: false, screen: { title: "Preguntas pegadas", text: "Se pegan en el formulario preguntas de otra encuesta." } },
+      { id: "2d", label: "\"Agregue la mayor cantidad de preguntas posible para obtener más información.\"", correct: false, screen: { title: "Formulario extenso", text: "El formulario queda con muchas preguntas." } },
     ],
   },
   {
     title: "Paso 3 — ¿Cómo recoger las respuestas?",
     options: [
       { id: "3a", label: "\"Configure las respuestas como anónimas y comparta el enlace por el grupo de WhatsApp del edificio y por correo.\"", correct: true, screen: "responses" },
-      { id: "3b", label: "\"Pida que cada vecino firme con nombre completo y RUT para validar las respuestas.\"", correct: false, screen: { title: "Datos personales solicitados", text: "Pide nombre y RUT; muchos vecinos preferirán no responder." } },
-      { id: "3c", label: "\"Imprima el formulario y distribúyalo en papel por debajo de las puertas.\"", correct: false, screen: { title: "Formulario impreso", text: "Vuelve al papel, justo lo que la herramienta digital evitaba." } },
-      { id: "3d", label: "\"Publique el enlace en sus redes sociales personales para que más personas opinen.\"", correct: false, screen: { title: "Publicado en redes personales", text: "Personas ajenas al edificio podrían responder y distorsionar el resultado." } },
+      { id: "3b", label: "\"Pida que cada vecino firme con nombre completo y RUT para validar las respuestas.\"", correct: false, screen: { title: "Datos personales solicitados", text: "El formulario pide nombre y RUT en cada respuesta." } },
+      { id: "3c", label: "\"Imprima el formulario y distribúyalo en papel por debajo de las puertas.\"", correct: false, screen: { title: "Formulario impreso", text: "El formulario se imprime en papel." } },
+      { id: "3d", label: "\"Publique el enlace en sus redes sociales personales para que más personas opinen.\"", correct: false, screen: { title: "Enlace en redes personales", text: "El enlace queda publicado en el perfil personal." } },
     ],
   },
   {
     title: "Paso 4 — ¿Qué hacer con los resultados?",
     options: [
       { id: "4a", label: "\"Revise los resultados en el panel de respuestas y prepare un resumen para la próxima reunión de vecinos.\"", correct: true, screen: "summary" },
-      { id: "4b", label: "\"Cierre el formulario inmediatamente sin revisar los resultados.\"", correct: false, screen: { title: "Formulario cerrado", text: "Se cerró sin revisar; se desperdicia la información recogida." } },
-      { id: "4c", label: "\"Tome una decisión basándose solo en las primeras 10 respuestas.\"", correct: false, screen: { title: "Solo 10 respuestas", text: "Diez respuestas no representan a los 120 residentes." } },
-      { id: "4d", label: "\"Reenvíe el formulario todos los días hasta que respondan los 120 vecinos.\"", correct: false, screen: { title: "Reenvío diario", text: "El reenvío diario molesta a los vecinos y no es necesario." } },
+      { id: "4b", label: "\"Cierre el formulario inmediatamente sin revisar los resultados.\"", correct: false, screen: { title: "Formulario cerrado", text: "El formulario se cierra." } },
+      { id: "4c", label: "\"Tome una decisión basándose solo en las primeras 10 respuestas.\"", correct: false, screen: { title: "Diez respuestas", text: "Se toma una decisión con las primeras diez respuestas." } },
+      { id: "4d", label: "\"Reenvíe el formulario todos los días hasta que respondan los 120 vecinos.\"", correct: false, screen: { title: "Reenvío diario", text: "El formulario se reenvía cada día a los vecinos." } },
     ],
   },
 ]
@@ -188,7 +188,7 @@ export default function Page() {
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Avanzado"
       index={2} total={3}
       title="Guiar la creación de una encuesta en línea"
-      instruction={'Caso práctico con entorno interactivo.\n\nSituación: el presidente de la junta de vecinos necesita enviar una encuesta digital a los 120 residentes para decidir si instalan cámaras de seguridad, pero nunca ha creado un formulario en línea. Guíelo dándole una instrucción en cada paso. La pantalla de su computador muestra el resultado de la instrucción que usted elige; en cada paso solo puede dar una instrucción.'}
+      instruction={'El presidente de la junta de vecinos necesita enviar una encuesta digital a los 120 residentes para decidir si instalan cámaras de seguridad, pero nunca ha creado un formulario en línea. Guíelo dándole una instrucción en cada paso. La pantalla de su computador muestra el resultado de la instrucción que usted elige; en cada paso solo puede dar una instrucción.'}
       onNext={handleNext}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(300px,1fr)_1fr] gap-6 items-stretch">

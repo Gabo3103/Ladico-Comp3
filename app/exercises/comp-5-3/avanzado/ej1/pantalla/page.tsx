@@ -72,7 +72,7 @@ export default function Page() {
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Avanzado"
       index={1} total={3}
       title="Estrategia digital de una campaña solidaria"
-      instruction={'Caso práctico con entorno interactivo.\n\nSituación: unos colegas quieren organizar una campaña para apoyar a una compañera con un tratamiento costoso. Ella consintió la campaña, pero pidió no publicar detalles de su diagnóstico. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo difusión, recaudación, transparencia y comunicación. Para cada herramienta, abra y elija una acción.'}
+      instruction={'Unos colegas quieren organizar una campaña para apoyar a una compañera con un tratamiento costoso. Ella consintió la campaña, pero pidió no publicar detalles de su diagnóstico. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo difusión, recaudación, transparencia y comunicación. Para cada herramienta, abra y elija una acción.'}
       onNext={handleNext}
     >
       {/* Barra de progreso de dimensiones */}

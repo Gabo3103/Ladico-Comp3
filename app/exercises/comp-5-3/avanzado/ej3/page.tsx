@@ -79,7 +79,7 @@ export default function Page() {
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Avanzado"
       index={3} total={3}
       title="Estrategia digital para vender en línea"
-      instruction={'Caso práctico con entorno interactivo.\n\nSituación: su vecina es artesana del cuero y solo vende en ferias los fines de semana. Quiere empezar a vender por Internet, invirtiendo lo mínimo y con una solución que pueda mantener sola. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo presencia digital, material visual, gestión de pedidos y comunicación. Para cada herramienta, abra y elija una acción.'}
+      instruction={'Su vecina es artesana del cuero y solo vende en ferias los fines de semana. Quiere empezar a vender por Internet, invirtiendo lo mínimo y con una solución que pueda mantener sola. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo presencia digital, material visual, gestión de pedidos y comunicación. Para cada herramienta, abra y elija una acción.'}
       onNext={handleNext} nextLabel="Finalizar"
       nextDisabled={usedTools.length < 4}
     >

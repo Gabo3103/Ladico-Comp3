@@ -31,6 +31,13 @@ const AREA3_DEMO_COMPETENCES = [
   { id: "3.4", label: "Pensamiento computacional" },
 ] as const
 
+const AREA5_DEMO_COMPETENCES = [
+  { id: "5.1", label: "Identificar y resolver problemas técnicos" },
+  { id: "5.2", label: "Necesidades y respuestas tecnológicas" },
+  { id: "5.3", label: "Uso creativo de tecnologías digitales" },
+  { id: "5.4", label: "Necesidades de competencia digital" },
+] as const
+
 export default function Sidebar() {
   const { logout, userData, user, isProfesor } = useAuth()
   const pathname = usePathname()
@@ -40,7 +47,7 @@ export default function Sidebar() {
   const isAdmin = user?.email?.endsWith('@admin.com') || false
   const demoMode = isProfesor || isAdmin
 
-  const goToDemo = (competenceId: string, level: "intermedio" | "avanzado") => {
+  const goToDemo = (competenceId: string, level: "basico" | "intermedio" | "avanzado") => {
     setIsOpen(false)
     router.push(firstExerciseRoute(competenceId, level))
   }
@@ -152,52 +159,107 @@ export default function Sidebar() {
             </Link>
 
             {demoMode && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="flex w-full items-center px-4 py-3 text-sm font-medium rounded-xl text-white hover:bg-[#94b2ba] hover:text-white transition-colors mb-2 border border-white/20"
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="flex w-full items-center px-4 py-3 text-sm font-medium rounded-xl text-white hover:bg-[#94b2ba] hover:text-white transition-colors mb-2 border border-white/20"
+                    >
+                      <Eye className="w-5 h-5 mr-3" />
+                      Demo Área 3
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-64 border border-slate-200 bg-white text-slate-800 shadow-lg"
+                    style={{ zIndex: 9999 }}
                   >
-                    <Eye className="w-5 h-5 mr-3" />
-                    Demo Área 3
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="w-64 border border-slate-200 bg-white text-slate-800 shadow-lg"
-                  style={{ zIndex: 9999 }}
-                >
-                  <DropdownMenuLabel className="text-slate-700">
-                    Elige competencia y nivel
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-slate-200" />
-                  {AREA3_DEMO_COMPETENCES.map((comp) => (
-                    <DropdownMenuSub key={comp.id}>
-                      <DropdownMenuSubTrigger className="focus:bg-slate-100 data-[state=open]:bg-slate-100">
-                        {comp.id} — {comp.label}
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent
-                          className="border border-slate-200 bg-white text-slate-800 shadow-lg"
-                          style={{ zIndex: 9999 }}
-                        >
-                          <DropdownMenuItem
-                            className="cursor-pointer focus:bg-slate-100"
-                            onSelect={() => goToDemo(comp.id, "intermedio")}
+                    <DropdownMenuLabel className="text-slate-700">
+                      Elige competencia y nivel
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-slate-200" />
+                    {AREA3_DEMO_COMPETENCES.map((comp) => (
+                      <DropdownMenuSub key={comp.id}>
+                        <DropdownMenuSubTrigger className="focus:bg-slate-100 data-[state=open]:bg-slate-100">
+                          {comp.id} — {comp.label}
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent
+                            className="border border-slate-200 bg-white text-slate-800 shadow-lg"
+                            style={{ zIndex: 9999 }}
                           >
-                            Intermedio
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer focus:bg-slate-100"
-                            onSelect={() => goToDemo(comp.id, "avanzado")}
+                            <DropdownMenuItem
+                              className="cursor-pointer focus:bg-slate-100"
+                              onSelect={() => goToDemo(comp.id, "intermedio")}
+                            >
+                              Intermedio
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer focus:bg-slate-100"
+                              onSelect={() => goToDemo(comp.id, "avanzado")}
+                            >
+                              Avanzado
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="flex w-full items-center px-4 py-3 text-sm font-medium rounded-xl text-white hover:bg-[#94b2ba] hover:text-white transition-colors mb-2 border border-white/20"
+                    >
+                      <Eye className="w-5 h-5 mr-3" />
+                      Demo Área 5
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-72 border border-slate-200 bg-white text-slate-800 shadow-lg"
+                    style={{ zIndex: 9999 }}
+                  >
+                    <DropdownMenuLabel className="text-slate-700">
+                      Elige competencia y nivel
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-slate-200" />
+                    {AREA5_DEMO_COMPETENCES.map((comp) => (
+                      <DropdownMenuSub key={comp.id}>
+                        <DropdownMenuSubTrigger className="focus:bg-slate-100 data-[state=open]:bg-slate-100">
+                          {comp.id} — {comp.label}
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent
+                            className="border border-slate-200 bg-white text-slate-800 shadow-lg"
+                            style={{ zIndex: 9999 }}
                           >
-                            Avanzado
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                            <DropdownMenuItem
+                              className="cursor-pointer focus:bg-slate-100"
+                              onSelect={() => goToDemo(comp.id, "basico")}
+                            >
+                              Básico
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer focus:bg-slate-100"
+                              onSelect={() => goToDemo(comp.id, "intermedio")}
+                            >
+                              Intermedio
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer focus:bg-slate-100"
+                              onSelect={() => goToDemo(comp.id, "avanzado")}
+                            >
+                              Avanzado
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             )}
 
             <button

@@ -76,7 +76,7 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={2} total={3}
       title="Armar un plan ante un cambio de acceso"
-      instruction={'Elegir una opción en cada etapa (plan paso a paso).\n\nSituación: Usted utiliza este servicio digital con frecuencia para realizar trámites importantes. El sistema anuncia que el proceso de ingreso cambiará el próximo mes y que será necesario utilizar un nuevo método de verificación. Desea prepararse con anticipación para seguir utilizando el servicio sin dificultades. Ordene las siguientes acciones desde la primera hasta la última.'}
+      instruction={'Usted utiliza este servicio digital con frecuencia para realizar trámites importantes. El sistema anuncia que el proceso de ingreso cambiará el próximo mes y que será necesario utilizar un nuevo método de verificación. Desea prepararse con anticipación para seguir utilizando el servicio sin dificultades. Ordene las siguientes acciones desde la primera hasta la última.'}
       onNext={handleNext} nextDisabled={sel.some(s => s === null)}
     >
       <UpdateNoticePreview />

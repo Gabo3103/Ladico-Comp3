@@ -81,7 +81,7 @@ export default function Page() {
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Avanzado"
       index={2} total={3}
       title="Apoyar a una persona con dificultad auditiva en una videollamada"
-      instruction={'Configurar la videollamada.\n\nSituación: acompaña a una persona con dificultad auditiva en la videollamada que se muestra. Abra el menú de accesibilidad (botón Apoyos) y active los apoyos que esta app ofrece para que pueda seguir la conversación. Cada app ofrece cosas distintas: active solo lo pertinente y deje lo que no ayuda a escuchar.'}
+      instruction={'Acompaña a una persona con dificultad auditiva en la videollamada que se muestra. Abra el menú de accesibilidad (botón Apoyos) y active los apoyos que esta app ofrece para que pueda seguir la conversación. Cada app ofrece cosas distintas: active solo lo pertinente y deje lo que no ayuda a escuchar.'}
       onNext={handleNext}
       nextDisabled={on.size === 0}
     >

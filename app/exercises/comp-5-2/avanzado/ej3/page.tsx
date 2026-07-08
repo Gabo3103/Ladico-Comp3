@@ -55,7 +55,7 @@ export default function Page() {
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Avanzado"
       index={3} total={3}
       title="Ajustar el panel de apoyo de una solicitud en línea"
-      instruction={'Configurar el panel (activar o desactivar cada opción).\n\nSituación: una persona con poca experiencia debe completar una solicitud de varios pasos y teme perder su avance. Ajuste el panel: active los apoyos que la protegen y desactive las opciones riesgosas. Algunas opciones ya vienen activadas.'}
+      instruction={'Una persona con poca experiencia debe completar una solicitud de varios pasos y teme perder su avance. Ajuste el panel: active los apoyos que la protegen y desactive las opciones riesgosas. Algunas opciones ya vienen activadas.'}
       onNext={handleNext} nextLabel="Finalizar" nextDisabled={!hasAdjusted}
     >
       <div className="max-w-2xl mx-auto rounded-2xl border-2 border-gray-300 bg-white overflow-hidden shadow-lg">

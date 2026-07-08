@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
-import { Choice } from "@/components/Choice"
+import MultipleSelectionGrid from "@/components/MultipleSelectionGrid"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
 
@@ -40,14 +40,10 @@ export default function Page() {
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Intermedio"
       index={1} total={3}
       title="Resolver un problema de conexión de correo"
-      instruction={'Selección múltiple (seleccione todas las estrategias adecuadas).\n\nSituación: Su aplicación de correo electrónico muestra el mensaje "Error de conexión con el servidor" desde hace 20 minutos. Usted espera una respuesta laboral urgente y necesita acceder a su bandeja de entrada lo antes posible.\n\nSeleccione TODAS las estrategias de resolución que considere adecuadas para este problema.'}
+      instruction={'Su aplicación de correo electrónico muestra el mensaje "Error de conexión con el servidor" desde hace 20 minutos. Usted espera una respuesta laboral urgente y necesita acceder a su bandeja de entrada lo antes posible.\n\nSeleccione TODAS las estrategias de resolución que considere adecuadas para este problema.'}
       onNext={handleNext} nextDisabled={sel.size === 0}
     >
-      <div className="space-y-2" role="group" aria-label="Opciones de respuesta (puede marcar más de una)">
-        {OPTIONS.map((o, i) => (
-          <Choice key={i} variant="check" selected={sel.has(i)} onClick={() => toggle(i)}>{String.fromCharCode(65 + i)}) {o}</Choice>
-        ))}
-      </div>
+      <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
     </ExerciseShell>
   )
 }

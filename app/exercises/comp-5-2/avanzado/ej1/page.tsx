@@ -53,7 +53,7 @@ export default function Page() {
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Avanzado"
       index={1} total={3}
       title="Detectar las barreras de accesibilidad"
-      instruction={'Marcar zonas en una página web (se abre en una ventana aparte).\n\nSituación: revise el portal de agenda de horas médicas y marque únicamente los elementos que constituyen una barrera de accesibilidad. Abra el portal con el botón, márquelos allí (haga clic para resaltar en rojo) y cierre la ventana. Luego vuelva aquí y presione Siguiente.'}
+      instruction={'Revise el portal de agenda de horas médicas y marque únicamente los elementos que constituyen una barrera de accesibilidad. Abra el portal con el botón, márquelos allí y cierre la ventana.'}
       onNext={handleNext}
       nextDisabled={marks.length === 0}
     >

@@ -42,7 +42,7 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={1} total={3}
       title="¿Qué necesita aprender para evitar el problema?"
-      instruction={'Elegir una opción en cada fila.\n\nSituación: en las últimas semanas cometió errores con herramientas digitales que le obligaron a repetir trabajo. Para cada caso, identifique el aprendizaje que necesita desarrollar para evitar que el mismo problema vuelva a ocurrir.'}
+      instruction={'En las últimas semanas cometió errores con herramientas digitales que le obligaron a repetir trabajo. Para cada caso, identifique el aprendizaje que necesita desarrollar para evitar que el mismo problema vuelva a ocurrir.'}
       onNext={handleNext} nextDisabled={sel.some(s => s === null)}
     >
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} casos respondidos</p>

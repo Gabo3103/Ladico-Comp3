@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
-import { Choice } from "@/components/Choice"
+import MultipleSelectionGrid from "@/components/MultipleSelectionGrid"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
 
@@ -37,14 +37,10 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Avanzado"
       index={1} total={3}
       title="Apoyar la autonomía digital de un adolescente"
-      instruction={'Seleccionar más de una respuesta (la persona puede marcar más de una opción).\n\nSituación: usted acompaña a un adolescente para que aprenda a manejar de forma autónoma y segura su tiempo de pantalla y su privacidad en el teléfono. Marque qué conviene enseñarle y acordar con él para que logre esa autonomía.'}
+      instruction={'Usted acompaña a un adolescente para que aprenda a manejar de forma autónoma y segura su tiempo de pantalla y su privacidad en el teléfono. Marque qué conviene enseñarle y acordar con él para que logre esa autonomía.'}
       onNext={handleNext} nextDisabled={sel.size === 0}
     >
-      <div className="space-y-2" role="group" aria-label="Opciones de respuesta (puede marcar más de una)">
-        {OPTIONS.map((o, i) => (
-          <Choice key={i} variant="check" selected={sel.has(i)} onClick={() => toggle(i)}>{String.fromCharCode(65 + i)}) {o}</Choice>
-        ))}
-      </div>
+      <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
     </ExerciseShell>
   )
 }
