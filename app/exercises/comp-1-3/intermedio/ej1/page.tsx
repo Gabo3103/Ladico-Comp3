@@ -28,7 +28,7 @@ import Link from "next/link";
 /* ======= Progreso/registro ========= */
 import { useAuth } from "@/contexts/AuthContext";
 import { ensureSession, markAnswered } from "@/lib/testSession";
-import { setPoint } from "@/lib/levelProgress";
+import {  } from "@/lib/levelProgress";
 import { useRouter } from "next/navigation";
 
 // ======= Puntaje/sesión =======

@@ -227,7 +227,7 @@ export default function Page() {
       q2: String(q2),
       q3: String(q3),
     })
-    router.push(`/test/comp-4-3-intermedio/results?${qs.toString()}`)
+    router.push(`/test/comp-4-3-?${qs.toString()}`)
   }
 
   const progressPct = 100

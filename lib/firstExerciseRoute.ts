@@ -15,6 +15,14 @@ export function firstExerciseRoute(competenceId: string, level: LevelSlug): stri
       avanzado: "/exercises/comp-1-3/avanzado/ej1",
     },
 
+    // Programación 3.4
+    "3.4": {
+      basico: "/test/1.3?level=básico", // 
+      intermedio: "/exercises/comp-3-4/intermedio/ej1", // 
+      avanzado: "/exercises/comp-3-4/avanzado/ej1",   
+    },
+
+
     // Seguridad 4.3
     "4.3": {
       basico: "/test/4.3?level=básico",
