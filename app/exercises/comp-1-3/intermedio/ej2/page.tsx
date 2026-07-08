@@ -255,7 +255,7 @@ function validateExercise(root: FileItem) {
   return { ok: true, reason: "¡Correcto!" };
 }
 
-export function FileExplorerEmbedded() {
+function FileExplorerEmbedded() {
   const [tree, setTree] = useState<FileItem>(() => deepClone(demoRoot));
   const [path, setPath] = useState<string[]>(["Computer"]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ root: true });
