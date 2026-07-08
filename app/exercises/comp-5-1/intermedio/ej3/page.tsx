@@ -71,7 +71,7 @@ export default function Page() {
       index={3} total={3}
       title="Configuraciones preventivas del teléfono"
       instruction={"Completar la oración (seleccione la opción correcta para cada enunciado).\n\nSituación: Desea optimizar el funcionamiento y la seguridad de su teléfono realizando ajustes preventivos. Complete cada enunciado eligiendo la opción más adecuada."}
-      onNext={handleNext} nextLabel="Finalizar"
+      onNext={handleNext} nextLabel="Finalizar" nextDisabled={ans.some(a => a === null)}
     >
       <div className="space-y-6">
         {ENUNCIADOS.map((e, i) => (

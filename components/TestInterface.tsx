@@ -30,10 +30,10 @@ function CircularTimer({
   const dashoffset = C * (1 - pct);
 
   return (
-    <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
-      <div className="relative w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center">
+    <div className="absolute -top-7 left-1/2 -translate-x-1/2 z-10">
+      <div className="relative w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center">
         {/* fondo del anillo */}
-        <svg className="w-20 h-20 rotate-[-90deg]" viewBox="0 0 80 80">
+        <svg className="w-16 h-16 rotate-[-90deg]" viewBox="0 0 80 80">
           <circle
             cx="40"
             cy="40"
@@ -59,7 +59,7 @@ function CircularTimer({
 
         {/* número al centro */}
         <div className={`absolute inset-0 flex items-center justify-center`}>
-          <span className={`font-bold text-xl ${invalidated ? "text-red-600" : "text-[#286575]"}`}>
+          <span className={`font-bold text-base ${invalidated ? "text-red-600" : "text-[#286575]"}`}>
             {clamped}
           </span>
         </div>
@@ -116,6 +116,9 @@ export default function TestInterface({
   const progress = ((currentIndex + 1) / totalQuestions) * 100
   const competenceCode = currentQuestion?.competence
   const competenceName = getCompetenceTitle(competenceCode)
+  const hasAnswer = Array.isArray(selectedAnswer)
+    ? selectedAnswer.length > 0
+    : selectedAnswer !== null
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (currentQuestion?.type === "multiple-response") {
@@ -293,18 +296,18 @@ export default function TestInterface({
     <div className="min-h-screen bg-[#f3fbfb]">
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 rounded-b-2xl">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-3">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-2 sm:py-2.5">
           <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between text-white space-y-2 sm:space-y-0">
             <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-4">
               <Link href="/dashboard">
                 <img
                   src="/ladico_green.png"
                   alt="Ladico Logo"
-                  className="w-24 h-24 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                  className="w-16 h-16 object-contain cursor-pointer hover:opacity-80 transition-opacity"
                 />
               </Link>
 
-              <span className="text-[#2e6372] sm:text-sm opacity-80 bg-white/10 px-2 sm:px-3 py-1 rounded-full text-center">
+              <span className="text-[#2e6372] text-xs sm:text-sm opacity-80 bg-white/10 px-2 sm:px-3 py-1 rounded-full text-center">
                 {currentQuestion?.dimension} | {competenceCode}
                 {competenceName ? ` ${competenceName}` : ""} - {" Nivel "}
                 {testSession.level?.toString().toLowerCase?.() === "intermedio"
@@ -333,25 +336,25 @@ export default function TestInterface({
               </span>
             </div>
           </div>
-          
+
           {/* Progreso compacto, pegado al header */}
           <div className="mt-1">
-            <div className="flex items-center justify-between text-[#286575] mb-2">
-              <span className="text-xs sm:text-sm font-medium bg-white/40 px-2 sm:px-3 py-1 rounded-full">
+            <div className="flex items-center justify-between text-[#286575] mb-1.5">
+              <span className="text-xs font-medium bg-white/40 px-2 sm:px-3 py-1 rounded-full">
                 Pregunta {currentIndex + 1} de {totalQuestions}
               </span>
               <div className="flex space-x-1 sm:space-x-2">
                 {Array.from({ length: totalQuestions }, (_, index) => (
                   <div
                     key={index}
-                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+                    className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
                       index <= currentIndex ? "bg-[#286575] shadow-lg" : "bg-[#dde3e8]"
                     }`}
                   />
                 ))}
               </div>
             </div>
-            <div className="h-1.5 sm:h-2 bg-[#dde3e8] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-[#dde3e8] rounded-full overflow-hidden">
               <div
                 className="h-full bg-[#286575] rounded-full transition-all duration-500 ease-in-out shadow-sm"
                 style={{ width: `${progress}%` }}
@@ -403,36 +406,36 @@ export default function TestInterface({
           </Alert>
         </div>
       )}
-      <div className="h-6 sm:h-8" aria-hidden />
+      <div className="h-5 sm:h-6" aria-hidden />
 
       {/* Tarjeta de pregunta */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6 sm:pb-8">
         <Card className="bg-white shadow-2xl rounded-2xl sm:rounded-3xl border-0 transition-all duration-300 relative ring-2 ring-[#286575] ring-opacity-30 shadow-[#286575]/10">
-          <CardContent className="p-4 sm:p-6 lg:p-8">
+          <CardContent className="p-4 sm:p-6">
             {/* Timer circular */}
             <CircularTimer timeLeft={timeLeft} total={QUESTION_TIME} invalidated={invalidated} />
             {/* (opcional) separador visual para que no choque con el contenido */}
-            <div className="h-6" />
+            <div className="h-5" />
             {/* Escenario */}
-            <div className="mb-6 sm:mb-8">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
+            <div className="mb-5 sm:mb-6">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-2 sm:mb-3">
                 {currentQuestion?.title}
               </h2>
-              <div className="bg-gray-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-l-4 border-[#286575]">
-                <p className="text-gray-700 leading-relaxed font-medium text-sm sm:text-base">
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border-l-4 border-[#286575]">
+                <p className="text-gray-700 leading-snug font-medium text-sm">
                   {currentQuestion?.scenario}
                 </p>
               </div>
             </div>
 
             {/* Título e instrucciones */}
-            <div className="mb-6 sm:mb-8">
-              <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 bg-blue-50 px-3 sm:px-4 py-2 rounded-full inline-block">
+            <div className="mb-5 sm:mb-6">
+              <p className="text-xs text-gray-600 mb-3 sm:mb-4 bg-blue-50 px-3 py-1.5 rounded-full inline-block">
                 {currentQuestion?.type === "multiple-response" ? "Selección múltiple" : "Selección única"}
               </p>
 
               {/* Opciones */}
-              <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-2.5">
                 {currentQuestion?.options?.map((option: string, index: number) => {
                   const isSelected = Array.isArray(selectedAnswer)
                     ? selectedAnswer.includes(index)
@@ -441,15 +444,15 @@ export default function TestInterface({
                   return (
                   <label
                     key={index}
-                    className={`flex items-start space-x-3 sm:space-x-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 ${
+                    className={`flex items-start space-x-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${
                       invalidated
                         ? "border-gray-200 bg-gray-100 opacity-60 cursor-not-allowed"
                         : isSelected
-                        ? "border-[#286575] bg-[#e6f2f3] shadow-md transform scale-[1.01] sm:scale-[1.02] cursor-pointer"
+                        ? "border-[#286575] bg-[#e6f2f3] shadow-md cursor-pointer"
                         : "border-gray-200 hover:border-[#286575] hover:bg-gray-50 hover:shadow-sm cursor-pointer"
                     }`}
                   >
-                    <div className="relative mt-1">
+                    <div className="relative mt-0.5">
                       <input
                         type={currentQuestion.type === "multiple-response" ? "checkbox" : "radio"}
                         name="answer"
@@ -460,7 +463,7 @@ export default function TestInterface({
                         className="sr-only"
                       />
                       <div
-                        className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 transition-all ${
+                        className={`w-4 h-4 rounded-full border-2 transition-all ${
                            isSelected
                             ? "border-[#286575] bg-[#286575]"
                             : "border-gray-300"
@@ -471,7 +474,7 @@ export default function TestInterface({
                         )}
                       </div>
                     </div>
-                    <span className="text-gray-700 leading-relaxed flex-1 text-sm sm:text-base">
+                    <span className="text-gray-700 leading-snug flex-1 text-sm">
                       {option}
                     </span>
                   </label>
@@ -487,7 +490,7 @@ export default function TestInterface({
                   <Button
                     onClick={handlePrev}
                     variant="outline"
-                    className="flex-1 sm:flex-none px-6 sm:px-8 py-3 bg-transparent border-2 border-gray-300 hover:border-gray-400 rounded-xl sm:rounded-2xl font-medium transition-all text-sm sm:text-base"
+                    className="flex-1 sm:flex-none px-6 py-2.5 bg-transparent border-2 border-gray-300 hover:border-gray-400 rounded-xl sm:rounded-2xl font-medium transition-all text-sm"
                   >
                     Anterior
                   </Button>
@@ -496,18 +499,18 @@ export default function TestInterface({
 
               <Button
                 onClick={() => handleNext(false)}
-                disabled={selectedAnswer === null || invalidated}
-                className="w-full sm:w-auto px-8 sm:px-10 py-3 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white sm:text-lg shadow-lg hover:bg-[#3a7d89] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!hasAnswer || invalidated}
+                className="w-full sm:w-auto px-8 sm:px-10 py-2.5 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white shadow-lg hover:bg-[#3a7d89] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLastQuestion ? "Finalizar" : "Siguiente"}
               </Button>
             </div>
 
             {/* Ayuda */}
-            {selectedAnswer === null && !invalidated && (
-              <div className="mt-4 sm:mt-6 flex items-center justify-center space-x-3 text-blue-600 bg-blue-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
-                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-blue-100 flex items-center justify-center animate-pulse">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-600" />
+            {!hasAnswer && !invalidated && (
+              <div className="mt-4 flex items-center justify-center space-x-3 text-blue-600 bg-blue-50 p-3 rounded-xl">
+                <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center animate-pulse">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
                 </div>
                 <span className="text-xs sm:text-sm font-medium">
                   Por favor, selecciona una respuesta para continuar

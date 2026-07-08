@@ -56,6 +56,7 @@ export default function Page() {
       title="Transmitir fotos a la Smart TV"
       instruction={'Caso práctico con entorno interactivo.\n\nSituación: Quiere mostrar las fotos del viaje en la Smart TV, pero al abrir "Transmitir pantalla" aparece "No se encontraron televisores." La TV está encendida y con pantalla compartida activa. Observe la TV y el router, opere su celular y logre la transmisión. Al terminar, presione Finalizar.'}
       onNext={handleNext}
+      nextDisabled={!transmitted}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
         {/* IZQUIERDA: Smart TV + Router (apilados) */}

@@ -56,6 +56,7 @@ export default function Page() {
       title="Liberar almacenamiento para usar la cámara"
       instruction={'Caso práctico con entorno interactivo.\n\nSituación: Un familiar le pide tomarle una fotografía para un trámite urgente. Al abrir la cámara aparece un problema. Use el teléfono como lo haría normalmente, resuélvalo y tome la foto. Cuando termine, presione Siguiente.'}
       onNext={handleNext}
+      nextDisabled={!cameraOk || removedWrong}
     >
       <div className="mx-auto w-full max-w-[360px] rounded-[2.6rem] border-[10px] border-gray-900 bg-black overflow-hidden shadow-2xl">
         <div className="bg-gray-900 text-white flex items-center justify-between px-6 py-1.5 text-xs">

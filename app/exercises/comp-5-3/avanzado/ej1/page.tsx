@@ -74,6 +74,7 @@ export default function Page() {
       title="Estrategia digital de una campaña solidaria"
       instruction={'Caso práctico con entorno interactivo.\n\nSituación: unos colegas quieren organizar una campaña para apoyar a una compañera con un tratamiento costoso. Ella consintió la campaña, pero pidió no publicar detalles de su diagnóstico. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo difusión, recaudación, transparencia y comunicación. Para cada herramienta, abra y elija una acción.'}
       onNext={handleNext}
+      nextDisabled={usedTools.length < 4}
     >
       {/* Barra de progreso de dimensiones */}
       <div className="max-w-3xl mx-auto mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 flex flex-wrap items-center gap-x-5 gap-y-2">

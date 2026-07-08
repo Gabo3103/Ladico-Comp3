@@ -82,6 +82,7 @@ export default function Page() {
       title="Guiar paso a paso a otra persona"
       instruction={'Caso práctico con entorno interactivo.\n\nSituación: Su madre le dice que no puede ver las fotos que le mandan por WhatsApp ("no se pueden descargar") ni enviar audios, pero los mensajes de texto sí le llegan. Guíela dándole una instrucción en cada paso. La madre ejecuta lo que usted elige y el teléfono muestra el resultado; luego la simulación avanza al siguiente paso. Elige con cuidado: en cada paso solo puede dar una instrucción.'}
       onNext={handleNext}
+      nextDisabled={!solved}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 items-stretch">
         <div className="w-full mx-auto lg:mx-0 rounded-[2.6rem] border-[10px] border-gray-900 bg-white overflow-hidden shadow-2xl flex flex-col min-h-[520px]">

@@ -81,6 +81,7 @@ export default function Page() {
       title="Estrategia digital para vender en línea"
       instruction={'Caso práctico con entorno interactivo.\n\nSituación: su vecina es artesana del cuero y solo vende en ferias los fines de semana. Quiere empezar a vender por Internet, invirtiendo lo mínimo y con una solución que pueda mantener sola. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo presencia digital, material visual, gestión de pedidos y comunicación. Para cada herramienta, abra y elija una acción.'}
       onNext={handleNext} nextLabel="Finalizar"
+      nextDisabled={usedTools.length < 4}
     >
       <div className="max-w-3xl mx-auto mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 flex flex-wrap items-center gap-x-5 gap-y-2">
         <span className="text-xs text-gray-500">Herramientas usadas: <b className="text-gray-800">{usedTools.length}</b></span>

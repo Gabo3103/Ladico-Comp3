@@ -46,8 +46,8 @@ export default function Page() {
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ETAPAS.length} pasos respondidos</p>
       <div className="space-y-5">
         {ETAPAS.map((e, i) => (
-          <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">
-            <p className="text-sm font-semibold text-gray-800 mb-3">{e.fin}</p>
+          <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
+            <p className="text-[13px] font-semibold text-gray-800 mb-2.5">{e.fin}</p>
             <div className="space-y-2" role="radiogroup" aria-label={e.fin}>
               {e.opts.map((o, j) => (
                 <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={sel[i] === j} onClick={() => pick(i, j)}>{o}</Choice>

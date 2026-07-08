@@ -23,12 +23,16 @@ export default function Page() {
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const byId = Object.fromEntries(STEPS.map(s => [s.id, s]))
   const [order, setOrder] = useState<number[]>(INITIAL)
+  const [hasMoved, setHasMoved] = useState(false)
 
-  const move = (idx: number, dir: -1 | 1) => setOrder(prev => {
-    const n = [...prev]; const j = idx + dir
-    if (j < 0 || j >= n.length) return prev
-    ;[n[idx], n[j]] = [n[j], n[idx]]; return n
-  })
+  const move = (idx: number, dir: -1 | 1) => {
+    setOrder(prev => {
+      const n = [...prev]; const j = idx + dir
+      if (j < 0 || j >= n.length) return prev
+      setHasMoved(true)
+      ;[n[idx], n[j]] = [n[j], n[idx]]; return n
+    })
+  }
 
   const handleNext = async () => {
     let ok = 0
@@ -45,7 +49,7 @@ export default function Page() {
       index={2} total={3}
       title="Configurar avisos de un medicamento"
       instruction={'Ordenar los pasos (del paso 1 al paso 4).\n\nSituación: debe configurar avisos automáticos de un medicamento (08:00, 14:00 y 21:00), visibles y sonoros. Ordene las cuatro acciones necesarias con las flechas (1 = primera, 4 = última).'}
-      onNext={handleNext}
+      onNext={handleNext} nextDisabled={!hasMoved}
     >
       <ol className="space-y-2">
         {order.map((id, idx) => (

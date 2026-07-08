@@ -52,8 +52,8 @@ export default function Page() {
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} filas respondidas</p>
       <div className="space-y-3">
         {ROWS.map((r, i) => (
-          <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">
-            <p className="text-sm text-gray-800 mb-3">{r.need}</p>
+          <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
+            <p className="text-[13px] text-gray-800 mb-2.5">{r.need}</p>
             <div className="grid sm:grid-cols-3 gap-2" role="radiogroup" aria-label={r.need}>
               {MENU.map((m, j) => (
                 <SegChoice key={j} selected={sel[i] === j} onClick={() => pick(i, j)}>{m}</SegChoice>

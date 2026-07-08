@@ -14,6 +14,16 @@ import type { TestSession, Question } from "@/types"
 
 type AnswerValue = number | number[] | null;
 
+function answersAreEqual(left: AnswerValue, right: number | number[]): boolean {
+  if (Array.isArray(left) && Array.isArray(right)) {
+    if (left.length !== right.length) return false
+    const sortedLeft = [...left].sort((a, b) => a - b)
+    const sortedRight = [...right].sort((a, b) => a - b)
+    return sortedLeft.every((value, index) => value === sortedRight[index])
+  }
+  return left === right
+}
+
 function TestResultsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -42,7 +52,9 @@ function TestResultsContent() {
   // === NUEVO: banderas q1, q2, q3 según respuestas ===
   const [q1, q2, q3] = useMemo<boolean[]>(() => {
     if (testQuestions.length >= 3 && userAnswers.length >= 3) {
-      return [0, 1, 2].map(i => userAnswers[i] === (testQuestions[i] as any)?.correctAnswerIndex)
+      return [0, 1, 2].map(i =>
+        answersAreEqual(userAnswers[i], testQuestions[i].correctAnswerIndex)
+      )
     }
     // Fallback: si no hay preguntas/respuestas en memoria,
     // marcamos como correctas las primeras "correctAnswers"

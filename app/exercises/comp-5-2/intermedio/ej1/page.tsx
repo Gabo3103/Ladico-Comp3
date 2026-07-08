@@ -43,8 +43,11 @@ export default function Page() {
       index={1} total={3}
       title="Elegir la función digital adecuada"
       instruction={'Elegir una opción en cada fila. En algunas filas, las opciones pueden cambiar.\n\nInstrucción: para cada situación, elija la función digital de asistencia más adecuada. Debe marcar una opción por fila.'}
-      onNext={handleNext}
+      onNext={handleNext} nextDisabled={sel.some(s => s === null)}
     >
+      <p className="text-sm text-gray-600 mb-3" aria-live="polite">
+        {sel.filter(s => s !== null).length} de {ROWS.length} casos respondidos
+      </p>
       <div className="space-y-4">
         {ROWS.map((r, i) => (
           <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">

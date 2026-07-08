@@ -27,11 +27,15 @@ export default function Page() {
   const router = useRouter()
   const { sessionId, mark } = useLadicoSession(COMPETENCE, "Avanzado", PREFIX)
   const [on, setOn] = useState<Set<string>>(new Set(DEFAULT_ON))
-  const toggle = (id: string) => setOn(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n })
+  const [hasAdjusted, setHasAdjusted] = useState(false)
+  const toggle = (id: string) => {
+    setHasAdjusted(true)
+    setOn(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
+  const supportsOn = OPTS.filter(o => o.support && on.has(o.id)).length
+  const riskyOn = OPTS.filter(o => !o.support && on.has(o.id)).length
 
   const handleNext = async () => {
-    const supportsOn = OPTS.filter(o => o.support && on.has(o.id)).length
-    const riskyOn = OPTS.filter(o => !o.support && on.has(o.id)).length
     const point: 0 | 1 = riskyOn === 0 && supportsOn >= 5 ? 1 : 0
     setPoint(COMPETENCE, "avanzado", 3, point)
     await mark(2, point === 1)
@@ -52,7 +56,7 @@ export default function Page() {
       index={3} total={3}
       title="Ajustar el panel de apoyo de una solicitud en línea"
       instruction={'Configurar el panel (activar o desactivar cada opción).\n\nSituación: una persona con poca experiencia debe completar una solicitud de varios pasos y teme perder su avance. Ajuste el panel: active los apoyos que la protegen y desactive las opciones riesgosas. Algunas opciones ya vienen activadas.'}
-      onNext={handleNext} nextLabel="Finalizar"
+      onNext={handleNext} nextLabel="Finalizar" nextDisabled={!hasAdjusted}
     >
       <div className="max-w-2xl mx-auto rounded-2xl border-2 border-gray-300 bg-white overflow-hidden shadow-lg">
         <div className="bg-gray-100 border-b px-4 py-2 flex items-center gap-2">

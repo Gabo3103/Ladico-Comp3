@@ -190,6 +190,7 @@ export default function Page() {
       title="Guiar la creación de una encuesta en línea"
       instruction={'Caso práctico con entorno interactivo.\n\nSituación: el presidente de la junta de vecinos necesita enviar una encuesta digital a los 120 residentes para decidir si instalan cámaras de seguridad, pero nunca ha creado un formulario en línea. Guíelo dándole una instrucción en cada paso. La pantalla de su computador muestra el resultado de la instrucción que usted elige; en cada paso solo puede dar una instrucción.'}
       onNext={handleNext}
+      nextDisabled={!done}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(300px,1fr)_1fr] gap-6 items-stretch">
         <div className="w-full flex flex-col">

@@ -38,8 +38,11 @@ export default function Page() {
       index={1} total={3}
       title="¿Enfoque centrado en las personas?"
       instruction={'Elegir una opción en cada fila.\n\nInstrucción: para cada situación, identifique si aplica o no un enfoque centrado en las personas (human-centric): colocar los derechos, valores y necesidades de las personas en el centro del diseño y uso de la tecnología.'}
-      onNext={handleNext}
+      onNext={handleNext} nextDisabled={sel.some(s => s === null)}
     >
+      <p className="text-sm text-gray-600 mb-3" aria-live="polite">
+        {sel.filter(s => s !== null).length} de {SITS.length} situaciones respondidas
+      </p>
       <div className="space-y-4">
         {SITS.map((s, i) => (
           <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">

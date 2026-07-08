@@ -55,6 +55,7 @@ export default function Page() {
       title="Detectar las barreras de accesibilidad"
       instruction={'Marcar zonas en una página web (se abre en una ventana aparte).\n\nSituación: revise el portal de agenda de horas médicas y marque únicamente los elementos que constituyen una barrera de accesibilidad. Abra el portal con el botón, márquelos allí (haga clic para resaltar en rojo) y cierre la ventana. Luego vuelva aquí y presione Siguiente.'}
       onNext={handleNext}
+      nextDisabled={marks.length === 0}
     >
       <div className="max-w-xl mx-auto text-center">
         <div className="rounded-2xl border border-gray-200 bg-white p-8">

@@ -36,7 +36,7 @@ export default function FullScreenShell({ label, index, total, title, instructio
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-5">
           <div className="flex items-start justify-between gap-3 mb-3">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">{title}</h1>
+            <h1 className="text-base sm:text-lg font-bold text-gray-900">{title}</h1>
             {instruction && (
               <button onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="exercise-instruction-fs" className="text-xs text-[#286575] flex items-center gap-1 shrink-0 mt-1 hover:underline focus-visible:ring-2 focus-visible:ring-[#286575] rounded">
                 {open ? <>Ocultar enunciado <ChevronUp className="w-3.5 h-3.5" /></> : <>Ver enunciado <ChevronDown className="w-3.5 h-3.5" /></>}
@@ -44,7 +44,7 @@ export default function FullScreenShell({ label, index, total, title, instructio
             )}
           </div>
           {instruction && open && (
-            <div id="exercise-instruction-fs" className="mb-5 bg-white p-4 rounded-xl border-l-4 border-[#286575]"><p className="text-gray-700 whitespace-pre-line leading-snug text-sm">{instruction}</p></div>
+            <div id="exercise-instruction-fs" className="mb-4 bg-white p-3 rounded-xl border-l-4 border-[#286575]"><p className="text-gray-700 whitespace-pre-line leading-snug text-[13px]">{instruction}</p></div>
           )}
           {children}
         </div>

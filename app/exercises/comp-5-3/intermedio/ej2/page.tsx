@@ -56,7 +56,7 @@ export default function Page() {
       index={2} total={3}
       title="Fortalezas, debilidades y ética de la IA"
       instruction={'Completar la oración (seleccione la opción correcta para cada enunciado).\n\nSituación: en su equipo de trabajo evalúan si incorporar herramientas de inteligencia artificial para distintas tareas. Identifique correctamente las fortalezas, debilidades y consideraciones éticas en cada caso.'}
-      onNext={handleNext}
+      onNext={handleNext} nextDisabled={ans.some(a => a === null)}
     >
       <div className="space-y-6">
         {ENUNCIADOS.map((e, i) => (

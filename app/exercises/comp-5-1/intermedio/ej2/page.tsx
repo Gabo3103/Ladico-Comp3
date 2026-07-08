@@ -25,11 +25,13 @@ export default function Page() {
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const byId = Object.fromEntries(STEPS.map((s) => [s.id, s]))
   const [order, setOrder] = useState<number[]>(INITIAL)
+  const [hasMoved, setHasMoved] = useState(false)
 
   const move = (idx: number, dir: -1 | 1) => {
     setOrder((prev) => {
       const n = [...prev]; const j = idx + dir
       if (j < 0 || j >= n.length) return prev
+      setHasMoved(true)
       ;[n[idx], n[j]] = [n[j], n[idx]]; return n
     })
   }
@@ -49,16 +51,16 @@ export default function Page() {
       index={2} total={3}
       title="Ordenar la respuesta ante un aviso de cargo sospechoso"
       instruction={'Ordene por prioridad (del paso 1 al paso 5).\n\nSituación: Recibe un mensaje de texto que dice que se hizo una compra por $189.990 con su tarjeta terminada en **4532 y le pide ingresar a un enlace. Usted no ha realizado ninguna compra por ese monto.\n\nUse las flechas para ordenar las acciones (1 = primera, 5 = última).'}
-      onNext={handleNext}
+      onNext={handleNext} nextDisabled={!hasMoved}
     >
       <ol className="space-y-2">
         {order.map((id, idx) => (
-          <li key={id} className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white">
-            <span className="w-7 h-7 rounded-full bg-[#286575] text-white flex items-center justify-center text-sm font-semibold shrink-0">{idx + 1}</span>
-            <span className="text-sm text-gray-700 flex-1">{byId[id].text}</span>
+          <li key={id} className="flex items-center gap-2.5 p-2.5 rounded-xl border border-gray-200 bg-white">
+            <span className="w-6 h-6 rounded-full bg-[#286575] text-white flex items-center justify-center text-xs font-semibold shrink-0">{idx + 1}</span>
+            <span className="text-[13px] text-gray-700 flex-1">{byId[id].text}</span>
             <div className="flex flex-col">
-              <button type="button" onClick={() => move(idx, -1)} className="p-1 hover:bg-gray-100 rounded"><ChevronUp className="w-4 h-4 text-gray-500" /></button>
-              <button type="button" onClick={() => move(idx, 1)} className="p-1 hover:bg-gray-100 rounded"><ChevronDown className="w-4 h-4 text-gray-500" /></button>
+              <button type="button" onClick={() => move(idx, -1)} aria-label={`Subir: ${byId[id].text.slice(0, 40)}`} className="p-0.5 hover:bg-gray-100 rounded"><ChevronUp className="w-4 h-4 text-gray-500" /></button>
+              <button type="button" onClick={() => move(idx, 1)} aria-label={`Bajar: ${byId[id].text.slice(0, 40)}`} className="p-0.5 hover:bg-gray-100 rounded"><ChevronDown className="w-4 h-4 text-gray-500" /></button>
             </div>
           </li>
         ))}

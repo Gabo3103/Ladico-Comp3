@@ -83,6 +83,7 @@ export default function Page() {
       title="Apoyar a una persona con dificultad auditiva en una videollamada"
       instruction={'Configurar la videollamada.\n\nSituación: acompaña a una persona con dificultad auditiva en la videollamada que se muestra. Abra el menú de accesibilidad (botón Apoyos) y active los apoyos que esta app ofrece para que pueda seguir la conversación. Cada app ofrece cosas distintas: active solo lo pertinente y deje lo que no ayuda a escuchar.'}
       onNext={handleNext}
+      nextDisabled={on.size === 0}
     >
       <div className="max-w-2xl mx-auto">
         {/* Barra de la app (según el estilo real de cada app) */}
