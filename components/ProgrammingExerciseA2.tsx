@@ -6,12 +6,15 @@ import alasql from "alasql/dist/alasql.min.js"
 type FlowerRow = { id: number; nombre: string; precio: number }
 
 export type ProgrammingExerciseA2Handle = {
-    finish: () => boolean
-    check: () => boolean
+    finish: (opts?: { silent?: boolean }) => boolean
+    check: (opts?: { silent?: boolean }) => boolean
+    isReady: () => boolean
 }
 
 type Props = {
     onFinish?: (point: 0 | 1) => void
+    onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 type PromptOption = {
@@ -256,12 +259,13 @@ function sanitizeNumberInput(value: string) {
 }
 
 const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
-    function ProgrammingExerciseA2({ onFinish }, ref) {
+    function ProgrammingExerciseA2({ onFinish, onReadyChange, seed }, ref) {
+        const s = seed ?? Math.random()
         const [datasetUrl] = useState(
-            DATASET_FILES[Math.floor(Math.random() * DATASET_FILES.length)]
+            DATASET_FILES[Math.floor((((s + 0.31) % 1)) * DATASET_FILES.length)]
         )
         const [routine] = useState(
-            () => ROUTINE_CASES[Math.floor(Math.random() * ROUTINE_CASES.length)]
+            () => ROUTINE_CASES[Math.floor(s * ROUTINE_CASES.length)]
         )
         const promptOptions = useMemo(() => shuffle(routine.promptOptions), [routine])
         const outputOptions = useMemo(() => shuffle(routine.outputOptions), [routine])
@@ -283,6 +287,12 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
         } | null>(null)
         const [lastCorrect, setLastCorrect] = useState(false)
         const [openPanel, setOpenPanel] = useState<1 | 2 | 3>(1)
+
+        const isReady = !!promptChoice && !!outputChoice && hasRun && answer !== ""
+
+        useEffect(() => {
+            onReadyChange?.(isReady)
+        }, [isReady, onReadyChange])
 
         const expectedRows = useMemo(() => rows.filter(routine.predicate), [rows, routine])
 
@@ -399,38 +409,41 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
             }
         }
 
-        function checkNow() {
+        function checkNow(opts?: { silent?: boolean }) {
             const { reasoningScore, validationScore, total } = calculateScore()
             // Para aprobar se exige razonamiento correcto (elegir bien instrucción y
             // salida) Y validación empírica correcta (ejecutar y contar bien) por
             // separado, no solo un puntaje total: así elegir bien la salida no
             // garantiza por sí solo el resto del puntaje.
             const ok = reasoningScore === 2 && validationScore === 2
-            setLastCorrect(ok)
 
-            if (ok) {
-                setFeedback({
-                    score: total,
-                    kind: "success",
-                    message:
-                        "Excelente. La automatización queda bien definida, ejecutada y validada.",
-                })
-            } else if (reasoningScore + validationScore >= 2) {
-                setFeedback({
-                    score: total,
-                    kind: "warning",
-                    message:
-                        reasoningScore < 2
-                            ? "Revisa el razonamiento: la instrucción mejorada o la salida elegida todavía no son las más adecuadas para esta tarea."
-                            : "El razonamiento está bien, pero falta validar correctamente: ejecuta la consulta y confirma el número de filas esperado.",
-                })
-            } else {
-                setFeedback({
-                    score: total,
-                    kind: "error",
-                    message:
-                        "Revisa el flujo completo: automatizar no es solo generar una consulta, también hay que definir bien la tarea y validar la salida.",
-                })
+            if (!opts?.silent) {
+                setLastCorrect(ok)
+
+                if (ok) {
+                    setFeedback({
+                        score: total,
+                        kind: "success",
+                        message:
+                            "Excelente. La automatización queda bien definida, ejecutada y validada.",
+                    })
+                } else if (reasoningScore + validationScore >= 2) {
+                    setFeedback({
+                        score: total,
+                        kind: "warning",
+                        message:
+                            reasoningScore < 2
+                                ? "Revisa el razonamiento: la instrucción mejorada o la salida elegida todavía no son las más adecuadas para esta tarea."
+                                : "El razonamiento está bien, pero falta validar correctamente: ejecuta la consulta y confirma el número de filas esperado.",
+                    })
+                } else {
+                    setFeedback({
+                        score: total,
+                        kind: "error",
+                        message:
+                            "Revisa el flujo completo: automatizar no es solo generar una consulta, también hay que definir bien la tarea y validar la salida.",
+                    })
+                }
             }
 
             onFinish?.(ok ? 1 : 0)
@@ -440,6 +453,7 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
         useImperativeHandle(ref, () => ({
             finish: checkNow,
             check: checkNow,
+            isReady: () => isReady,
         }))
 
         const selectedPromptOption = promptOptions.find((o) => o.id === promptChoice)

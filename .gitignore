@@ -30,6 +30,9 @@ Thumbs.db
 # Coverage (si usas testing)
 coverage/
 
+# Carpeta temporal / caché local (npm cache, logs, etc.)
+.tmp/
+
 # Typescript build (si lo compilas)
 *.tsbuildinfo
 

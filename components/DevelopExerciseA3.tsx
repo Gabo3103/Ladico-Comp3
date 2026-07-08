@@ -3,7 +3,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type DevelopExerciseA3Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -349,9 +349,14 @@ const DevelopExerciseA3 = forwardRef<DevelopExerciseA3Handle, Props>(
             return structureScore + justificationScore;
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             const result = score();
             const ok = result >= 3;
+
+            if (opts?.silent) {
+                onEvaluate?.(ok ? 1 : 0);
+                return ok;
+            }
 
             if (result === 4) {
                 setFeedback({

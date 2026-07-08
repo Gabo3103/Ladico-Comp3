@@ -2,9 +2,13 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
+import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 import RightsExerciseA1, {
     RightsExerciseA1Handle,
@@ -21,16 +25,19 @@ const SCENARIO =
     "Encontraste esta fotografía en la web y quieres reutilizarla en distintos contextos digitales, incluyendo ediciones hechas con herramientas que pueden sugerir cambios o atribuciones automáticas. Selecciona qué usos respetan correctamente la licencia."
 const COMPETENCE = "3.3"
 const LEVEL = "avanzado"
-const DEBUG = false
+const PREFIX = "session:3.3:Avanzado"
 const FALLBACK_COUNTRY: CountryCode = "CL"
 
 export default function PageEj1_33_Avanzado_Select() {
-    const exRef = useRef<RightsExerciseA1Handle>(null)
-    const [checking, setChecking] = useState(false)
-    const [ready, setReady] = useState(false)
-    const [approved, setApproved] = useState(false)
+    const router = useRouter()
+    const { user, userData, loading: authLoading, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
+    const { mark } = useLadicoSession(COMPETENCE, "Avanzado", PREFIX)
 
-    const { user, userData, loading: authLoading } = useAuth()
+    const exRef = useRef<RightsExerciseA1Handle>(null)
+    const [ready, setReady] = useState(false)
+    const [saving, setSaving] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 1))
 
     const [country, setCountry] = useState<CountryCode | null>(null)
     const [asset, setAsset] = useState<ImageAsset | null>(null)
@@ -61,18 +68,17 @@ export default function PageEj1_33_Avanzado_Select() {
         setCountry(resolvedCountry)
         setAsset(picked)
         setLoading(false)
-
-        if (DEBUG) {
-            console.log("[3.3 avanzado ej1] country:", resolvedCountry, "asset:", picked)
-        }
     }, [authLoading, user, userData?.country])
 
-    const onCheck = () => {
+    const handleNext = async () => {
         if (!exRef.current) return
-        setChecking(true)
-        const result = exRef.current.grade()
-        setApproved(result.quality === "good" || result.quality === "partial")
-        setChecking(false)
+        setSaving(true)
+        const result = exRef.current.grade({ silent: true })
+        const ok = result.quality === "good" || result.quality === "partial"
+        setPoint(COMPETENCE, LEVEL, 1, ok ? 1 : 0)
+        await mark(0, ok)
+        setSaving(false)
+        router.push("/exercises/comp-3-3/avanzado/ej2")
     }
 
     return (
@@ -131,26 +137,6 @@ export default function PageEj1_33_Avanzado_Select() {
                             </p>
                         </div>
 
-                        {DEBUG && (
-                            <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-xs text-gray-600">
-                                <div>
-                                    <b>DEBUG</b>
-                                </div>
-                                <div>
-                                    country: <code>{country}</code>
-                                </div>
-                                <div>
-                                    asset.title: <code>{asset?.title ?? "-"}</code>
-                                </div>
-                                <div>
-                                    asset.author: <code>{asset?.author ?? "-"}</code>
-                                </div>
-                                <div>
-                                    asset.license: <code>{asset?.license.short ?? "-"}</code>
-                                </div>
-                            </div>
-                        )}
-
                         {loading ? (
                             <div className="text-sm text-gray-500">
                                 Cargando componentes...
@@ -159,6 +145,7 @@ export default function PageEj1_33_Avanzado_Select() {
                             <RightsExerciseA1
                                 ref={exRef}
                                 onReadyChange={setReady}
+                                seed={seed}
                                 asset={{
                                     title: asset.title,
                                     author: asset.author,
@@ -181,20 +168,23 @@ export default function PageEj1_33_Avanzado_Select() {
                             </Button>
 
                             <div className="flex gap-3">
-                                <Button
-                                    onClick={onCheck}
-                                    disabled={checking || !ready || loading || !asset}
-                                    className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                                >
-                                    {checking ? "Comprobando..." : "Comprobar"}
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.grade()}
+                                        disabled={!ready || loading || !asset}
+                                        variant="outline"
+                                        className="rounded-2xl border-[#286675] px-6 py-2 font-medium text-[#286675] shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
 
                                 <Button
-                                    asChild
-                                    disabled={!approved || loading || !asset}
+                                    onClick={handleNext}
+                                    disabled={saving || !ready || loading || !asset}
                                     className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
-                                    <Link href="/exercises/comp-3-3/avanzado/ej2">Siguiente</Link>
+                                    {saving ? "Guardando..." : "Siguiente"}
                                 </Button>
                             </div>
                         </div>

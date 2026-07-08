@@ -1,22 +1,49 @@
 "use client"
 
 import { useAuth } from "@/contexts/AuthContext"
-import { Home, Award, Settings, Menu, X, LogOut, HelpCircle, CheckSquare } from "lucide-react"
+import { Home, Award, Settings, Menu, X, LogOut, HelpCircle, CheckSquare, Eye } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
+import { firstExerciseRoute } from "@/lib/firstExerciseRoute"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: Home },
   { name: "Competencias", href: "/dashboard", icon: Award },
 ]
 
+const AREA3_DEMO_COMPETENCES = [
+  { id: "3.1", label: "Desarrollo de contenidos digitales" },
+  { id: "3.2", label: "Integración y reelaboración" },
+  { id: "3.3", label: "Derechos de autor y licencias" },
+  { id: "3.4", label: "Pensamiento computacional" },
+] as const
+
 export default function Sidebar() {
-  const { logout, userData, user } = useAuth()
+  const { logout, userData, user, isProfesor } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
 
   const isAdmin = user?.email?.endsWith('@admin.com') || false
+  const demoMode = isProfesor || isAdmin
+
+  const goToDemo = (competenceId: string, level: "intermedio" | "avanzado") => {
+    setIsOpen(false)
+    router.push(firstExerciseRoute(competenceId, level))
+  }
 
   return (
     <>
@@ -123,6 +150,56 @@ export default function Sidebar() {
               </div>
 
             </Link>
+
+            {demoMode && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex w-full items-center px-4 py-3 text-sm font-medium rounded-xl text-white hover:bg-[#94b2ba] hover:text-white transition-colors mb-2 border border-white/20"
+                  >
+                    <Eye className="w-5 h-5 mr-3" />
+                    Demo Área 3
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-64 border border-slate-200 bg-white text-slate-800 shadow-lg"
+                  style={{ zIndex: 9999 }}
+                >
+                  <DropdownMenuLabel className="text-slate-700">
+                    Elige competencia y nivel
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-slate-200" />
+                  {AREA3_DEMO_COMPETENCES.map((comp) => (
+                    <DropdownMenuSub key={comp.id}>
+                      <DropdownMenuSubTrigger className="focus:bg-slate-100 data-[state=open]:bg-slate-100">
+                        {comp.id} — {comp.label}
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent
+                          className="border border-slate-200 bg-white text-slate-800 shadow-lg"
+                          style={{ zIndex: 9999 }}
+                        >
+                          <DropdownMenuItem
+                            className="cursor-pointer focus:bg-slate-100"
+                            onSelect={() => goToDemo(comp.id, "intermedio")}
+                          >
+                            Intermedio
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer focus:bg-slate-100"
+                            onSelect={() => goToDemo(comp.id, "avanzado")}
+                          >
+                            Avanzado
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             <button
               onClick={logout}
               className="flex w-full items-center px-4 py-3 text-sm font-medium rounded-xl text-white hover:bg-[#94b2ba] hover:text-white transition-colors mb-4"

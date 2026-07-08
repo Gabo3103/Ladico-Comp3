@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { ensureSession, markAnswered } from "@/lib/testSession"
 import { setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 const SCENARIO =
     "Participas en un proyecto donde se debe crear una solución digital o un sistema de IA sencillo. Ordena las etapas para pasar desde la definición del problema hasta la validación y publicación responsable."
@@ -20,12 +21,13 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 
 export default function SandboxProgrammingPage2() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
 
     const [sessionId, setSessionId] = useState<string | null>(null)
     const ensuringRef = useRef(false)
     const [saving, setSaving] = useState(false)
-    const [approved, setApproved] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 2))
 
     const exRef = useRef<ProgrammingExerciseI2Handle>(null)
 
@@ -69,19 +71,10 @@ export default function SandboxProgrammingPage2() {
         })()
     }, [user?.uid, sessionId])
 
-    const handleCheck = () => {
-        if (!exRef.current) return
-        exRef.current.check()
-        const result = exRef.current.grade()
-        setApproved(result.quality === "good" || result.quality === "partial")
-    }
-
     const handleNext = async () => {
         if (!exRef.current) return
-        exRef.current.check()
         const result = exRef.current.grade()
-        const isCorrect = result.quality === "good" || result.quality === "partial"
-        setApproved(isCorrect)
+        const isCorrect = result.quality !== "bad"
         setSaving(true)
         const point: 0 | 1 = isCorrect ? 1 : 0
 
@@ -154,7 +147,7 @@ export default function SandboxProgrammingPage2() {
                             Ordena las <b>etapas del ciclo de desarrollo</b> antes de publicar la solución
                         </p>
 
-                        <ProgrammingExerciseI2 ref={exRef} />
+                        <ProgrammingExerciseI2 ref={exRef} seed={seed} />
 
                         <div className="mt-6 flex items-center justify-between gap-3">
                             <Button
@@ -165,16 +158,18 @@ export default function SandboxProgrammingPage2() {
                             </Button>
 
                             <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={handleCheck}
-                                    variant="outline"
-                                    className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
-                                >
-                                    Comprobar
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.check()}
+                                        variant="outline"
+                                        className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
                                 <Button
                                     onClick={handleNext}
-                                    disabled={saving || !approved}
+                                    disabled={saving}
                                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
                                     {saving ? "Guardando..." : "Siguiente"}

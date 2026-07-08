@@ -4,16 +4,57 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLadicoSession } from "@/hooks/useLadicoSession";
+import { getProgress, setPoint, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress";
+import { getOrCreateSeed } from "@/lib/caseSeed";
 import DevelopExerciseI3, { DevelopExerciseI3Handle } from "@/components/DevelopExerciseI3";
 
 const COMPETENCE = "3.1";
 const LEVEL = "intermedio";
+const PREFIX = "session:3.1:Intermedio";
 
 export default function PageEj3_31_Intermedio() {
+    const router = useRouter();
+    const { isProfesor, isAdmin } = useAuth();
+    const demoMode = isProfesor || isAdmin;
+    const { sessionId, mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX);
+
     const progressPct = (3 / 3) * 100; // ejercicio 3 de 3
     const exRef = useRef<DevelopExerciseI3Handle>(null);
-    const [, setDone] = useState(false);
     const [ready, setReady] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 3));
+
+    const handleFinish = async () => {
+        if (!exRef.current) return;
+        setSaving(true);
+        const ok = exRef.current.check({ silent: true });
+        setPoint(COMPETENCE, LEVEL, 3, ok ? 1 : 0);
+        const sid = await mark(2, ok);
+
+        const prog = getProgress(COMPETENCE, LEVEL);
+        const totalPts = levelPoints(prog);
+        const passed = isLevelPassed(prog);
+        const score = Math.round((totalPts / 3) * 100);
+
+        const qs = new URLSearchParams({
+            score: String(score),
+            passed: String(passed),
+            correct: String(totalPts),
+            total: "3",
+            competence: COMPETENCE,
+            level: LEVEL,
+            q1: String(getPoint(prog, 1)),
+            q2: String(getPoint(prog, 2)),
+            q3: String(getPoint(prog, 3)),
+            ...(sid ?? sessionId ? { sid: (sid ?? sessionId) as string } : {}),
+        });
+
+        setSaving(false);
+        router.push(`/test/comp-3-1-intermedio?${qs.toString()}`);
+    };
 
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
@@ -71,30 +112,35 @@ export default function PageEj3_31_Intermedio() {
                 </p>
                 <DevelopExerciseI3
                 ref={exRef}
-                onEvaluate={(pt) => setDone(pt === 1)}
                 onReadyChange={setReady}
+                seed={seed}
                 />
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <span />
-
-                <div className="flex gap-3">
-                    <Button
-                    disabled={!ready}
-                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                    onClick={() => {
-                        if (!exRef.current) return;
-                        exRef.current.check();
-                    }}
-                    >
-                    Comprobar
-                    </Button>
-
-                    <Button
+                <Button
                     asChild
                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                >
+                    <Link href="/dashboard">Terminar</Link>
+                </Button>
+
+                <div className="flex gap-3">
+                    {demoMode && (
+                        <Button
+                            variant="outline"
+                            disabled={!ready}
+                            className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                            onClick={() => exRef.current?.check()}
+                        >
+                            Comprobar
+                        </Button>
+                    )}
+                    <Button
+                    disabled={!ready || saving}
+                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
+                    onClick={handleFinish}
                     >
-                    <Link href="/exercises/comp-3-1/avanzado/ej1">Siguiente</Link>
+                    {saving ? "Guardando..." : "Finalizar"}
                     </Button>
                 </div>
                 </div>

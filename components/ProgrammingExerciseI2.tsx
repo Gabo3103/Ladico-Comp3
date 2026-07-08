@@ -100,8 +100,20 @@ const SCENARIOS: Scenario[] = [
     },
 ]
 
-function shuffle<T>(items: T[]): T[] {
-    return [...items].sort(() => Math.random() - 0.5)
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
+    const copy = [...items]
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(rand() * (i + 1))
+        ;[copy[i], copy[j]] = [copy[j], copy[i]]
+    }
+    return copy
 }
 
 function reorderByIds<T extends { id: string }>(items: T[], draggedId: string, targetId: string) {
@@ -118,9 +130,10 @@ function reorderByIds<T extends { id: string }>(items: T[], draggedId: string, t
     return next
 }
 
-function disorderStages(stages: Stage[], validOrder: StageId[]) {
+function disorderStages(stages: Stage[], validOrder: StageId[], seed?: number) {
+    const s = seed ?? Math.random()
     for (let attempt = 0; attempt < 30; attempt++) {
-        const candidate = shuffle(stages)
+        const candidate = shuffle(stages, s + attempt * 0.017)
         const misplaced = candidate.filter((stage, index) => stage.id !== validOrder[index]).length
 
         if (misplaced >= Math.max(4, validOrder.length - 1)) return candidate
@@ -142,9 +155,13 @@ export type ProgrammingExerciseI2Handle = {
 
 const DND_TYPE = "application/ladico-programming-stage"
 
-const ProgrammingExerciseI2 = forwardRef<ProgrammingExerciseI2Handle, {}>(
-    function ProgrammingExerciseI2(_, ref) {
-        const scenario = useMemo(() => shuffle(SCENARIOS)[0], [])
+type Props = {
+    seed?: number
+}
+
+const ProgrammingExerciseI2 = forwardRef<ProgrammingExerciseI2Handle, Props>(
+    function ProgrammingExerciseI2({ seed }, ref) {
+        const scenario = useMemo(() => shuffle(SCENARIOS, seed)[0], [seed])
         const [order, setOrder] = useState<Stage[]>([])
         const [dragId, setDragId] = useState<string | null>(null)
         const [overId, setOverId] = useState<string | null>(null)
@@ -155,8 +172,8 @@ const ProgrammingExerciseI2 = forwardRef<ProgrammingExerciseI2Handle, {}>(
         }>({ kind: "idle" })
 
         useEffect(() => {
-            setOrder(disorderStages(scenario.stages, scenario.validOrder))
-        }, [scenario])
+            setOrder(disorderStages(scenario.stages, scenario.validOrder, seed))
+        }, [scenario, seed])
 
         const score = (items = order) =>
             items.reduce(

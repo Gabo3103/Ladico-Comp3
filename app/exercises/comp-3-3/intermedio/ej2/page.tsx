@@ -2,8 +2,12 @@
 
 import Link from "next/link"
 import { useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/AuthContext"
+import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { setPoint } from "@/lib/levelProgress"
 
 import RightsExerciseI2, {
     RightsExerciseI2Handle,
@@ -14,21 +18,29 @@ const SCENARIO =
 
 const COMPETENCE = "3.3"
 const LEVEL = "intermedio"
+const PREFIX = "session:3.3:Intermedio"
 
 export default function PageEj2_33_Intermedio() {
+    const router = useRouter()
+    const { isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
+    const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
+
     const exRef = useRef<RightsExerciseI2Handle>(null)
-    const [checking, setChecking] = useState(false)
     const [ready, setReady] = useState(false)
-    const [approved, setApproved] = useState(false)
+    const [saving, setSaving] = useState(false)
 
     const progressPct = (2 / 3) * 100
 
-    const onCheck = () => {
+    const handleNext = async () => {
         if (!exRef.current) return
-        setChecking(true)
-        const result = exRef.current.grade()
-        setApproved(result.quality === "good" || result.quality === "partial")
-        setChecking(false)
+        setSaving(true)
+        const result = exRef.current.grade({ silent: true })
+        const ok = result.quality === "good" || result.quality === "partial"
+        setPoint(COMPETENCE, LEVEL, 2, ok ? 1 : 0)
+        await mark(1, ok)
+        setSaving(false)
+        router.push("/exercises/comp-3-3/intermedio/ej3")
     }
 
     return (
@@ -97,20 +109,23 @@ export default function PageEj2_33_Intermedio() {
                             </Button>
 
                             <div className="flex gap-3">
-                                <Button
-                                    onClick={onCheck}
-                                    disabled={checking || !ready}
-                                    className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                                >
-                                    {checking ? "Comprobando..." : "Comprobar"}
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.grade()}
+                                        disabled={!ready}
+                                        variant="outline"
+                                        className="rounded-2xl border-[#286675] px-6 py-2 font-medium text-[#286675] shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
 
                                 <Button
-                                    asChild
-                                    disabled={!approved}
+                                    onClick={handleNext}
+                                    disabled={saving || !ready}
                                     className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
-                                    <Link href="/exercises/comp-3-3/intermedio/ej3">Siguiente</Link>
+                                    {saving ? "Guardando..." : "Siguiente"}
                                 </Button>
                             </div>
                         </div>

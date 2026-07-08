@@ -10,6 +10,7 @@ import ProgrammingExerciseA1, { ProgrammingExerciseA1Handle } from "@/components
 import { useAuth } from "@/contexts/AuthContext"
 import { ensureSession, markAnswered } from "@/lib/testSession"
 import { setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 const TITLE = ""
 const SCENARIO =
@@ -22,14 +23,16 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 
 export default function PageBlocklyMaze() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
     const exRef = useRef<ProgrammingExerciseA1Handle>(null)
 
     const [sessionId, setSessionId] = useState<string | null>(null)
     const [ensuring, setEnsuring] = useState(false)
     const [saving, setSaving] = useState(false)
     const [feedback, setFeedback] = useState<string | null>(null)
-    const [approved, setApproved] = useState(false)
+    const [ready, setReady] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 1))
 
     useEffect(() => {
         if (!user || typeof window === "undefined") return
@@ -70,7 +73,6 @@ export default function PageBlocklyMaze() {
 
     const handleCheck = () => {
         const mazeOk = Boolean(exRef.current?.check())
-        setApproved(mazeOk)
         setFeedback(
             mazeOk
                 ? "Automatización validada: corregiste y completaste la propuesta hasta lograr una secuencia ejecutable."
@@ -158,10 +160,15 @@ export default function PageBlocklyMaze() {
                         </div>
 
                         <div className="w-full">
-                            <ProgrammingExerciseA1 ref={exRef} onAttemptsExhausted={handleNext} />
+                            <ProgrammingExerciseA1
+                                ref={exRef}
+                                onAttemptsExhausted={handleNext}
+                                onReadyChange={setReady}
+                                seed={seed}
+                            />
                         </div>
 
-                        {feedback && (
+                        {demoMode && feedback && (
                             <div
                                 className={`mt-4 rounded-xl border px-4 py-3 text-sm font-medium ${
                                     feedback.startsWith("Automatización validada")
@@ -182,18 +189,20 @@ export default function PageBlocklyMaze() {
                             </Button>
 
                             <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={handleCheck}
-                                    variant="outline"
-                                    className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
-                                >
-                                    Validar
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={handleCheck}
+                                        variant="outline"
+                                        className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
+                                    >
+                                        Validar
+                                    </Button>
+                                )}
 
                                 <Button
                                     onClick={handleNext}
-                                    disabled={saving || !approved}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                                    disabled={saving || !ready}
+                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
                                     {saving ? "Guardando..." : "Siguiente"}
                                 </Button>

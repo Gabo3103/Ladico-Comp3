@@ -29,11 +29,12 @@ export type RightsExerciseI1Handle = {
     check: () => void
     isReady: () => boolean
     reset: () => void
-    grade: () => RightsExerciseI1Grade
+    grade: (opts?: { silent?: boolean }) => RightsExerciseI1Grade
 }
 
 type Props = {
     onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 const ACTION_LABEL: Record<ActionKey, string> = {
@@ -105,17 +106,24 @@ const CASE_BANK: Array<{
 const fieldStyle =
     "w-full max-w-[420px] appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-2.5 pr-11 font-inherit text-sm font-medium text-slate-700 shadow-sm outline-none transition hover:border-[#286575]/40 focus:border-[#286575] focus:ring-2 focus:ring-[#286575]/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
 
-function shuffle<T>(items: T[]): T[] {
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
     const copy = [...items]
     for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1))
+        const j = Math.floor(rand() * (i + 1))
         ;[copy[i], copy[j]] = [copy[j], copy[i]]
     }
     return copy
 }
 
-function pickRandomCases() {
-    return shuffle(CASE_BANK).slice(0, 3)
+function pickRandomCases(seed?: number) {
+    return shuffle(CASE_BANK, seed).slice(0, 3)
 }
 
 const ORIGINAL_ACTIONS: ActionKey[] = [
@@ -134,8 +142,8 @@ function buildOptionsForCase(correct: ActionKey): ActionKey[] {
 }
 
 const RightsExerciseI1 = forwardRef<RightsExerciseI1Handle, Props>(
-    function RightsExerciseI1({ onReadyChange }, ref) {
-        const [visibleCases, setVisibleCases] = useState(() => pickRandomCases())
+    function RightsExerciseI1({ onReadyChange, seed }, ref) {
+        const [visibleCases, setVisibleCases] = useState(() => pickRandomCases(seed))
         const [answers, setAnswers] = useState<Partial<Record<CaseId, ActionKey>>>({})
         const [checked, setChecked] = useState(false)
 
@@ -199,9 +207,9 @@ const RightsExerciseI1 = forwardRef<RightsExerciseI1Handle, Props>(
                 setChecked(false)
                 onReadyChange?.(false)
             },
-            grade() {
+            grade(opts) {
                 const result = computeGrade()
-                if (allAnswered) setChecked(true)
+                if (allAnswered && !opts?.silent) setChecked(true)
                 return result
             },
         }))
@@ -257,7 +265,6 @@ const RightsExerciseI1 = forwardRef<RightsExerciseI1Handle, Props>(
                                                     (e.target.value as ActionKey) || undefined
                                                 )
                                             }
-                                            disabled={checked}
                                         >
                                             <option value="" className="text-slate-500">
                                                 Selecciona...

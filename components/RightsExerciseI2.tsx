@@ -20,7 +20,7 @@ export type RightsExerciseI2Handle = {
     check: () => void
     isReady: () => boolean
     reset: () => void
-    grade: () => RightsExerciseI2Grade
+    grade: (opts?: { silent?: boolean }) => RightsExerciseI2Grade
 }
 
 type UseOption = "FREE" | "ATTR" | "NO" | "REVIEW"
@@ -93,9 +93,9 @@ const RightsExerciseI2 = forwardRef<RightsExerciseI2Handle, Props>(
                 setChecked(false)
                 onReadyChange?.(false)
             },
-            grade() {
+            grade(opts) {
                 const result = computeGrade()
-                if (allAnswered) setChecked(true)
+                if (allAnswered && !opts?.silent) setChecked(true)
                 return result
             },
         }))
@@ -139,7 +139,6 @@ const RightsExerciseI2 = forwardRef<RightsExerciseI2Handle, Props>(
                                         : "text-slate-500"
                                 }`}
                                 value={q1}
-                                disabled={checked}
                                 onChange={(e) => setQ1(e.target.value as UseOption)}
                             >
                                 <option value="" className="text-slate-500">
@@ -189,7 +188,6 @@ const RightsExerciseI2 = forwardRef<RightsExerciseI2Handle, Props>(
                                         : "text-slate-500"
                                 }`}
                                 value={q2}
-                                disabled={checked}
                                 onChange={(e) => setQ2(e.target.value as UseOption)}
                             >
                                 <option value="" className="text-slate-500">
@@ -239,7 +237,6 @@ const RightsExerciseI2 = forwardRef<RightsExerciseI2Handle, Props>(
                                         : "text-slate-500"
                                 }`}
                                 value={q3}
-                                disabled={checked}
                                 onChange={(e) => setQ3(e.target.value as UseOption)}
                             >
                                 <option value="" className="text-slate-500">
@@ -289,7 +286,6 @@ const RightsExerciseI2 = forwardRef<RightsExerciseI2Handle, Props>(
                                         : "text-slate-500"
                                 }`}
                                 value={q4}
-                                disabled={checked}
                                 onChange={(e) => setQ4(e.target.value)}
                             >
                                 <option value="" className="text-slate-500">

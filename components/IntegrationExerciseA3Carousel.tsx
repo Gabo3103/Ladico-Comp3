@@ -11,7 +11,7 @@ export type IntegrationExerciseA3CarouselGrade = {
 };
 
 export type IntegrationExerciseA3CarouselHandle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
     grade: () => IntegrationExerciseA3CarouselGrade;
@@ -20,6 +20,7 @@ export type IntegrationExerciseA3CarouselHandle = {
 type Props = {
     onEvaluate?: (point: 0 | 1) => void;
     onReadyChange?: (ready: boolean) => void;
+    seed?: number;
 };
 
 type QuestionId = "content" | "structure" | "visual" | "tools";
@@ -229,8 +230,8 @@ function shuffleOptions(question: Question): Question {
     return { ...question, options: shuffled };
 }
 
-function pickScenario() {
-    const scenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+function pickScenario(seed?: number) {
+    const scenario = SCENARIOS[Math.floor((seed ?? Math.random()) * SCENARIOS.length)];
     return {
         ...scenario,
         questions: scenario.questions.map(shuffleOptions),
@@ -238,8 +239,8 @@ function pickScenario() {
 }
 
 const IntegrationExerciseA3Carousel = forwardRef<IntegrationExerciseA3CarouselHandle, Props>(
-    function IntegrationExerciseA3Carousel({ onEvaluate, onReadyChange }, ref) {
-        const scenario = useMemo(() => pickScenario(), []);
+    function IntegrationExerciseA3Carousel({ onEvaluate, onReadyChange, seed }, ref) {
+        const scenario = useMemo(() => pickScenario(seed), [seed]);
         const [answers, setAnswers] = useState<Partial<Record<QuestionId, string>>>({});
         const [checked, setChecked] = useState(false);
         const [activeQuestion, setActiveQuestion] = useState(0);
@@ -272,11 +273,11 @@ const IntegrationExerciseA3Carousel = forwardRef<IntegrationExerciseA3CarouselHa
             return { correctCount, totalCount, quality };
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             if (!allAnswered) return false;
             const result = computeGrade();
             const ok = result.quality === "good" || result.quality === "partial";
-            setChecked(true);
+            if (!opts?.silent) setChecked(true);
             onEvaluate?.(ok ? 1 : 0);
             return ok;
         }
@@ -359,7 +360,6 @@ const IntegrationExerciseA3Carousel = forwardRef<IntegrationExerciseA3CarouselHa
                                         <button
                                             key={option.id}
                                             type="button"
-                                            disabled={checked}
                                             onClick={() => setAnswer(question.id, option.id)}
                                             className={`block w-full rounded-xl border px-4 py-3 text-left text-sm leading-relaxed shadow-sm transition ${
                                                 selected

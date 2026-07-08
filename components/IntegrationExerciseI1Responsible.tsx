@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 export type IntegrationExerciseI1ResponsibleHandle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -376,9 +376,13 @@ const IntegrationExerciseI1Responsible = forwardRef<
 
         return points;
     }
-    function evaluate() {
+    function evaluate(opts?: { silent?: boolean }) {
         const result = score();
         const ok = result === 2;
+        if (opts?.silent) {
+            onEvaluate?.(ok ? 1 : 0);
+            return ok;
+        }
         if (ok) {
             setFeedback({
                 kind: "success",

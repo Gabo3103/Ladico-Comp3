@@ -98,6 +98,13 @@ export default function Dashboard() {
     // slug del nivel
     const slug: LevelSlug = level === "Básico" ? "basico" : (level.toLowerCase() as LevelSlug)
 
+    // Básico usa el banco de preguntas con timer (/test/{id}?level=básico), no
+    // páginas ej1/ej2/ej3 estáticas: no se puede "retomar" en una pregunta
+    // específica, así que siempre reinicia desde el principio.
+    if (slug === "basico") {
+      return firstExerciseRoute(competenceId, slug)
+    }
+
     // si no hay progreso o ya está completado → ir al ej1 (comportamiento original)
     if (!st || st.completed || (!st.inProgress && st.answered === 0)) {
       return firstExerciseRoute(competenceId, slug)

@@ -13,7 +13,7 @@ export type IntegrationExerciseA1AuditGrade = {
 };
 
 export type IntegrationExerciseA1AuditHandle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
     grade: () => IntegrationExerciseA1AuditGrade;
@@ -22,6 +22,7 @@ export type IntegrationExerciseA1AuditHandle = {
 type Props = {
     onEvaluate?: (point: 0 | 1) => void;
     onReadyChange?: (ready: boolean) => void;
+    seed?: number;
 };
 
 type FormatId = "document" | "presentation" | "video" | "infographic";
@@ -401,8 +402,8 @@ const SCENARIOS: Scenario[] = [
     },
 ];
 
-function pickScenario() {
-    return SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+function pickScenario(seed?: number) {
+    return SCENARIOS[Math.floor((seed ?? Math.random()) * SCENARIOS.length)];
 }
 
 type Step2Option = { id: string; text: string };
@@ -438,8 +439,8 @@ function buildStep2(scenario: Scenario, formatId: FormatId): Step2Setup {
 }
 
 const IntegrationExerciseA1Audit = forwardRef<IntegrationExerciseA1AuditHandle, Props>(
-    function IntegrationExerciseA1Audit({ onEvaluate, onReadyChange }, ref) {
-        const scenario = useMemo(() => pickScenario(), []);
+    function IntegrationExerciseA1Audit({ onEvaluate, onReadyChange, seed }, ref) {
+        const scenario = useMemo(() => pickScenario(seed), [seed]);
         const [format, setFormat] = useState<FormatId | null>(null);
         const [step2Choice, setStep2Choice] = useState<string | null>(null);
         const [pickedElements, setPickedElements] = useState<string[]>([]);
@@ -506,11 +507,11 @@ const IntegrationExerciseA1Audit = forwardRef<IntegrationExerciseA1AuditHandle, 
             };
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             if (!isReady) return false;
             const result = computeGrade();
             const ok = result.quality === "good" || result.quality === "partial";
-            setChecked(true);
+            if (!opts?.silent) setChecked(true);
             onEvaluate?.(ok ? 1 : 0);
             return ok;
         }
@@ -559,7 +560,6 @@ const IntegrationExerciseA1Audit = forwardRef<IntegrationExerciseA1AuditHandle, 
                                 <button
                                     key={item.id}
                                     type="button"
-                                    disabled={checked}
                                     onClick={() => chooseFormat(item.id)}
                                     className={`h-full w-full rounded-2xl border px-5 py-4 text-left transition ${
                                         isPicked
@@ -594,7 +594,6 @@ const IntegrationExerciseA1Audit = forwardRef<IntegrationExerciseA1AuditHandle, 
                                                 <button
                                                     key={item.id}
                                                     type="button"
-                                                    disabled={checked}
                                                     onClick={() => chooseStep2(item.id)}
                                                     className={`block w-full rounded-2xl border px-5 py-4 text-left text-sm font-medium leading-relaxed shadow-sm transition ${
                                                         isPicked
@@ -634,7 +633,6 @@ const IntegrationExerciseA1Audit = forwardRef<IntegrationExerciseA1AuditHandle, 
                                                                     <input
                                                                         type="checkbox"
                                                                         checked={isPicked}
-                                                                        disabled={checked}
                                                                         onChange={() => toggleElement(el.id)}
                                                                         className="mt-1 h-5 w-5 shrink-0 rounded accent-[#286575]"
                                                                     />

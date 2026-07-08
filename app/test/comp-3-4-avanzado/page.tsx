@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, XCircle, CheckCircle, XCircle as XIcon } from "lucide-react"
+import { clearCaseSeeds } from "@/lib/caseSeed"
 
 function ResultsAvanzadoContent() {
     const sp = useSearchParams()
@@ -90,6 +91,7 @@ function ResultsAvanzadoContent() {
         try {
         const key = `ladico:${data.competence}:${data.level}:progress`
         localStorage.removeItem(key)
+        clearCaseSeeds(data.competence, data.level)
         } catch {}
     }, [data.competence, data.level])
 

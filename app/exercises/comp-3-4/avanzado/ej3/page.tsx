@@ -10,6 +10,7 @@ import ProgrammingExerciseA3, { ProgrammingExerciseA3Handle } from "@/components
 import { useAuth } from "@/contexts/AuthContext"
 import { ensureSession, finalizeSession, markAnswered } from "@/lib/testSession"
 import { getPoint, getProgress, isLevelPassed, levelPoints, setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 const SCENARIO =
     "La Dirección de Asuntos Estudiantiles de una universidad recibió 8.000 respuestas abiertas de estudiantes de primer año sobre su proceso de adaptación. Antes de desplegar el proceso de análisis, el equipo debe decidir qué parte de cada tarea conviene automatizar con Python o IA, y en qué punto es necesaria la revisión humana para evitar errores antes de publicar el informe final."
@@ -23,10 +24,14 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 export default function PageProgrammingA3() {
     const exerciseRef = useRef<ProgrammingExerciseA3Handle>(null)
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
 
     const [sessionId, setSessionId] = useState<string | null>(null)
     const [ensuring, setEnsuring] = useState(false)
+    const [ready, setReady] = useState(false)
+    const [saving, setSaving] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 3))
 
     useEffect(() => {
         if (!user || typeof window === "undefined") return
@@ -64,12 +69,9 @@ export default function PageProgrammingA3() {
         })()
     }, [user?.uid, sessionId, ensuring])
 
-    const handleCheck = () => {
-        exerciseRef.current?.check()
-    }
-
     const handleFinish = async () => {
-        const isCorrect = exerciseRef.current?.finish() ?? false
+        setSaving(true)
+        const isCorrect = exerciseRef.current?.finish({ silent: true }) ?? false
         const point: 0 | 1 = isCorrect ? 1 : 0
 
         setPoint(COMPETENCE, LEVEL, 3, point)
@@ -115,6 +117,7 @@ export default function PageProgrammingA3() {
             ...(sessionId ? { sid: sessionId } : {}),
         })
 
+        setSaving(false)
         router.push(`/test/comp-3-4-avanzado?${qs.toString()}`)
     }
 
@@ -172,7 +175,7 @@ export default function PageProgrammingA3() {
                             <b>Decide</b> qué herramienta usar en cada actividad y ordena las etapas antes de publicar el informe
                         </p>
 
-                        <ProgrammingExerciseA3 ref={exerciseRef} />
+                        <ProgrammingExerciseA3 ref={exerciseRef} onReadyChange={setReady} seed={seed} />
 
                         <div className="mt-6 flex items-center justify-between">
                             <Button
@@ -183,17 +186,21 @@ export default function PageProgrammingA3() {
                             </Button>
 
                             <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={handleCheck}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
-                                >
-                                    Comprobar
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exerciseRef.current?.check()}
+                                        disabled={!ready}
+                                        className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
                                 <Button
                                     onClick={handleFinish}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                                    disabled={saving || !ready}
+                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
-                                    Finalizar nivel
+                                    {saving ? "Guardando..." : "Finalizar nivel"}
                                 </Button>
                             </div>
                         </div>

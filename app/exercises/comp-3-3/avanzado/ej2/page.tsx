@@ -2,26 +2,41 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLadicoSession } from "@/hooks/useLadicoSession";
+import { setPoint } from "@/lib/levelProgress";
+import { getOrCreateSeed } from "@/lib/caseSeed";
 import RightsExerciseA2, { type RightsExerciseA2Handle } from "@/components/RightsExerciseA2";
 
 const COMPETENCE = "3.3";
 const LEVEL = "avanzado";
+const PREFIX = "session:3.3:Avanzado";
 const SCENARIO =
     "Trabajas en una auditoría de contenido digital. Debes revisar casos de uso de recursos digitales y decidir cómo se relacionan con derechos de autor, licencias, entrenamiento de IA y contenido generado por IA.";
 
 export default function PageEj2_33_Avanzado() {
+    const router = useRouter();
+    const { isProfesor, isAdmin } = useAuth();
+    const demoMode = isProfesor || isAdmin;
+    const { mark } = useLadicoSession(COMPETENCE, "Avanzado", PREFIX);
+
     const exRef = useRef<RightsExerciseA2Handle>(null);
-    const [checking, setChecking] = useState(false);
     const [ready, setReady] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 2));
     const progressPct = (2 / 3) * 100;
 
-    const onCheck = () => {
+    const handleNext = async () => {
         if (!exRef.current) return;
-        setChecking(true);
-        exRef.current.check();
-        setChecking(false);
+        setSaving(true);
+        const ok = exRef.current.check({ silent: true });
+        setPoint(COMPETENCE, LEVEL, 2, ok ? 1 : 0);
+        await mark(1, ok);
+        setSaving(false);
+        router.push("/exercises/comp-3-3/avanzado/ej3");
     };
 
     return (
@@ -79,7 +94,7 @@ export default function PageEj2_33_Avanzado() {
                             </p>
                         </div>
 
-                        <RightsExerciseA2 ref={exRef} onReadyChange={setReady} />
+                        <RightsExerciseA2 ref={exRef} onReadyChange={setReady} seed={seed} />
 
                         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                             <Button
@@ -90,20 +105,23 @@ export default function PageEj2_33_Avanzado() {
                             </Button>
 
                             <div className="flex gap-3">
-                                <Button
-                                    onClick={onCheck}
-                                    disabled={checking || !ready}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                                >
-                                    {checking ? "Comprobando..." : "Comprobar"}
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.check()}
+                                        disabled={!ready}
+                                        variant="outline"
+                                        className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
 
                                 <Button
-                                    asChild
-                                    disabled={!ready}
+                                    onClick={handleNext}
+                                    disabled={saving || !ready}
                                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
-                                    <Link href="/exercises/comp-3-3/avanzado/ej3">Siguiente</Link>
+                                    {saving ? "Guardando..." : "Siguiente"}
                                 </Button>
                             </div>
                         </div>

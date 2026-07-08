@@ -3,7 +3,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type DevelopExerciseI1Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -20,6 +20,7 @@ type Option = {
 type Props = {
     onEvaluate?: (point: 0 | 1) => void;
     onReadyChange?: (ready: boolean) => void;
+    seed?: number;
 };
 
 // Fiel a la tabla de indicadores CS3.1.08 del Excel, pero con un banco de opciones
@@ -110,22 +111,39 @@ const DISTRACTOR_BANK: ReadonlyArray<Option> = [
     },
 ];
 
-function shuffle<T>(items: ReadonlyArray<T>) {
-    return [...items].sort(() => Math.random() - 0.5);
+function shuffle<T>(items: ReadonlyArray<T>, seed = Math.random()) {
+    // Generador mulberry32: el sort(() => Math.random() - 0.5) anterior estaba
+    // sesgado y además no era reproducible por seed.
+    let a = Math.floor(seed * 1e9) | 0;
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const out = [...items];
+
+    for (let i = out.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [out[i], out[j]] = [out[j], out[i]];
+    }
+
+    return out;
 }
 
-function pickOptions() {
-    const benefits = shuffle(BENEFIT_BANK).slice(0, 2); // slot fijo: 2 beneficios
-    const limitation = shuffle(LIMITATION_BANK).slice(0, 1); // slot fijo: 1 limitación
-    const ethics = shuffle(ETHICS_BANK).slice(0, 1); // slot fijo: 1 ética
-    const distractors = shuffle(DISTRACTOR_BANK).slice(0, 1); // slot fijo: 1 distractor (5 alternativas en total)
+function pickOptions(seed?: number) {
+    const s = seed ?? Math.random();
+    const benefits = shuffle(BENEFIT_BANK, s).slice(0, 2); // slot fijo: 2 beneficios
+    const limitation = shuffle(LIMITATION_BANK, s + 0.11).slice(0, 1); // slot fijo: 1 limitación
+    const ethics = shuffle(ETHICS_BANK, s + 0.23).slice(0, 1); // slot fijo: 1 ética
+    const distractors = shuffle(DISTRACTOR_BANK, s + 0.37).slice(0, 1); // slot fijo: 1 distractor (5 alternativas en total)
 
-    return shuffle([...benefits, ...limitation, ...ethics, ...distractors]);
+    return shuffle([...benefits, ...limitation, ...ethics, ...distractors], s + 0.53);
 }
 
 const DevelopExerciseI1 = forwardRef<DevelopExerciseI1Handle, Props>(
-    function DevelopExerciseI1({ onEvaluate, onReadyChange }, ref) {
-        const options = useMemo(() => pickOptions(), []);
+    function DevelopExerciseI1({ onEvaluate, onReadyChange, seed }, ref) {
+        const options = useMemo(() => pickOptions(seed), [seed]);
         const [selected, setSelected] = useState<Record<string, boolean>>({});
         const [feedback, setFeedback] = useState<{
             kind: "idle" | "success" | "warning" | "error";
@@ -184,9 +202,14 @@ const DevelopExerciseI1 = forwardRef<DevelopExerciseI1Handle, Props>(
             return { meetsBenefit, meetsLimitation, meetsEthics, distractorsPicked, score };
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             const { score, distractorsPicked } = evaluateDimensions();
             const ok = score >= 2.5 && distractorsPicked === 0;
+
+            if (opts?.silent) {
+                onEvaluate?.(ok ? 1 : 0);
+                return ok;
+            }
 
             if (ok && score === 3) {
                 setFeedback({

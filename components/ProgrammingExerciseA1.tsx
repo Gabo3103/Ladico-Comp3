@@ -39,6 +39,8 @@ export type ProgrammingExerciseA1Handle = {
     type Props = {
     onFinish?: (point: 0 | 1) => void
     onAttemptsExhausted?: () => void
+    onReadyChange?: (ready: boolean) => void
+    seed?: number
     }
 
     /** Carga Blockly y aplica locale ES de forma robusta (soporta distintas distros/versiones) */
@@ -91,7 +93,7 @@ export type ProgrammingExerciseA1Handle = {
     }
 
     const ProgrammingExerciseA1 = forwardRef<ProgrammingExerciseA1Handle, Props>(function ProgrammingExerciseA1(
-    { onFinish, onAttemptsExhausted },
+    { onFinish, onAttemptsExhausted, onReadyChange, seed },
     ref
     ) {
     const MAX_ATTEMPTS = 3
@@ -125,6 +127,12 @@ export type ProgrammingExerciseA1Handle = {
     const [msg, setMsg] = useState("")
     const [remaining, setRemaining] = useState<number>(0)
     const [reached, setReached] = useState(false)
+
+    const hasAttempted = attempts > 0 || reached
+
+    useEffect(() => {
+        onReadyChange?.(hasAttempted)
+    }, [hasAttempted, onReadyChange])
 
     const LABYRINTHS: boolean[][][] = [
         [
@@ -162,7 +170,7 @@ export type ProgrammingExerciseA1Handle = {
     ]
 
     const [labyrinthIndex] = useState<number>(() =>
-        Math.floor(Math.random() * LABYRINTHS.length)
+        Math.floor((seed ?? Math.random()) * LABYRINTHS.length)
     )
     const [walls] = useState<boolean[][]>(() => LABYRINTHS[labyrinthIndex])
 

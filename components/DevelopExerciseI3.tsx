@@ -3,7 +3,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type DevelopExerciseI3Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -212,11 +212,16 @@ const DevelopExerciseI3 = forwardRef<DevelopExerciseI3Handle, Props>(
             return 0;
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             const missing = correctIds.filter((id) => !chosen.includes(id));
             const wrong = wrongIds.filter((id) => chosen.includes(id));
             const score = calculateScore();
             const ok = missing.length === 0 && wrong.length === 0;
+
+            if (opts?.silent) {
+                onEvaluate?.(ok ? 1 : 0);
+                return ok;
+            }
 
             if (ok) {
                 setFeedback({

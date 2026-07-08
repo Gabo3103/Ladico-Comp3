@@ -104,8 +104,20 @@ String nota2 = "5.0";
     },
 ]
 
-function shuffle<T>(items: T[]): T[] {
-    return [...items].sort(() => Math.random() - 0.5)
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
+    const copy = [...items]
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(rand() * (i + 1))
+        ;[copy[i], copy[j]] = [copy[j], copy[i]]
+    }
+    return copy
 }
 
 export type ProgrammingQuality = "good" | "partial" | "bad"
@@ -119,14 +131,20 @@ export type ProgrammingExerciseI1Grade = {
 export type ProgrammingExerciseI1Handle = {
     check: () => boolean
     grade: () => ProgrammingExerciseI1Grade
+    isReady: () => boolean
+}
+
+type Props = {
+    onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 const SELECT_STYLE =
     "w-full appearance-none rounded-2xl border px-4 py-3 pr-10 text-sm font-semibold leading-relaxed shadow-sm outline-none transition border-slate-200 bg-white text-slate-950 hover:border-[#286575]/40 focus:border-[#286575] focus:ring-2 focus:ring-[#286575]/20"
 
-const ProgrammingExerciseI1 = forwardRef<ProgrammingExerciseI1Handle, {}>(
-    function ProgrammingExerciseI1(_, ref) {
-        const scenario = useMemo(() => shuffle(SCENARIOS)[0], [])
+const ProgrammingExerciseI1 = forwardRef<ProgrammingExerciseI1Handle, Props>(
+    function ProgrammingExerciseI1({ onReadyChange, seed }, ref) {
+        const scenario = useMemo(() => shuffle(SCENARIOS, seed)[0], [seed])
         const expectedLength = scenario.validOrders[0].length
 
         const [sequence, setSequence] = useState<(StepId | "")[]>(
@@ -141,6 +159,12 @@ const ProgrammingExerciseI1 = forwardRef<ProgrammingExerciseI1Handle, {}>(
         useEffect(() => {
             setShuffledOptions(shuffle(scenario.steps))
         }, [scenario])
+
+        const isComplete = sequence.every(Boolean)
+
+        useEffect(() => {
+            onReadyChange?.(isComplete)
+        }, [isComplete, onReadyChange])
 
         const availableOptions = (rowIndex: number) => {
             const selectedElsewhere = new Set(
@@ -217,6 +241,7 @@ const ProgrammingExerciseI1 = forwardRef<ProgrammingExerciseI1Handle, {}>(
         useImperativeHandle(ref, () => ({
             check,
             grade: computeGrade,
+            isReady: () => isComplete,
         }))
 
         return (

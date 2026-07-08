@@ -2,20 +2,42 @@
 
 import Link from "next/link";
 import React, { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLadicoSession } from "@/hooks/useLadicoSession";
+import { setPoint } from "@/lib/levelProgress";
+import { getOrCreateSeed } from "@/lib/caseSeed";
 import DevelopExerciseA1, {
     type DevelopExerciseA1Handle,
 } from "@/components/DevelopExerciseA1";
 
 const COMPETENCE = "3.1";
 const LEVEL = "avanzado";
+const PREFIX = "session:3.1:Avanzado";
 
 export default function PageEj1_31_Avanzado() {
+    const router = useRouter();
+    const { isProfesor, isAdmin } = useAuth();
+    const demoMode = isProfesor || isAdmin;
+    const { mark } = useLadicoSession(COMPETENCE, "Avanzado", PREFIX);
+
     const progressPct = (1 / 3) * 100;
     const exRef = useRef<DevelopExerciseA1Handle>(null);
-    const [, setDone] = useState(false);
     const [ready, setReady] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 1));
+
+    const handleNext = async () => {
+        if (!exRef.current) return;
+        setSaving(true);
+        const ok = exRef.current.check({ silent: true });
+        setPoint(COMPETENCE, LEVEL, 1, ok ? 1 : 0);
+        await mark(0, ok);
+        setSaving(false);
+        router.push("/exercises/comp-3-1/avanzado/ej2");
+    };
 
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
@@ -74,8 +96,8 @@ export default function PageEj1_31_Avanzado() {
 
                         <DevelopExerciseA1
                             ref={exRef}
-                            onEvaluate={(pt) => setDone(pt === 1)}
                             onReadyChange={setReady}
+                            seed={seed}
                         />
 
                         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
@@ -87,22 +109,23 @@ export default function PageEj1_31_Avanzado() {
                             </Button>
 
                             <div className="flex gap-3">
-                                <Button
-                                    disabled={!ready}
-                                    className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                                    onClick={() => {
-                                        if (!exRef.current) return;
-                                        exRef.current.check();
-                                    }}
-                                >
-                                    Comprobar
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        disabled={!ready}
+                                        variant="outline"
+                                        className="rounded-2xl border-[#286675] px-6 py-2 font-medium text-[#286675] shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                        onClick={() => exRef.current?.check()}
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
 
                                 <Button
-                                    asChild
-                                    className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89]"
+                                    disabled={!ready || saving}
+                                    className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
+                                    onClick={handleNext}
                                 >
-                                    <Link href="/exercises/comp-3-1/avanzado/ej2">Siguiente</Link>
+                                    {saving ? "Guardando..." : "Siguiente"}
                                 </Button>
                             </div>
                         </div>

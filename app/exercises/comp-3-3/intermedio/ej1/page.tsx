@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
 import { ensureSession, markAnswered } from "@/lib/testSession"
 import { setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 import RightsExerciseI1, {
     RightsExerciseI1Handle,
@@ -22,11 +23,12 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 
 export default function PageEj1_33_Intermedio() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
 
     const exRef = useRef<RightsExerciseI1Handle>(null)
-    const [checking, setChecking] = useState(false)
     const [ready, setReady] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 1))
 
     const [sessionId, setSessionId] = useState<string | null>(null)
     const ensuringRef = useRef(false)
@@ -72,17 +74,10 @@ export default function PageEj1_33_Intermedio() {
         })()
     }, [user?.uid, sessionId])
 
-    const onCheck = () => {
-        if (!exRef.current) return
-        setChecking(true)
-        exRef.current.grade()
-        setChecking(false)
-    }
-
     const handleNext = async () => {
         if (!exRef.current) return
 
-        const result = exRef.current.grade()
+        const result = exRef.current.grade({ silent: true })
         const isCorrectForScore =
             result.quality === "good" || result.quality === "partial"
         const point: 0 | 1 = isCorrectForScore ? 1 : 0
@@ -158,7 +153,7 @@ export default function PageEj1_33_Intermedio() {
                             </p>
                         </div>
 
-                        <RightsExerciseI1 ref={exRef} onReadyChange={setReady} />
+                        <RightsExerciseI1 ref={exRef} onReadyChange={setReady} seed={seed} />
 
                         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                             <Button
@@ -169,13 +164,16 @@ export default function PageEj1_33_Intermedio() {
                             </Button>
 
                             <div className="flex gap-3">
-                                <Button
-                                    onClick={onCheck}
-                                    disabled={checking || !ready}
-                                    className="rounded-2xl bg-[#286675] px-6 py-2 font-medium text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
-                                >
-                                    {checking ? "Comprobando..." : "Comprobar"}
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.grade()}
+                                        disabled={!ready}
+                                        variant="outline"
+                                        className="rounded-2xl border-[#286675] px-6 py-2 font-medium text-[#286675] shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
 
                                 <Button
                                     onClick={handleNext}

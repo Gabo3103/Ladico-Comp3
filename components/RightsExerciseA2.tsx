@@ -9,7 +9,7 @@ import React, {
 } from "react"
 
 export type RightsExerciseA2Handle = {
-    check: () => boolean
+    check: (opts?: { silent?: boolean }) => boolean
     isReady: () => boolean
     reset: () => void
 }
@@ -50,6 +50,7 @@ type CaseItem = {
 type Props = {
     onEvaluate?: (point: 0 | 1) => void
     onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 type Answer = Partial<Record<Dimension, string>>
@@ -351,29 +352,39 @@ const CASE_BANK: CaseItem[] = [
     },
 ]
 
-function shuffle<T>(items: T[]): T[] {
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
     const copy = [...items]
     for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1))
+        const j = Math.floor(rand() * (i + 1))
         ;[copy[i], copy[j]] = [copy[j], copy[i]]
     }
     return copy
 }
 
-function pickCases(): CaseItem[] {
+function pickCases(seed?: number): CaseItem[] {
+    const s = seed ?? Math.random()
     const aiCase = shuffle(
-        CASE_BANK.filter((item) => item.group === "training" || item.group === "generated")
+        CASE_BANK.filter((item) => item.group === "training" || item.group === "generated"),
+        s + 0.13
     )[0]
     const generalCase = shuffle(
-        CASE_BANK.filter((item) => item.group === "license" || item.group === "hybrid")
+        CASE_BANK.filter((item) => item.group === "license" || item.group === "hybrid"),
+        s + 0.29
     )[0]
 
-    return shuffle([aiCase, generalCase])
+    return shuffle([aiCase, generalCase], s + 0.41)
 }
 
 const RightsExerciseA2 = forwardRef<RightsExerciseA2Handle, Props>(
-    function RightsExerciseA2({ onEvaluate, onReadyChange }, ref) {
-        const [visibleCases, setVisibleCases] = useState<CaseItem[]>(() => pickCases())
+    function RightsExerciseA2({ onEvaluate, onReadyChange, seed }, ref) {
+        const [visibleCases, setVisibleCases] = useState<CaseItem[]>(() => pickCases(seed))
         const [answers, setAnswers] = useState<Record<string, Answer>>({})
         const [checked, setChecked] = useState(false)
         const [activeCase, setActiveCase] = useState(0)
@@ -439,17 +450,17 @@ const RightsExerciseA2 = forwardRef<RightsExerciseA2Handle, Props>(
             return "Bajo"
         }
 
-        const handleCheck = () => {
+        const handleCheck = (opts?: { silent?: boolean }) => {
             if (!allAnswered) return false
 
             const ok = totalScore() >= Math.ceil(maxScore * 0.75)
-            setChecked(true)
+            if (!opts?.silent) setChecked(true)
             onEvaluate?.(ok ? 1 : 0)
             return ok
         }
 
         useImperativeHandle(ref, () => ({
-            check: () => handleCheck(),
+            check: (opts) => handleCheck(opts),
             isReady: () => allAnswered,
             reset: () => {
                 setVisibleCases(pickCases())
@@ -500,7 +511,6 @@ const RightsExerciseA2 = forwardRef<RightsExerciseA2Handle, Props>(
                                 <button
                                     key={option.value}
                                     type="button"
-                                    disabled={checked}
                                     onClick={() =>
                                         setAnswer(item.id, dimension, option.value)
                                     }

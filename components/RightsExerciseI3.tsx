@@ -35,11 +35,12 @@ export type RightsExerciseI3Handle = {
     check: () => void
     isReady: () => boolean
     reset: () => void
-    grade: () => RightsExerciseI3Grade
+    grade: (opts?: { silent?: boolean }) => RightsExerciseI3Grade
 }
 
 type Props = {
     onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 const CONFLICT_LABEL: Record<ConflictKey, string> = {
@@ -167,10 +168,17 @@ const CASE_BANK: Array<{
     },
 ]
 
-function shuffle<T>(items: T[]): T[] {
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
     const copy = [...items]
     for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1))
+        const j = Math.floor(rand() * (i + 1))
         ;[copy[i], copy[j]] = [copy[j], copy[i]]
     }
     return copy
@@ -185,13 +193,14 @@ function isNoConflict(item: (typeof CASE_BANK)[number]) {
     return correct.length === 1 && correct[0] === "NONE"
 }
 
-function pickRandomCases() {
-    const noConflictCases = shuffle(CASE_BANK.filter(isNoConflict))
-    const conflictCases = shuffle(CASE_BANK.filter((item) => !isNoConflict(item)))
-    const includeNoConflict = Math.random() < 0.55
+function pickRandomCases(seed?: number) {
+    const s = seed ?? Math.random()
+    const noConflictCases = shuffle(CASE_BANK.filter(isNoConflict), s + 0.13)
+    const conflictCases = shuffle(CASE_BANK.filter((item) => !isNoConflict(item)), s + 0.29)
+    const includeNoConflict = s < 0.55
 
     if (includeNoConflict && noConflictCases.length > 0) {
-        return shuffle([...conflictCases.slice(0, 3), noConflictCases[0]])
+        return shuffle([...conflictCases.slice(0, 3), noConflictCases[0]], s + 0.41)
     }
 
     return conflictCases.slice(0, 4)
@@ -205,8 +214,8 @@ function sameSet(a: ConflictKey[] | undefined, b: ConflictKey[] | ConflictKey) {
 }
 
 const RightsExerciseI3 = forwardRef<RightsExerciseI3Handle, Props>(
-    function RightsExerciseI3({ onReadyChange }, ref) {
-        const [visibleCases, setVisibleCases] = useState(() => pickRandomCases())
+    function RightsExerciseI3({ onReadyChange, seed }, ref) {
+        const [visibleCases, setVisibleCases] = useState(() => pickRandomCases(seed))
         const [answers, setAnswers] = useState<Partial<Record<CaseId, ConflictKey[]>>>({})
         const [checked, setChecked] = useState(false)
         const [activeCase, setActiveCase] = useState(0)
@@ -292,9 +301,9 @@ const RightsExerciseI3 = forwardRef<RightsExerciseI3Handle, Props>(
                 setActiveCase(0)
                 onReadyChange?.(false)
             },
-            grade() {
+            grade(opts) {
                 const result = computeGrade()
-                if (allAnswered) setChecked(true)
+                if (allAnswered && !opts?.silent) setChecked(true)
                 return result
             },
         }))
@@ -357,7 +366,6 @@ const RightsExerciseI3 = forwardRef<RightsExerciseI3Handle, Props>(
                                             <input
                                                 type="checkbox"
                                                 checked={isPicked}
-                                                disabled={checked}
                                                 onChange={() => toggleConflict(item.id, conflict)}
                                                 className="mt-1 h-5 w-5 shrink-0 rounded accent-[#286575]"
                                             />

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useMemo, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type IntegrationExerciseI2AdaptHandle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -36,6 +36,7 @@ type Scenario = {
 
 type Props = {
     onEvaluate?: (point: 0 | 1) => void;
+    onReadyChange?: (ready: boolean) => void;
     seed?: number;
 };
 
@@ -410,7 +411,7 @@ function pickScenario(seed?: number) {
 }
 
 const IntegrationExerciseI2Adapt = forwardRef<IntegrationExerciseI2AdaptHandle, Props>(
-    function IntegrationExerciseI2Adapt({ onEvaluate, seed }, ref) {
+    function IntegrationExerciseI2Adapt({ onEvaluate, onReadyChange, seed }, ref) {
         const scenario = useMemo(() => pickScenario(seed), [seed]);
         const decisions = useMemo(
             () =>
@@ -441,6 +442,10 @@ const IntegrationExerciseI2Adapt = forwardRef<IntegrationExerciseI2AdaptHandle, 
             [answers]
         );
 
+        useEffect(() => {
+            onReadyChange?.(answeredCount === decisions.length);
+        }, [answeredCount, decisions.length, onReadyChange]);
+
         function setAnswer(decisionId: DecisionId, optionId: OptionId) {
             setAnswers((prev) => ({ ...prev, [decisionId]: optionId }));
             setFeedback({ kind: "idle" });
@@ -455,9 +460,14 @@ const IntegrationExerciseI2Adapt = forwardRef<IntegrationExerciseI2AdaptHandle, 
             }, 0);
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             const result = score();
             const ok = result >= 3;
+
+            if (opts?.silent) {
+                onEvaluate?.(ok ? 1 : 0);
+                return ok;
+            }
 
             if (result === decisions.length) {
                 setFeedback({
@@ -508,6 +518,7 @@ const IntegrationExerciseI2Adapt = forwardRef<IntegrationExerciseI2AdaptHandle, 
                 });
                 setFeedback({ kind: "idle" });
                 onEvaluate?.(0);
+                onReadyChange?.(false);
             },
         }));
 

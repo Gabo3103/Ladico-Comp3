@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
 import { ensureSession, markAnswered } from "@/lib/testSession"
 import { setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 import ProgrammingExerciseI1, { ProgrammingExerciseI1Handle } from "@/components/ProgrammingExerciseI1"
 
 const COMPETENCE = "3.4"
@@ -17,23 +18,23 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 
 export default function PageEj1() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
 
     const [sessionId, setSessionId] = useState<string | null>(null)
     const ensuringRef = useRef(false)
     const [saving, setSaving] = useState(false)
-    const [approved, setApproved] = useState(false)
+    const [ready, setReady] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 1))
 
     const exRef = useRef<ProgrammingExerciseI1Handle>(null)
 
-    // 1) Cargar sesión cacheada
     useEffect(() => {
         if (!user || typeof window === "undefined") return
         const sid = localStorage.getItem(sessionKeyFor(user.uid))
         if (sid) setSessionId(sid)
     }, [user?.uid])
 
-    // 2) Crear sesión si no existe
     useEffect(() => {
         if (!user) {
             setSessionId(null)
@@ -68,14 +69,10 @@ export default function PageEj1() {
         })()
     }, [user?.uid, sessionId])
 
-    const handleCheck = () => {
-        const ok = exRef.current?.check() ?? false
-        setApproved(ok)
-    }
-
     const handleNext = async () => {
         if (!exRef.current) return
-        const isCorrect = exRef.current.check()
+        const result = exRef.current.grade()
+        const isCorrect = result.quality !== "bad"
 
         setSaving(true)
         const point: 0 | 1 = isCorrect ? 1 : 0
@@ -140,7 +137,7 @@ export default function PageEj1() {
 
                 <Card className="bg-white shadow-2xl rounded-3xl border-0 ring-2 ring-[#286575] ring-opacity-30">
                     <CardContent className="p-6 lg:p-8">
-                        <ProgrammingExerciseI1 ref={exRef} />
+                        <ProgrammingExerciseI1 ref={exRef} onReadyChange={setReady} seed={seed} />
 
                         <div className="mt-6 flex items-center justify-between gap-3">
                             <Button
@@ -151,16 +148,19 @@ export default function PageEj1() {
                             </Button>
 
                             <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={handleCheck}
-                                    variant="outline"
-                                    className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
-                                >
-                                    Comprobar
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.check()}
+                                        disabled={!ready}
+                                        variant="outline"
+                                        className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
                                 <Button
                                     onClick={handleNext}
-                                    disabled={saving || !approved}
+                                    disabled={saving || !ready}
                                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
                                     {saving ? "Guardando..." : "Siguiente"}

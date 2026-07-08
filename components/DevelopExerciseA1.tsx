@@ -3,7 +3,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type DevelopExerciseA1Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -437,9 +437,14 @@ const DevelopExerciseA1 = forwardRef<DevelopExerciseA1Handle, Props>(
             return Math.round((proposalScore + justificationScore + elementsScore) * 100) / 100;
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             const result = score();
             const ok = result >= 2.5;
+
+            if (opts?.silent) {
+                onEvaluate?.(ok ? 1 : 0);
+                return ok;
+            }
 
             if (result >= 3.5) {
                 setFeedback({

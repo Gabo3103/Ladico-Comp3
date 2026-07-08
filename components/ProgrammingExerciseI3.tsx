@@ -1,10 +1,11 @@
 "use client"
 
-import React, { forwardRef, useImperativeHandle, useMemo, useState } from "react"
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react"
 
 export type ProgrammingExerciseI3Handle = {
-    check: () => boolean
-    finish: () => void
+    check: (opts?: { silent?: boolean }) => boolean
+    finish: (opts?: { silent?: boolean }) => void
+    isReady: () => boolean
 }
 
 type CategoryId = "ML" | "RULES" | "NO_AI"
@@ -22,6 +23,8 @@ type CaseCard = {
 
 type Props = {
     onFinish?: (point: 0 | 1) => void
+    onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 const CATEGORIES: Category[] = [
@@ -111,26 +114,37 @@ const CASES: CaseCard[] = [
     },
 ]
 
-function shuffle<T>(items: T[]) {
-    return [...items].sort(() => Math.random() - 0.5)
+function shuffle<T>(items: T[], seed = Math.random()) {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
+    const copy = [...items]
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(rand() * (i + 1))
+        ;[copy[i], copy[j]] = [copy[j], copy[i]]
+    }
+    return copy
 }
 
-function pickCases() {
-    const byCategory = (category: CategoryId) =>
-        shuffle(CASES.filter((item) => item.correct === category))
-    const mlCases = byCategory("ML")
+function pickCases(seed?: number) {
+    const s = seed ?? Math.random()
+    const byCategory = (category: CategoryId, offset: number) =>
+        shuffle(CASES.filter((item) => item.correct === category), s + offset)
+    const mlCases = byCategory("ML", 0.11)
 
-    return shuffle([
-        mlCases[0],
-        mlCases[1],
-        byCategory("RULES")[0],
-        byCategory("NO_AI")[0],
-    ])
+    return shuffle(
+        [mlCases[0], mlCases[1], byCategory("RULES", 0.23)[0], byCategory("NO_AI", 0.37)[0]],
+        s + 0.53
+    )
 }
 
 const ProgrammingExerciseI3 = forwardRef<ProgrammingExerciseI3Handle, Props>(
-    function ProgrammingExerciseI3({ onFinish }, ref) {
-        const cases = useMemo(() => pickCases(), [])
+    function ProgrammingExerciseI3({ onFinish, onReadyChange, seed }, ref) {
+        const cases = useMemo(() => pickCases(seed), [seed])
         const [answers, setAnswers] = useState<Record<string, CategoryId | null>>({})
         const [activeCase, setActiveCase] = useState(0)
         const [feedback, setFeedback] = useState<{
@@ -139,36 +153,44 @@ const ProgrammingExerciseI3 = forwardRef<ProgrammingExerciseI3Handle, Props>(
             ok: boolean
         } | null>(null)
 
+        const allAnswered = cases.every((item) => !!answers[item.id])
+
+        useEffect(() => {
+            onReadyChange?.(allAnswered)
+        }, [allAnswered, onReadyChange])
+
         const score = () =>
             cases.reduce(
                 (total, item) => total + Number(answers[item.id] === item.correct),
                 0
             )
 
-        const check = () => {
+        const check = (opts?: { silent?: boolean }) => {
             const result = score()
             const ok = result === cases.length
             const approved = result >= 2
 
-            setFeedback({
-                score: result,
-                ok: approved,
-                message: ok
-                    ? "Excelente. Distingues cuándo un sistema aprende de datos y cuándo solo sigue reglas o automatiza tareas."
-                    : approved
-                    ? "Vas bien. Comprendes la mayoría, revisa el caso que falló: el aprendizaje automático usa ejemplos o datos para clasificar, predecir o recomendar."
-                    : "Revisa los casos: el aprendizaje automático usa ejemplos o datos para clasificar, predecir o recomendar.",
-            })
+            if (!opts?.silent) {
+                setFeedback({
+                    score: result,
+                    ok: approved,
+                    message: ok
+                        ? "Excelente. Distingues cuándo un sistema aprende de datos y cuándo solo sigue reglas o automatiza tareas."
+                        : approved
+                        ? "Vas bien. Comprendes la mayoría, revisa el caso que falló: el aprendizaje automático usa ejemplos o datos para clasificar, predecir o recomendar."
+                        : "Revisa los casos: el aprendizaje automático usa ejemplos o datos para clasificar, predecir o recomendar.",
+                })
+            }
             return approved
         }
 
-        const finish = () => {
-            const ok = check()
+        const finish = (opts?: { silent?: boolean }) => {
+            const ok = check(opts)
             const point: 0 | 1 = ok ? 1 : 0
             onFinish?.(point)
         }
 
-        useImperativeHandle(ref, () => ({ check, finish }))
+        useImperativeHandle(ref, () => ({ check, finish, isReady: () => allAnswered }))
 
         return (
             <section className="space-y-5 rounded-2xl border bg-white p-5 shadow-sm">

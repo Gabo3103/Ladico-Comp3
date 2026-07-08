@@ -15,11 +15,32 @@ export function firstExerciseRoute(competenceId: string, level: LevelSlug): stri
       avanzado: "/exercises/comp-1-3/avanzado/ej1",
     },
 
+    // Desarrollo de contenidos 3.1
+    "3.1": {
+      basico: "/test/3.1?level=básico",
+      intermedio: "/exercises/comp-3-1/intermedio/ej1",
+      avanzado: "/exercises/comp-3-1/avanzado/ej1",
+    },
+
+    // Integración y reelaboración 3.2
+    "3.2": {
+      basico: "/test/3.2?level=básico",
+      intermedio: "/exercises/comp-3-2/intermedio/ej1",
+      avanzado: "/exercises/comp-3-2/avanzado/ej1",
+    },
+
+    // Derechos de autor y licencias 3.3
+    "3.3": {
+      basico: "/test/3.3?level=básico",
+      intermedio: "/exercises/comp-3-3/intermedio/ej1",
+      avanzado: "/exercises/comp-3-3/avanzado/ej1",
+    },
+
     // Programación 3.4
     "3.4": {
-      basico: "/test/1.3?level=básico", // 
-      intermedio: "/exercises/comp-3-4/intermedio/ej1", // 
-      avanzado: "/exercises/comp-3-4/avanzado/ej1",   
+      basico: "/test/3.4?level=básico",
+      intermedio: "/exercises/comp-3-4/intermedio/ej1", //
+      avanzado: "/exercises/comp-3-4/avanzado/ej1",
     },
 
 

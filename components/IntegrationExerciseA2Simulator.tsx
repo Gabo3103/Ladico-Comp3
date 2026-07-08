@@ -14,7 +14,7 @@ export type IntegrationExerciseA2SimulatorGrade = {
 };
 
 export type IntegrationExerciseA2SimulatorHandle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
     grade: () => IntegrationExerciseA2SimulatorGrade;
@@ -23,6 +23,7 @@ export type IntegrationExerciseA2SimulatorHandle = {
 type Props = {
     onEvaluate?: (point: 0 | 1) => void;
     onReadyChange?: (ready: boolean) => void;
+    seed?: number;
 };
 
 type OptionRole = "selective" | "transparency" | "quality" | "exclude";
@@ -161,15 +162,15 @@ function shuffle<T>(items: readonly T[]) {
     return [...items].sort(() => Math.random() - 0.5);
 }
 
-function pickScenario() {
-    return SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+function pickScenario(seed?: number) {
+    return SCENARIOS[Math.floor((seed ?? Math.random()) * SCENARIOS.length)];
 }
 
 const IntegrationExerciseA2Simulator = forwardRef<
     IntegrationExerciseA2SimulatorHandle,
     Props
->(function IntegrationExerciseA2Simulator({ onEvaluate, onReadyChange }, ref) {
-    const scenario = useMemo(() => pickScenario(), []);
+>(function IntegrationExerciseA2Simulator({ onEvaluate, onReadyChange, seed }, ref) {
+    const scenario = useMemo(() => pickScenario(seed), [seed]);
     const options = useMemo(() => shuffle(scenario.options), [scenario]);
     const [selected, setSelected] = useState<Record<string, boolean>>({});
     const [checked, setChecked] = useState(false);
@@ -220,12 +221,12 @@ const IntegrationExerciseA2Simulator = forwardRef<
         return { selectiveUse, transparency, qualityControl, criticalJudgment, total, quality };
     }
 
-    function evaluate() {
+    function evaluate(opts?: { silent?: boolean }) {
         if (!isReady) return false;
         const result = computeGrade();
         // Aprobación estricta: solo el puntaje máximo (4/4) aprueba.
         const ok = result.quality === "good";
-        setChecked(true);
+        if (!opts?.silent) setChecked(true);
         onEvaluate?.(ok ? 1 : 0);
         return ok;
     }
@@ -297,7 +298,6 @@ const IntegrationExerciseA2Simulator = forwardRef<
                                 <input
                                     type="checkbox"
                                     checked={isPicked}
-                                    disabled={checked}
                                     onChange={() => toggle(option.id)}
                                     className="h-5 w-5 shrink-0 rounded accent-[#286575]"
                                 />

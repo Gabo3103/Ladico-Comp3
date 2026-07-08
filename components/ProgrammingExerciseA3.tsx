@@ -21,13 +21,16 @@ export type ProgrammingExerciseA3Grade = {
 }
 
 export type ProgrammingExerciseA3Handle = {
-    check: () => boolean
-    finish: () => boolean
+    check: (opts?: { silent?: boolean }) => boolean
+    finish: (opts?: { silent?: boolean }) => boolean
     grade: () => ProgrammingExerciseA3Grade
+    isReady: () => boolean
 }
 
 type Props = {
     onFinish?: (point: 0 | 1) => void
+    onReadyChange?: (ready: boolean) => void
+    seed?: number
 }
 
 type ToolId = "CODE" | "AI" | "HUMAN"
@@ -94,8 +97,20 @@ const STAGE_ORDER: StageId[] = [
     "report",
 ]
 
-function shuffle<T>(items: readonly T[]) {
-    return [...items].sort(() => Math.random() - 0.5)
+function shuffle<T>(items: readonly T[], seed = Math.random()) {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
+    const copy = [...items]
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(rand() * (i + 1))
+        ;[copy[i], copy[j]] = [copy[j], copy[i]]
+    }
+    return copy
 }
 
 function reorderByIds<T extends { id: string }>(
@@ -116,9 +131,10 @@ function reorderByIds<T extends { id: string }>(
     return next
 }
 
-function disorderStages(stages: { id: StageId; label: string }[], validOrder: StageId[]) {
+function disorderStages(stages: { id: StageId; label: string }[], validOrder: StageId[], seed?: number) {
+    const s = seed ?? Math.random()
     for (let attempt = 0; attempt < 30; attempt++) {
-        const candidate = shuffle(stages)
+        const candidate = shuffle(stages, s + attempt * 0.017)
         const misplaced = candidate.filter(
             (stage, index) => stage.id !== validOrder[index]
         ).length
@@ -147,8 +163,8 @@ const SelectArrow = () => (
 )
 
 const ProgrammingExerciseA3 = forwardRef<ProgrammingExerciseA3Handle, Props>(
-    function ProgrammingExerciseA3({ onFinish }, ref) {
-        const activities = useMemo(() => shuffle(ACTIVITIES), [])
+    function ProgrammingExerciseA3({ onFinish, onReadyChange, seed }, ref) {
+        const activities = useMemo(() => shuffle(ACTIVITIES, seed), [seed])
         const stages = useMemo(
             () => STAGE_ORDER.map((id) => ({ id, label: STAGE_LABEL[id] })),
             []
@@ -164,11 +180,15 @@ const ProgrammingExerciseA3 = forwardRef<ProgrammingExerciseA3Handle, Props>(
         const [feedbackVisible, setFeedbackVisible] = useState(false)
 
         useEffect(() => {
-            setOrder(disorderStages(stages, STAGE_ORDER))
-        }, [stages])
+            setOrder(disorderStages(stages, STAGE_ORDER, seed !== undefined ? seed + 0.61 : undefined))
+        }, [stages, seed])
 
         const allToolsAnswered = activities.every((a) => !!toolAnswers[a.id])
         const allAnswered = allToolsAnswered && order.length === STAGE_ORDER.length
+
+        useEffect(() => {
+            onReadyChange?.(allAnswered)
+        }, [allAnswered, onReadyChange])
 
         function setToolAnswer(activityId: ActivityId, tool: ToolId) {
             setToolAnswers((prev) => ({ ...prev, [activityId]: tool }))
@@ -240,12 +260,14 @@ const ProgrammingExerciseA3 = forwardRef<ProgrammingExerciseA3Handle, Props>(
             }
         }
 
-        function checkNow() {
+        function checkNow(opts?: { silent?: boolean }) {
             if (!allAnswered) return false
             const result = computeGrade()
             const ok = result.quality === "good" || result.quality === "partial"
-            setChecked(true)
-            setFeedbackVisible(true)
+            if (!opts?.silent) {
+                setChecked(true)
+                setFeedbackVisible(true)
+            }
             onFinish?.(ok ? 1 : 0)
             return ok
         }
@@ -254,6 +276,7 @@ const ProgrammingExerciseA3 = forwardRef<ProgrammingExerciseA3Handle, Props>(
             check: checkNow,
             finish: checkNow,
             grade: computeGrade,
+            isReady: () => allAnswered,
         }))
 
         const grade = feedbackVisible ? computeGrade() : null
@@ -285,7 +308,6 @@ const ProgrammingExerciseA3 = forwardRef<ProgrammingExerciseA3Handle, Props>(
                                     <div className="relative">
                                         <select
                                             value={selected ?? ""}
-                                            disabled={checked}
                                             onChange={(e) =>
                                                 setToolAnswer(
                                                     activity.id,

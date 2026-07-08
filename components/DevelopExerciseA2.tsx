@@ -3,7 +3,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type DevelopExerciseA2Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -292,9 +292,14 @@ const DevelopExerciseA2 = forwardRef<DevelopExerciseA2Handle, Props>(
             ).length;
         }
 
-        function evaluate() {
+        function evaluate(opts?: { silent?: boolean }) {
             const correct = totalCorrect();
             const ok = correct === scenario.decisions.length;
+
+            if (opts?.silent) {
+                onEvaluate?.(ok ? 1 : 0);
+                return ok;
+            }
 
             if (ok) {
                 setFeedback({

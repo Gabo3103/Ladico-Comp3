@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext"
 
 import { getProgress, setPoint, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { ensureSession, markAnswered, finalizeSession } from "@/lib/testSession"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 const SCENARIO =
     "Analiza distintas herramientas digitales y clasifica si funcionan mediante aprendizaje automático, reglas programadas, automatización simple o si no corresponde a ninguno de los anteriores. Para cada caso, selecciona la categoría correcta según su funcionamiento."
@@ -24,9 +25,13 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 export default function SandboxHtmlExercisePage() {
     const exerciseRef = useRef<ProgrammingExerciseI3Handle>(null)
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
 
     const [sessionId, setSessionId] = useState<string | null>(null)
+    const [ready, setReady] = useState(false)
+    const [saving, setSaving] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 3))
 
     useEffect(() => {
         if (!user || typeof window === "undefined") return
@@ -35,6 +40,7 @@ export default function SandboxHtmlExercisePage() {
     }, [user?.uid])
 
     const handleFinish = async (point: 0 | 1) => {
+        setSaving(true)
         setPoint(COMPETENCE, LEVEL, 3, point)
 
         let sid = sessionId
@@ -91,6 +97,7 @@ export default function SandboxHtmlExercisePage() {
             ...(sid ? { sid } : {}),
         })
 
+        setSaving(false)
         router.push(`/test/comp-3-4-intermedio?${qs.toString()}`)
     }
 
@@ -148,7 +155,7 @@ export default function SandboxHtmlExercisePage() {
                             </p>
                         </div>
 
-                        <ProgrammingExerciseI3 ref={exerciseRef} onFinish={handleFinish} />
+                        <ProgrammingExerciseI3 ref={exerciseRef} onFinish={handleFinish} onReadyChange={setReady} seed={seed} />
 
                         <div className="mt-6 flex items-center justify-between">
                             <Button
@@ -159,18 +166,22 @@ export default function SandboxHtmlExercisePage() {
                             </Button>
 
                             <div className="flex items-center gap-3">
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exerciseRef.current?.check()}
+                                        disabled={!ready}
+                                        variant="outline"
+                                        className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
                                 <Button
-                                    onClick={() => exerciseRef.current?.check()}
-                                    variant="outline"
-                                    className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
+                                    onClick={() => exerciseRef.current?.finish({ silent: true })}
+                                    disabled={saving || !ready}
+                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
-                                    Comprobar
-                                </Button>
-                                <Button
-                                    onClick={() => exerciseRef.current?.finish()}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
-                                >
-                                    Finalizar
+                                    {saving ? "Guardando..." : "Finalizar"}
                                 </Button>
                             </div>
                         </div>

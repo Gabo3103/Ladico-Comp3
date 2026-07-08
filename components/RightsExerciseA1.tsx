@@ -20,7 +20,7 @@ export type RightsExerciseA1Handle = {
     check: () => void
     isReady: () => boolean
     reset: () => void
-    grade: () => RightsExerciseA1Grade
+    grade: (opts?: { silent?: boolean }) => RightsExerciseA1Grade
 }
 
 // PROPUESTA PARA FUTURO DESARROLLO (no implementado en esta versión):
@@ -46,6 +46,7 @@ type Asset = {
 type Props = {
     onReadyChange?: (ready: boolean) => void
     asset?: Asset
+    seed?: number
 }
 
 type LicenseKind = "BY_SA" | "BY_ND" | "CC0"
@@ -64,10 +65,17 @@ type Option = {
     feedback: string
 }
 
-function shuffle<T>(items: T[]): T[] {
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    let a = Math.floor(seed * 1e9) | 0
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0
+        let t = Math.imul(a ^ (a >>> 15), 1 | a)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
     const copy = [...items]
     for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1))
+        const j = Math.floor(rand() * (i + 1))
         ;[copy[i], copy[j]] = [copy[j], copy[i]]
     }
     return copy
@@ -242,8 +250,8 @@ function buildOptionSet(profile: LicenseProfile): Option[] {
 }
 
 const RightsExerciseA1 = forwardRef<RightsExerciseA1Handle, Props>(
-    function RightsExerciseA1({ onReadyChange, asset }, ref) {
-        const [profileIndex, setProfileIndex] = useState(() => Math.floor(Math.random() * 3))
+    function RightsExerciseA1({ onReadyChange, asset, seed }, ref) {
+        const [profileIndex, setProfileIndex] = useState(() => Math.floor((seed ?? Math.random()) * 3))
         const profiles = useMemo(
             () => licenseProfiles(asset),
             [asset?.license.short, asset?.license.url]
@@ -303,9 +311,9 @@ const RightsExerciseA1 = forwardRef<RightsExerciseA1Handle, Props>(
                 setChecked(false)
                 onReadyChange?.(false)
             },
-            grade() {
+            grade(opts) {
                 const result = computeGrade()
-                if (allAnswered) setChecked(true)
+                if (allAnswered && !opts?.silent) setChecked(true)
                 return result
             },
         }))
@@ -369,7 +377,6 @@ const RightsExerciseA1 = forwardRef<RightsExerciseA1Handle, Props>(
                                     className="mt-1 h-5 w-5 shrink-0 rounded accent-[#286575]"
                                     checked={selected.includes(opt.id)}
                                     onChange={() => toggle(opt.id)}
-                                    disabled={checked}
                                 />
                                 <span className="text-sm text-gray-800">{opt.label}</span>
                             </label>

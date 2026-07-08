@@ -10,6 +10,7 @@ import ProgrammingExerciseA2, { ProgrammingExerciseA2Handle } from "@/components
 import { useAuth } from "@/contexts/AuthContext"
 import { ensureSession, markAnswered } from "@/lib/testSession"
 import { setPoint } from "@/lib/levelProgress"
+import { getOrCreateSeed } from "@/lib/caseSeed"
 
 const SCENARIO =
     "Una tienda de flores quiere automatizar tareas que hoy se repiten manualmente cada semana, usando la tabla FLORES (id, nombre y precio de cada flor). Revisa la instrucción inicial, corrígela si es necesario, elige la salida que realmente automatiza la tarea y valida que el resultado sea el esperado."
@@ -22,12 +23,15 @@ const sessionKeyFor = (uid: string) => `${SESSION_PREFIX}:${uid}`
 
 export default function SandboxSQLPage() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isProfesor, isAdmin } = useAuth()
+    const demoMode = isProfesor || isAdmin
     const exRef = useRef<ProgrammingExerciseA2Handle>(null)
 
     const [sessionId, setSessionId] = useState<string | null>(null)
     const [ensuring, setEnsuring] = useState(false)
     const [saving, setSaving] = useState(false)
+    const [ready, setReady] = useState(false)
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 2))
 
     useEffect(() => {
         if (!user || typeof window === "undefined") return
@@ -65,13 +69,9 @@ export default function SandboxSQLPage() {
         })()
     }, [user?.uid, sessionId, ensuring])
 
-    const handleCheck = () => {
-        exRef.current?.check()
-    }
-
     const handleNext = async () => {
         if (!exRef.current) return
-        const isCorrect = exRef.current.finish()
+        const isCorrect = exRef.current.finish({ silent: true })
         const point: 0 | 1 = isCorrect ? 1 : 0
 
         setSaving(true)
@@ -146,7 +146,7 @@ export default function SandboxSQLPage() {
                             <b>Sigue los 3 pasos</b> del editor: mejora la instrucción, evalúa la salida generada y valida el resultado sobre la tabla FLORES
                         </p>
 
-                        <ProgrammingExerciseA2 ref={exRef} />
+                        <ProgrammingExerciseA2 ref={exRef} onReadyChange={setReady} seed={seed} />
 
                         <div className="mt-6 flex items-center justify-between">
                             <Button
@@ -157,17 +157,20 @@ export default function SandboxSQLPage() {
                             </Button>
 
                             <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={handleCheck}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
-                                >
-                                    Comprobar
-                                </Button>
+                                {demoMode && (
+                                    <Button
+                                        onClick={() => exRef.current?.check()}
+                                        disabled={!ready}
+                                        className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
+                                    >
+                                        Comprobar
+                                    </Button>
+                                )}
 
                                 <Button
                                     onClick={handleNext}
-                                    disabled={saving}
-                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
+                                    disabled={saving || !ready}
+                                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
                                 >
                                     {saving ? "Guardando..." : "Siguiente"}
                                 </Button>

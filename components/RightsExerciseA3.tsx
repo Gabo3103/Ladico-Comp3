@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useMemo, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 
 export type CatId =
     | "VERIFY_SOURCE_AND_LICENSE"
@@ -19,10 +19,12 @@ type BankCase = CaseCard & { group: CaseGroup };
 
 export type RightsExerciseA3Props = {
     onEvaluate?: (point: 0 | 1) => void;
+    onReadyChange?: (ready: boolean) => void;
+    seed?: number;
 };
 
 export type RightsExerciseA3Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -135,16 +137,35 @@ const CASE_BANK: BankCase[] = [
     },
 ];
 
-function pickRandomItems<T>(arr: T[], count: number): T[] {
-    const shuffled = [...arr].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
+function shuffle<T>(items: T[], seed = Math.random()): T[] {
+    // Generador mulberry32: el .sort(() => Math.random() - 0.5) anterior estaba
+    // sesgado y además no era reproducible por seed.
+    let a = Math.floor(seed * 1e9) | 0;
+    const rand = () => {
+        a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const out = [...items];
+    for (let i = out.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
 }
 
-function pickExerciseCases(): CaseCard[] {
-    const aiCase = pickRandomItems(CASE_BANK.filter((item) => item.group === "ai"), 1)[0];
+function pickRandomItems<T>(arr: T[], count: number, seed?: number): T[] {
+    return shuffle(arr, seed).slice(0, count);
+}
+
+function pickExerciseCases(seed?: number): CaseCard[] {
+    const s = seed ?? Math.random();
+    const aiCase = pickRandomItems(CASE_BANK.filter((item) => item.group === "ai"), 1, s + 0.11)[0];
     const imageCase = pickRandomItems(
         CASE_BANK.filter((item) => item.group === "image"),
-        1
+        1,
+        s + 0.23
     )[0];
 
     // Evita que el caso "complex" quede con la misma norma correcta que el caso de IA
@@ -154,14 +175,14 @@ function pickExerciseCases(): CaseCard[] {
     const complexPool = CASE_BANK.filter(
         (item) => item.group === "complex" && !usedCategories.has(item.correctFor)
     );
-    const complexCase = pickRandomItems(complexPool, 1)[0];
+    const complexCase = pickRandomItems(complexPool, 1, s + 0.37)[0];
 
-    return [aiCase, imageCase, complexCase].sort(() => Math.random() - 0.5);
+    return shuffle([aiCase, imageCase, complexCase], s + 0.53);
 }
 
 const RightsExerciseA3 = forwardRef<RightsExerciseA3Handle, RightsExerciseA3Props>(
-    function RightsExerciseA3({ onEvaluate }, ref) {
-        const [cases] = useState<CaseCard[]>(() => pickExerciseCases());
+    function RightsExerciseA3({ onEvaluate, onReadyChange, seed }, ref) {
+        const [cases] = useState<CaseCard[]>(() => pickExerciseCases(seed));
         const [dragging, setDragging] = useState<CatId | null>(null);
         const [dragOverCase, setDragOverCase] = useState<CaseId | null>(null);
         const [assign, setAssign] = useState<Record<CaseId, CatId | null>>(() =>
@@ -181,6 +202,15 @@ const RightsExerciseA3 = forwardRef<RightsExerciseA3Handle, RightsExerciseA3Prop
                 >,
             []
         );
+
+        const allAssigned = useMemo(
+            () => cases.every((item) => !!assign[item.id]),
+            [assign, cases]
+        );
+
+        useEffect(() => {
+            onReadyChange?.(allAssigned);
+        }, [allAssigned, onReadyChange]);
 
         const usedCatIds = useMemo(
             () => new Set(Object.values(assign).filter((v): v is CatId => !!v)),
@@ -243,7 +273,7 @@ const RightsExerciseA3 = forwardRef<RightsExerciseA3Handle, RightsExerciseA3Prop
             setAssign((prev) => ({ ...prev, [caseId]: null }));
         };
 
-        const check = () => {
+        const check = (opts?: { silent?: boolean }) => {
             let correctCount = 0;
             const rows: React.ReactNode[] = [];
 
@@ -267,32 +297,34 @@ const RightsExerciseA3 = forwardRef<RightsExerciseA3Handle, RightsExerciseA3Prop
                 correctCount === 3 ? "Alto" : correctCount === 2 ? "Medio" : "Bajo";
             const approved = correctCount >= 2;
 
-            setFeedback(
-                <div
-                    className={`mt-4 rounded-2xl p-3 ${
-                        approved ? "bg-green-50" : "bg-red-50"
-                    }`}
-                >
-                    <p className={`font-medium ${approved ? "text-green-700" : "text-red-700"}`}>
-                        Resultado: {correctCount} de {cases.length} — Nivel {level}
-                    </p>
-                    {level === "Alto" ? (
-                        <p className="mt-1 text-green-700">
-                            Excelente. Todas las asignaciones son coherentes.
+            if (!opts?.silent) {
+                setFeedback(
+                    <div
+                        className={`mt-4 rounded-2xl p-3 ${
+                            approved ? "bg-green-50" : "bg-red-50"
+                        }`}
+                    >
+                        <p className={`font-medium ${approved ? "text-green-700" : "text-red-700"}`}>
+                            Resultado: {correctCount} de {cases.length} — Nivel {level}
                         </p>
-                    ) : level === "Medio" ? (
-                        <div className="mt-1 text-green-700">
-                            Aprobado. Distingues la mayoría de los casos, revisa el detalle:
-                            <ul className="list-disc pl-5 mt-2 text-sm">{rows}</ul>
-                        </div>
-                    ) : (
-                        <div className="mt-1 text-red-700">
-                            No aprobado. Aún hay casos por revisar:
-                            <ul className="list-disc pl-5 mt-2 text-sm">{rows}</ul>
-                        </div>
-                    )}
-                </div>
-            );
+                        {level === "Alto" ? (
+                            <p className="mt-1 text-green-700">
+                                Excelente. Todas las asignaciones son coherentes.
+                            </p>
+                        ) : level === "Medio" ? (
+                            <div className="mt-1 text-green-700">
+                                Aprobado. Distingues la mayoría de los casos, revisa el detalle:
+                                <ul className="list-disc pl-5 mt-2 text-sm">{rows}</ul>
+                            </div>
+                        ) : (
+                            <div className="mt-1 text-red-700">
+                                No aprobado. Aún hay casos por revisar:
+                                <ul className="list-disc pl-5 mt-2 text-sm">{rows}</ul>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
 
             onEvaluate?.(approved ? 1 : 0);
             return approved;
@@ -310,6 +342,7 @@ const RightsExerciseA3 = forwardRef<RightsExerciseA3Handle, RightsExerciseA3Prop
                 );
                 setFeedback(null);
                 onEvaluate?.(0);
+                onReadyChange?.(false);
             },
         }));
 

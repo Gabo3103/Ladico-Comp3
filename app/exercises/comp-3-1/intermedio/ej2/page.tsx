@@ -4,17 +4,39 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLadicoSession } from "@/hooks/useLadicoSession";
+import { setPoint } from "@/lib/levelProgress";
+import { getOrCreateSeed } from "@/lib/caseSeed";
 import DevelopExerciseI2, {
     type DevelopExerciseI2Handle,
 } from "@/components/DevelopExerciseI2";
 
 const COMPETENCE = "3.1";
 const LEVEL = "intermedio";
+const PREFIX = "session:3.1:Intermedio";
 
 export default function PageEj2_31_Intermedio() {
+    const router = useRouter();
+    const { isProfesor, isAdmin } = useAuth();
+    const demoMode = isProfesor || isAdmin;
+    const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX);
+
     const progressPct = (2 / 3) * 100;
     const exRef = useRef<DevelopExerciseI2Handle>(null);
-    const [done, setDone] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [seed] = useState(() => getOrCreateSeed(COMPETENCE, LEVEL, 2));
+
+    const handleNext = async () => {
+        if (!exRef.current) return;
+        setSaving(true);
+        const ok = exRef.current.check({ silent: true });
+        setPoint(COMPETENCE, LEVEL, 2, ok ? 1 : 0);
+        await mark(1, ok);
+        setSaving(false);
+        router.push("/exercises/comp-3-1/intermedio/ej3");
+    };
 
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
@@ -74,7 +96,7 @@ export default function PageEj2_31_Intermedio() {
                 <DevelopExerciseI2
                 ref={exRef}
                 countScenarios={1}
-                onEvaluate={(pt) => setDone(pt === 1)}
+                seed={seed}
                 />
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
@@ -86,23 +108,21 @@ export default function PageEj2_31_Intermedio() {
                 </Button>
 
                 <div className="flex gap-3">
+                    {demoMode && (
+                        <Button
+                            variant="outline"
+                            className="px-6 py-2 rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5]"
+                            onClick={() => exRef.current?.check()}
+                        >
+                            Comprobar
+                        </Button>
+                    )}
                     <Button
-                    className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89]"
-                    onClick={() => {
-                    if (!exRef.current) return;
-                    const ok = exRef.current.check();
-                    setDone(ok);
-                    }}
-                    >
-                    Comprobar
-                    </Button>
-
-                    <Button
-                    asChild
-                    disabled={!done}
+                    disabled={saving}
                     className="px-6 py-2 bg-[#286675] rounded-2xl text-white font-medium shadow-lg hover:bg-[#3a7d89] disabled:opacity-50"
+                    onClick={handleNext}
                     >
-                    <Link href="/exercises/comp-3-1/intermedio/ej3">Siguiente</Link>
+                    {saving ? "Guardando..." : "Siguiente"}
                     </Button>
                 </div>
                 </div>

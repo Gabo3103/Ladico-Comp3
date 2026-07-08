@@ -11,7 +11,7 @@ export type IntegrationExerciseI3RepresentGrade = {
 };
 
 export type IntegrationExerciseI3RepresentHandle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
     grade: () => IntegrationExerciseI3RepresentGrade;
@@ -20,6 +20,7 @@ export type IntegrationExerciseI3RepresentHandle = {
 type Props = {
     onEvaluate?: (point: 0 | 1) => void;
     onReadyChange?: (ready: boolean) => void;
+    seed?: number;
 };
 
 type QuestionId = "q1" | "q2" | "q3";
@@ -215,15 +216,15 @@ const VARIANTS: Variant[] = [
     },
 ];
 
-function pickVariant() {
-    return VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
+function pickVariant(seed?: number) {
+    return VARIANTS[Math.floor((seed ?? Math.random()) * VARIANTS.length)];
 }
 
 const IntegrationExerciseI3Represent = forwardRef<
     IntegrationExerciseI3RepresentHandle,
     Props
->(function IntegrationExerciseI3Represent({ onEvaluate, onReadyChange }, ref) {
-    const questions = useMemo(() => pickVariant().questions, []);
+>(function IntegrationExerciseI3Represent({ onEvaluate, onReadyChange, seed }, ref) {
+    const questions = useMemo(() => pickVariant(seed).questions, [seed]);
     const [answers, setAnswers] = useState<Partial<Record<QuestionId, string>>>({});
     const [checked, setChecked] = useState(false);
     const [activeQuestion, setActiveQuestion] = useState(0);
@@ -256,11 +257,11 @@ const IntegrationExerciseI3Represent = forwardRef<
         return { correctCount, totalCount, quality };
     }
 
-    function evaluate() {
+    function evaluate(opts?: { silent?: boolean }) {
         if (!allAnswered) return false;
         const result = computeGrade();
         const ok = result.quality === "good" || result.quality === "partial";
-        setChecked(true);
+        if (!opts?.silent) setChecked(true);
         onEvaluate?.(ok ? 1 : 0);
         return ok;
     }
@@ -340,7 +341,6 @@ const IntegrationExerciseI3Represent = forwardRef<
                                     <button
                                         key={option.id}
                                         type="button"
-                                        disabled={checked}
                                         onClick={() => setAnswer(question.id, option.id)}
                                         className={`block w-full rounded-xl border px-4 py-2.5 text-left text-sm leading-relaxed transition ${
                                             selected

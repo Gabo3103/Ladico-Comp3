@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 export type DevelopExerciseI2Handle = {
-    check: () => boolean;
+    check: (opts?: { silent?: boolean }) => boolean;
     isReady: () => boolean;
     reset: () => void;
 };
@@ -161,7 +161,7 @@ function disorderSteps(steps: Step[]) {
 type FeedbackTier = "success" | "partial" | "low";
 
 const DevelopExerciseI2Core = forwardRef<
-    { check: () => boolean },
+    { check: (opts?: { silent?: boolean }) => boolean },
     { scenario: Scenario; onEvaluate?: (point: 0 | 1) => void }
 >(function DevelopExerciseI2Core({ scenario, onEvaluate }, ref) {
     const initial = useMemo(() => disorderSteps(scenario.steps), [scenario.id]);
@@ -201,9 +201,15 @@ const DevelopExerciseI2Core = forwardRef<
         setOverId(null);
     };
 
-    const check = () => {
+    const check = (opts?: { silent?: boolean }) => {
         const total = scenario.steps.length;
         const correctCount = countCorrectPositions(order);
+        const approvedSilent = correctCount >= total - 2;
+
+        if (opts?.silent) {
+            onEvaluate?.(approvedSilent ? 1 : 0);
+            return approvedSilent;
+        }
 
         // Bandas: 5/5 y 4/5 éxito pleno, 3/5 aprueba perdonando un desliz que invierte
         // dos pasos adyacentes (2 posiciones mal ubicadas) sin romper el flujo esencial,
@@ -314,16 +320,16 @@ const DevelopExerciseI2 = forwardRef<DevelopExerciseI2Handle, Props>(
             () => pickScenarios(countScenarios, seed),
             [countScenarios, seed]
         );
-        const scenarioRefs = useRef<Record<string, { check: () => boolean }>>({});
+        const scenarioRefs = useRef<Record<string, { check: (opts?: { silent?: boolean }) => boolean }>>({});
 
         useImperativeHandle(ref, () => ({
-            check: () => {
+            check: (opts?: { silent?: boolean }) => {
                 let allOk = true;
                 scenarios.forEach((scenario) => {
                     const refCore = scenarioRefs.current[scenario.id];
                     if (!refCore) return;
 
-                    const ok = refCore.check();
+                    const ok = refCore.check(opts);
                     if (!ok) allOk = false;
                 });
                 onEvaluate?.(allOk ? 1 : 0);

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, XCircle, CheckCircle, XCircle as XIcon } from "lucide-react"
 import { finalizeSession } from "@/lib/testSession"
+import { clearCaseSeeds } from "@/lib/caseSeed"
 
 function ResultsIntermedioContent() {
     const sp = useSearchParams()
@@ -100,6 +101,7 @@ function ResultsIntermedioContent() {
         try {
         const key = `ladico:${data.competence}:${data.level}:progress`
         localStorage.removeItem(key)
+        clearCaseSeeds(data.competence, data.level)
         } catch {
         /* no-op */
         }
