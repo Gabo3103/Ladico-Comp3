@@ -83,6 +83,13 @@ export default function Page() {
       title="Apoyar a una persona con dificultad auditiva en una videollamada"
       instruction={'Acompaña a una persona con dificultad auditiva en la videollamada que se muestra. Abra el menú de accesibilidad (botón Apoyos) y active los apoyos que esta app ofrece para que pueda seguir la conversación. Cada app ofrece cosas distintas: active solo lo pertinente y deje lo que no ayuda a escuchar.'}
       onNext={handleNext}
+      onCheck={() => {
+        const pertinent = app.menu.filter(o => o.pertinent).map(o => o.id)
+        const good = pertinent.filter(id => on.has(id)).length
+        const bad = app.menu.filter(o => !o.pertinent && on.has(o.id)).length
+        return good === pertinent.length && bad === 0
+      }}
+      checkDisabled={false}
     >
       <div className="max-w-2xl mx-auto">
         {/* Barra de la app (según el estilo real de cada app) */}

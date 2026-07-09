@@ -41,7 +41,14 @@ export default function Page() {
       index={1} total={3}
       title="Resolver un problema de conexión de correo"
       instruction={'Su aplicación de correo electrónico muestra el mensaje "Error de conexión con el servidor" desde hace 20 minutos. Usted espera una respuesta laboral urgente y necesita acceder a su bandeja de entrada lo antes posible.\n\nSeleccione TODAS las estrategias de resolución que considere adecuadas para este problema.'}
-      onNext={handleNext} nextDisabled={sel.size === 0}
+      onNext={handleNext}
+      onCheck={() => {
+        let ok = 0, bad = 0
+        sel.forEach((i) => (CORRECT.has(i) ? ok++ : bad++))
+        return ok >= 3 && bad === 0
+      }}
+      checkDisabled={false}
+      nextDisabled={sel.size === 0}
     >
       <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
     </ExerciseShell>

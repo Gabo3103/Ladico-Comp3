@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { getCompetenceTitle } from "@/components/data/digcompSkills"
 import Link from "next/link"
 import { AlertTriangle, Bot, FileText, Image as ImageIcon, Presentation, Sparkles, Wand2, X } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface TestInterfaceProps {
   testSession: TestSession
@@ -139,6 +140,8 @@ export default function TestInterface({
   onTestComplete,
   questionTimeSeconds = 60,
 }: TestInterfaceProps) {
+  const { isProfesor, isAdmin } = useAuth()
+  const demoMode = isProfesor || isAdmin
   // ------- Guards básicos -------
   const questions = testSession?.questions ?? []
   const totalQuestions = Array.isArray(questions) ? questions.length : 0
@@ -180,11 +183,13 @@ export default function TestInterface({
   const progress = ((currentIndex + 1) / totalQuestions) * 100
   const competenceCode = currentQuestion?.competence
   const competenceName = getCompetenceTitle(competenceCode)
+  const [checkResult, setCheckResult] = useState<boolean | null>(null)
   const hasAnswer = Array.isArray(selectedAnswer)
     ? selectedAnswer.length > 0
     : selectedAnswer !== null
 
   const handleAnswerSelect = (answerIndex: number) => {
+    setCheckResult(null)
     if (currentQuestion?.type === "multiple-response") {
       setSelectedAnswer((current) => {
         const selected = Array.isArray(current) ? current : []
@@ -332,6 +337,7 @@ export default function TestInterface({
       setAttemptsLeft(3)
       setShowWarning(false)
       setInvalidated(false)
+      setCheckResult(null)
       startTimer() // nuevo timer
       return nextIndex
     })
@@ -349,6 +355,7 @@ export default function TestInterface({
       setAttemptsLeft(3)
       setShowWarning(false)
       setInvalidated(false)
+      setCheckResult(null)
       startTimer()
     }
   }
@@ -363,6 +370,16 @@ export default function TestInterface({
     questionText.includes("ia generativa") ||
     questionText.includes("inteligencia artificial")
   const showGenerativePresentationDemo = competenceCode === "5.3" && isBasicLevel && isPresentationAiQuestion
+  const showArea5DemoControls = demoMode && competenceCode?.startsWith("5.") && isBasicLevel
+  const handleCheck = () => {
+    const correct = currentQuestion?.correctAnswerIndex
+    if (Array.isArray(correct)) {
+      const selected = Array.isArray(selectedAnswer) ? selectedAnswer : []
+      setCheckResult(correct.length === selected.length && correct.every((i) => selected.includes(i)))
+      return
+    }
+    setCheckResult(selectedAnswer === correct)
+  }
 
   return (
     <div className="min-h-screen bg-[#f3fbfb]">
@@ -559,7 +576,15 @@ export default function TestInterface({
 
             {/* Navegación */}
             <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
-              <div className="flex space-x-3 w-full sm:w-auto">
+              <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                {showArea5DemoControls && (
+                  <Button
+                    asChild
+                    className="flex-1 sm:flex-none px-6 py-2.5 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white shadow-lg hover:bg-[#3a7d89] transition-all text-sm"
+                  >
+                    <Link href="/dashboard">Terminar</Link>
+                  </Button>
+                )}
                 {currentIndex > 0 && (
                   <Button
                     onClick={handlePrev}
@@ -571,13 +596,32 @@ export default function TestInterface({
                 )}
               </div>
 
-              <Button
-                onClick={() => handleNext(false)}
-                disabled={!hasAnswer || invalidated}
-                className="w-full sm:w-auto px-8 sm:px-10 py-2.5 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white shadow-lg hover:bg-[#3a7d89] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLastQuestion ? "Finalizar" : "Siguiente"}
-              </Button>
+              <div className="flex flex-wrap items-center justify-end gap-3 w-full sm:w-auto">
+                {showArea5DemoControls && (
+                  <>
+                    {checkResult !== null && (
+                      <span className={`text-xs font-semibold rounded-full px-3 py-1 ${checkResult ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                        {checkResult ? "Correcto" : "Revisar respuesta"}
+                      </span>
+                    )}
+                    <Button
+                      variant="outline"
+                      onClick={handleCheck}
+                      disabled={!hasAnswer || invalidated}
+                      className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl sm:rounded-2xl border-[#286675] text-[#286675] font-medium shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Comprobar
+                    </Button>
+                  </>
+                )}
+                <Button
+                  onClick={() => handleNext(false)}
+                  disabled={!hasAnswer || invalidated}
+                  className="flex-1 sm:flex-none px-8 sm:px-10 py-2.5 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white shadow-lg hover:bg-[#3a7d89] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLastQuestion ? "Finalizar" : "Siguiente"}
+                </Button>
+              </div>
             </div>
 
             {/* Ayuda */}

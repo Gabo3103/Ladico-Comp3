@@ -1,0 +1,36 @@
+
+> ladico-v3.1@0.3.1 dev
+> next dev
+
+  ▲ Next.js 14.2.31
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 10.8s
+ ○ Compiling /exercises/comp-5-1/avanzado/ej2 ...
+ ✓ Compiled /exercises/comp-5-1/avanzado/ej2 in 14.2s (863 modules)
+ GET /exercises/comp-5-1/avanzado/ej2 200 in 7645ms
+ ✓ Compiled in 1874ms (361 modules)
+ GET /exercises/comp-5-1/avanzado/ej2 200 in 254ms
+ ✓ Compiled in 6s (361 modules)
+ ✓ Compiled in 1977ms (361 modules)
+ ✓ Compiled in 914ms (361 modules)
+ ✓ Compiled in 1209ms (361 modules)
+ ✓ Compiled in 1144ms (361 modules)
+ ✓ Compiled in 1124ms (361 modules)
+ ✓ Compiled in 1023ms (361 modules)
+ ✓ Compiled in 4.7s (361 modules)
+ ✓ Compiled in 829ms (361 modules)
+ ✓ Compiled in 1481ms (361 modules)
+ ✓ Compiled in 2.2s (361 modules)
+ ✓ Compiled in 1847ms (361 modules)
+ ✓ Compiled in 978ms (361 modules)
+ ✓ Compiled in 1499ms (361 modules)
+ ✓ Compiled in 834ms (361 modules)
+ ✓ Compiled in 797ms (361 modules)
+ ✓ Compiled in 934ms (361 modules)
+ ✓ Compiled in 1515ms (361 modules)
+ ✓ Compiled in 1059ms (361 modules)
+ ✓ Compiled in 1158ms (361 modules)
+ ✓ Compiled in 1405ms (361 modules)
+ ✓ Compiled in 1210ms (361 modules)

@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { useState, type ReactNode } from "react"
+import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
@@ -12,14 +13,23 @@ type Props = {
   instruction?: string
   children: ReactNode
   onNext: () => void
+  onCheck?: () => boolean
   nextLabel?: string
   nextDisabled?: boolean
+  checkDisabled?: boolean
 }
 
 // Contraparte a "pantalla entera" de ExerciseShell: misma API, pero ocupa todo
 // el alto de la ventana con barra superior, cuerpo amplio y pie con el botón.
-export default function FullScreenShell({ label, index, total, title, instruction, children, onNext, nextLabel = "Siguiente", nextDisabled = false }: Props) {
+export default function FullScreenShell({ label, index, total, title, instruction, children, onNext, onCheck, nextLabel = "Siguiente", nextDisabled = false, checkDisabled }: Props) {
+  const { isProfesor, isAdmin } = useAuth()
+  const demoMode = isProfesor || isAdmin
   const [open, setOpen] = useState(true)
+  const [checkResult, setCheckResult] = useState<boolean | null>(null)
+  const handleCheck = () => {
+    if (!onCheck) return
+    setCheckResult(onCheck())
+  }
   return (
     <div className="min-h-screen flex flex-col bg-[#f3fbfb]">
       <header className="bg-white border-b border-gray-200">
@@ -51,8 +61,30 @@ export default function FullScreenShell({ label, index, total, title, instructio
       </main>
 
       <footer className="bg-white border-t border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3 flex justify-end">
-          <Button onClick={onNext} disabled={nextDisabled} className="px-10 py-2.5 bg-[#286575] rounded-xl font-medium text-white shadow hover:bg-[#3a7d89] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">{nextLabel}</Button>
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+          <Button asChild className="px-8 py-2.5 bg-[#286575] rounded-xl font-medium text-white shadow hover:bg-[#3a7d89] focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">
+            <Link href="/dashboard">Terminar</Link>
+          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {demoMode && onCheck && (
+              <>
+                {checkResult !== null && (
+                  <span className={`text-xs font-semibold rounded-full px-3 py-1 ${checkResult ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                    {checkResult ? "Correcto" : "Revisar respuesta"}
+                  </span>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={handleCheck}
+                  disabled={checkDisabled ?? nextDisabled}
+                  className="px-8 py-2.5 rounded-xl border-[#286575] text-[#286575] font-medium shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Comprobar
+                </Button>
+              </>
+            )}
+            <Button onClick={onNext} disabled={nextDisabled} className="px-10 py-2.5 bg-[#286575] rounded-xl font-medium text-white shadow hover:bg-[#3a7d89] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">{nextLabel}</Button>
+          </div>
         </div>
       </footer>
     </div>

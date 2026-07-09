@@ -55,6 +55,13 @@ export default function Page() {
       title="Detectar las barreras de accesibilidad"
       instruction={'Revise el portal de agenda de horas médicas y marque únicamente los elementos que constituyen una barrera de accesibilidad. Abra el portal con el botón, márquelos allí y cierre la ventana.'}
       onNext={handleNext}
+      onCheck={() => {
+        const m = readMarks()
+        let ok = 0, bad = 0
+        m.forEach(id => (BARRIERS.has(id) ? ok++ : bad++))
+        return ok - bad >= 5
+      }}
+      checkDisabled={false}
       nextDisabled={marks.length === 0}
     >
       <div className="max-w-xl mx-auto text-center">

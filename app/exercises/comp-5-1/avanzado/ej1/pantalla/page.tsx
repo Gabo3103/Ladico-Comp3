@@ -1,24 +1,24 @@
 "use client"
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageIcon, Images, MessageCircle, Gamepad2, Film, Wifi, Signal, BatteryFull, X } from "lucide-react"
+import { Bell, Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageIcon, Images, MessageCircle, Gamepad2, Film, Wifi, Signal, BatteryFull, X } from "lucide-react"
 import FullScreenShell from "@/components/FullScreenShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
 
 const COMPETENCE = "5.1"
 const PREFIX = "session:5.1:Avanzado"
-const NEED_GB = 5
+const NEED_FREE = 2
 const CAP = 32
 
 type AppId = "juego" | "videos" | "whatsapp" | "fotos" | "camara"
 type App = { id: AppId; name: string; size: number; use: string; system?: boolean; keep?: boolean; icon: any }
 const APPS: App[] = [
-  { id: "juego", name: "Juego 3D Pro", size: 4.2, use: "hace 3 meses", icon: Gamepad2 },
-  { id: "videos", name: "Videos guardados", size: 3.1, use: "hace 2 meses", icon: Film },
-  { id: "whatsapp", name: "WhatsApp", size: 1.8, use: "hoy", keep: true, icon: MessageCircle },
+  { id: "juego", name: "Juego 3D Pro", size: 3.2, use: "hace 3 meses", icon: Gamepad2 },
+  { id: "videos", name: "Videos guardados", size: 2.6, use: "hace 2 meses", icon: Film },
+  { id: "whatsapp", name: "WhatsApp", size: 1.4, use: "hoy", keep: true, icon: MessageCircle },
   { id: "fotos", name: "Fotos del viaje", size: 0.9, use: "ayer", keep: true, icon: Images },
-  { id: "camara", name: "Cámara", size: 0.12, use: "hoy", system: true, keep: true, icon: Camera },
+  { id: "camara", name: "Cámara", size: 0.1, use: "hoy", system: true, keep: true, icon: Camera },
 ]
 const PHOTOS = ["from-amber-300 to-rose-300", "from-sky-300 to-indigo-300", "from-emerald-300 to-teal-300", "from-fuchsia-300 to-purple-300", "from-orange-300 to-red-300", "from-lime-300 to-green-300"]
 type Screen = "home" | "camera" | "settings" | "storage" | "fotos" | "whatsapp" | "app"
@@ -30,10 +30,10 @@ export default function Page() {
   const [openApp, setOpenApp] = useState<AppId | null>(null)
   const [removed, setRemoved] = useState<Set<AppId>>(new Set())
 
-  const other = 4.9
+  const other = 22.5
   const used = useMemo(() => other + APPS.filter(a => !removed.has(a.id)).reduce((s, a) => s + a.size, 0), [removed])
-  const freed = useMemo(() => APPS.filter(a => removed.has(a.id)).reduce((s, a) => s + a.size, 0), [removed])
-  const cameraOk = freed >= NEED_GB
+  const freeGB = CAP - used
+  const cameraOk = freeGB >= NEED_FREE
   const removedWrong = APPS.some(a => a.keep && removed.has(a.id))
   const uninstall = (id: AppId) => setRemoved(prev => new Set(prev).add(id))
 
@@ -56,6 +56,9 @@ export default function Page() {
       title="Liberar almacenamiento para usar la cámara"
       instruction={'Un familiar le pide tomarle una fotografía para un trámite urgente. Al abrir la cámara aparece un problema. Use el teléfono como lo haría normalmente, resuélvalo y tome la foto.'}
       onNext={handleNext}
+      onCheck={() => cameraOk && !removedWrong}
+      checkDisabled={false}
+      nextDisabled={!cameraOk || removedWrong}
     >
       <div className="mx-auto w-full max-w-[360px] rounded-[2.6rem] border-[10px] border-gray-900 bg-black overflow-hidden shadow-2xl">
         <div className="bg-gray-900 text-white flex items-center justify-between px-6 py-1.5 text-xs">
@@ -65,6 +68,17 @@ export default function Page() {
         <div className="h-[480px] overflow-y-auto bg-gradient-to-b from-[#dfeaf0] to-[#eef3f6]">
           {screen === "home" && (
             <div className="p-6">
+              {freeGB < NEED_FREE && (
+                <button onClick={() => setScreen("storage")} className="mb-5 w-full rounded-2xl border border-amber-200 bg-amber-50 p-3 text-left shadow-sm hover:bg-amber-100 transition">
+                  <span className="flex items-start gap-2">
+                    <Bell className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                    <span>
+                      <span className="block text-xs font-semibold text-amber-900">Almacenamiento casi lleno · quedan {freeGB.toFixed(1)} GB</span>
+                      <span className="block text-[11px] text-amber-700">La cámara necesita {NEED_FREE} GB libres. Libere espacio para poder usarla.</span>
+                    </span>
+                  </span>
+                </button>
+              )}
               <div className="grid grid-cols-4 gap-5 mt-2">
                 <HomeIcon label="Cámara" icon={Camera} onClick={() => setScreen("camera")} />
                 <HomeIcon label="Ajustes" icon={Settings} onClick={() => setScreen("settings")} />
@@ -82,7 +96,7 @@ export default function Page() {
               <div className="flex flex-col items-center justify-center h-[432px] p-6 text-center bg-black text-white">
                 {cameraOk ? (<><Camera className="w-16 h-16 mb-4 text-white" /><p className="text-base">Foto tomada.</p></>) : (
                   <><div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4"><X className="w-8 h-8 text-red-400" /></div>
-                    <p className="text-base">No se puede iniciar la cámara.</p><p className="text-sm text-white/70 mt-1">Espacio de almacenamiento insuficiente.</p></>)}
+                    <p className="text-base">No se puede iniciar la cámara.</p><p className="text-sm text-white/70 mt-1">Espacio insuficiente. La cámara necesita {NEED_FREE} GB libres.</p></>)}
               </div>
             </div>
           )}

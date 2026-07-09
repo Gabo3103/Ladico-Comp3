@@ -57,7 +57,15 @@ export default function Page() {
       index={3} total={3}
       title="Apoyo proporcional a un familiar mayor"
       instruction={'Usted acompaña a un familiar mayor que quiere "Hacer su vida más fácil" usando el teléfono para videollamadas y enviar fotos a la familia, ganando autonomía. Identifique la verdadera necesidad de aprendizaje y, para cada tarea, elija el tipo de apoyo proporcional a su complejidad.'}
-      onNext={handleNext} nextLabel="Finalizar" nextDisabled={p1 === null || rows.some(s => s === null)}
+      onNext={handleNext}
+      onCheck={() => {
+        const p1ok = p1 === P1_CORRECT ? 1 : 0
+        const rowsOk = ROWS.reduce((a, r, i) => a + (rows[i] === r.correct ? 1 : 0), 0)
+        return p1ok + rowsOk >= 3
+      }}
+      checkDisabled={false}
+      nextLabel="Finalizar"
+      nextDisabled={p1 === null || rows.some(s => s === null)}
     >
       <div className="space-y-6">
         <div>
@@ -70,6 +78,11 @@ export default function Page() {
         </div>
         <div>
           <p className="text-base font-semibold text-gray-800 mb-2">Parte 2 — Elija el apoyo proporcional para cada tarea</p>
+          <div className="mb-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 space-y-1">
+            <p><b className="text-gray-800">Demostración breve:</b> se lo muestran una vez.</p>
+            <p><b className="text-gray-800">Práctica guiada acompañada:</b> lo practica con alguien al lado.</p>
+            <p><b className="text-gray-800">Apoyo más extenso o repetido:</b> acompañamiento sostenido por la dificultad de la tarea.</p>
+          </div>
           <div className="space-y-3">
             {ROWS.map((r, i) => (
               <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">

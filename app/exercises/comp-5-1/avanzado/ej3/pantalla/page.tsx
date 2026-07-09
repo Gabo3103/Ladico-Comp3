@@ -56,13 +56,16 @@ export default function Page() {
       title="Transmitir fotos a la Smart TV"
       instruction={'Quiere mostrar las fotos del viaje en la Smart TV, pero al abrir "Transmitir pantalla" aparece "No se encontraron televisores." La TV está encendida y con pantalla compartida activa. Observe la TV y el router, opere su celular y logre la transmisión.'}
       onNext={handleNext}
+      onCheck={() => transmitted}
+      checkDisabled={false}
+      nextDisabled={!transmitted}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
         {/* IZQUIERDA: Smart TV + Router (apilados) */}
         <div className="space-y-4">
                 {/* IZQUIERDA: Smart TV (imagen + config) */}
         <InfoCard title="Smart TV"
-          screen={<div className="h-28 bg-gray-900 border-4 border-gray-800 flex flex-col items-center justify-center text-white/80 text-center px-3"><Tv className="w-9 h-9" /><span className="text-[10px] mt-1 text-white/70">No se encontraron dispositivos disponibles para transmitir</span><span className="text-[10px] mt-1 text-white/40">Red: MiRedCasa</span></div>}
+          screen={<div className={`h-28 bg-gray-900 border-4 flex flex-col items-center justify-center text-white/80 text-center px-3 ${transmitted ? "border-emerald-500" : "border-gray-800"}`}><Tv className="w-9 h-9" /><span className="text-[10px] mt-1 text-white/70">{transmitted ? "Conectado a su teléfono · transmitiendo fotos" : "No se encontraron dispositivos disponibles para transmitir"}</span><span className="text-[10px] mt-1 text-white/40">Red: MiRedCasa</span></div>}
           note='Encendida. Conectada a la red "MiRedCasa". Pantalla compartida activa: esperando un dispositivo en la misma red.' />
                 {/* DERECHA: Router (imagen + config) */}
         <InfoCard title="Router WiFi"
@@ -93,7 +96,6 @@ export default function Page() {
         </div>
       </div>
 
-      {transmitted && <div className="mt-4 rounded-xl p-3 text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 text-center max-w-md mx-auto">¡Las fotos del viaje se están transmitiendo en la Smart TV!</div>}
     </FullScreenShell>
   )
 }

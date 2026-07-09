@@ -16,7 +16,7 @@ const ROWS: Row[] = [
   { ctx: "Vida diaria", sit: "Entre muchas notificaciones, a veces no nota las importantes.",
     opts: ["Activar el modo \"no molestar\".", "Activar el resumen automático de notificaciones.", "Priorizar las notificaciones por remitente.", "Borrar las notificaciones antiguas."], correct: 2 },
   { ctx: "Accesibilidad", sit: "Una persona con baja visión amplía el texto, pero al hacerlo las pantallas se desordenan y quedan botones fuera del borde.",
-    opts: ["Activar la lupa de pantalla.", "Aumentar el tamaño del texto.", "Activar el alto contraste.", "Activar el lector de pantalla."], correct: 3 },
+    opts: ["Activar la lupa de pantalla.", "Aumentar el tamaño del texto.", "Activar el alto contraste.", "Activar el lector de pantalla."], correct: 0 },
   { ctx: "Trámites", sit: "Necesita pasar los montos y fechas de varias fotos de boletas a una planilla sin equivocarse.",
     opts: ["Extraer el texto de las fotos automáticamente.", "Usar el autocompletar de la planilla.", "Dictar los montos por voz.", "Adjuntar las fotos en la planilla."], correct: 0 },
   { ctx: "Estudio", sit: "Tiene varias clases grabadas en audio y quiere repasar solo lo clave sin reescucharlas completas.",
@@ -43,7 +43,10 @@ export default function Page() {
       index={1} total={3}
       title="Elegir la función digital adecuada"
       instruction={'Para cada situación, elija la función digital de asistencia más adecuada. Debe marcar una opción por fila.'}
-      onNext={handleNext} nextDisabled={sel.some(s => s === null)}
+      onNext={handleNext}
+      onCheck={() => ROWS.reduce((a, r, i) => a + (sel[i] === r.correct ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextDisabled={sel.some(s => s === null)}
     >
       <p className="text-sm text-gray-600 mb-3" aria-live="polite">
         {sel.filter(s => s !== null).length} de {ROWS.length} casos respondidos

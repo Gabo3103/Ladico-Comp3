@@ -13,13 +13,13 @@ const PREFIX = "session:5.4:Intermedio"
 type Etapa = { fin: string; opts: string[]; correct: number }
 const ETAPAS: Etapa[] = [
   { fin: "Paso 1 — Para enterarse de en qué consistirá el cambio:",
-    opts: ["Buscar videos aleatorios en redes sociales.", "Leer el aviso y la guía oficial del servicio.", "Activar las notificaciones promocionales.", "Consultar únicamente la opinión de otros usuarios."], correct: 1 },
+    opts: ["Preguntar en un grupo de usuarios cómo les resultó el cambio.", "Leer el aviso y la guía oficial del servicio.", "Buscar videos sobre el nuevo ingreso en distintos sitios web.", "Esperar a que el cambio llegue para verlo directamente."], correct: 1 },
   { fin: "Paso 2 — Para identificar qué necesita aprender:",
-    opts: ["Revisar qué nuevas funciones deberá utilizar y cuáles aún no conoce.", "Cerrar las sesiones abiertas en otros dispositivos.", "Revisar y actualizar el correo y el teléfono asociados a la cuenta.", "Cambiar el idioma de la aplicación."], correct: 0 },
+    opts: ["Revisar qué funciones nuevas deberá usar y cuáles aún no conoce.", "Repasar las funciones que ya domina del servicio actual.", "Anotar todas las funciones del servicio, conocidas y nuevas.", "Revisar los datos de contacto asociados a la cuenta."], correct: 0 },
   { fin: "Paso 3 — Para prepararse para utilizar el nuevo sistema:",
-    opts: ["Crear una contraseña más larga y anotarla en un lugar visible.", "Entrar usando el navegador en modo privado.", "Seguir las instrucciones oficiales y practicar el nuevo método de acceso cuando esté disponible.", "Desactivar las notificaciones del servicio."], correct: 2 },
+    opts: ["Leer otra vez el aviso del cambio para memorizarlo.", "Configurar una contraseña más larga para la cuenta.", "Seguir las instrucciones oficiales y practicar el nuevo acceso cuando esté disponible.", "Esperar a dominarlo el día en que el cambio entre en vigencia."], correct: 2 },
   { fin: "Paso 4 — Para comprobar que sabrá hacerlo cuando llegue el cambio:",
-    opts: ["Esperar a que el cambio se aplique y resolver los problemas cuando aparezcan.", "Pedir a otra persona que entre por usted.", "Probar el nuevo ingreso en un entorno de demostración.", "Guardar una captura del aviso."], correct: 2 },
+    opts: ["Revisar que los pasos del nuevo ingreso estén anotados.", "Confirmar que recuerda su contraseña actual.", "Probar el nuevo ingreso en un entorno de demostración.", "Esperar al primer ingreso real para ver si funciona."], correct: 2 },
 ]
 
 function UpdateNoticePreview() {
@@ -39,9 +39,7 @@ function UpdateNoticePreview() {
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-gray-900">Aviso de actualización del servicio</p>
                 <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                  Desde el próximo mes, el ingreso a la cuenta tendrá una etapa adicional.
-                  Revise sus datos de recuperación y prepare una opción alternativa de confirmación.
-                  El cambio será gradual.
+                  Desde el próximo mes, para entrar a su cuenta deberá confirmar su identidad con un segundo paso, además de su contraseña.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-gray-700">
                   <span className="rounded-full bg-white border px-2.5 py-1 flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5 text-[#286575]" /> Próximo mes</span>
@@ -76,8 +74,11 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={2} total={3}
       title="Armar un plan ante un cambio de acceso"
-      instruction={'Usted utiliza este servicio digital con frecuencia para realizar trámites importantes. El sistema anuncia que el proceso de ingreso cambiará el próximo mes y que será necesario utilizar un nuevo método de verificación. Desea prepararse con anticipación para seguir utilizando el servicio sin dificultades. Ordene las siguientes acciones desde la primera hasta la última.'}
-      onNext={handleNext} nextDisabled={sel.some(s => s === null)}
+      instruction={'Usted utiliza este servicio digital con frecuencia para realizar trámites importantes. El sistema anuncia que el proceso de ingreso cambiará el próximo mes y que será necesario utilizar un nuevo método de verificación. Desea prepararse con anticipación para seguir utilizando el servicio sin dificultades. Elija la acción adecuada en cada paso.'}
+      onNext={handleNext}
+      onCheck={() => ETAPAS.reduce((a, e, i) => a + (sel[i] === e.correct ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextDisabled={sel.some(s => s === null)}
     >
       <UpdateNoticePreview />
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ETAPAS.length} pasos respondidos</p>

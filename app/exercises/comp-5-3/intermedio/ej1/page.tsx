@@ -11,10 +11,10 @@ const PREFIX = "session:5.3:Intermedio"
 
 // correct: 0 = centrado en las personas, 1 = NO centrado
 const SITS: { text: string; correct: 0 | 1 }[] = [
-  { text: "Una municipalidad lanza una app de trámites con un diseño sencillo; tardó varios meses más de lo previsto porque incorporó pruebas y comentarios de vecinos mayores, y permite deshacer cada paso antes de confirmar.", correct: 0 },
-  { text: "Una app de finanzas muy elogiada por su diseño y rapidez personaliza la experiencia recopilando datos de uso en segundo plano; no explica qué datos toma ni ofrece una forma de desactivarlo.", correct: 1 },
-  { text: "Una plataforma de salud reduce funciones vistosas para cargar rápido en teléfonos antiguos y con poca señal, e incluye una versión por teléfono para quienes no usan la app.", correct: 0 },
-  { text: "Un servicio de atención reemplaza a sus operadores por un asistente automático disponible las 24 horas que resuelve más rápido; no ofrece una vía para hablar con una persona cuando el caso es complejo.", correct: 1 },
+  { text: "Una municipalidad publica una app de trámites que también funciona en teléfonos antiguos y con poca señal, luego de probarla con vecinos de distintas edades.", correct: 0 },
+  { text: "Una tienda lanza una app que, para mejorar la experiencia, reúne datos de uso en segundo plano y deja esa opción activada por defecto para todos.", correct: 1 },
+  { text: "Una plataforma de salud reduce funciones decorativas para cargar rápido en cualquier teléfono e incluye una versión por teléfono para quienes no usan la app.", correct: 0 },
+  { text: "Un servicio de atención reemplaza a todos sus operadores por un asistente automático que responde al instante a cualquier hora.", correct: 1 },
 ]
 const LABELS = ["Enfoque centrado en las personas", "Enfoque NO centrado en las personas"]
 
@@ -37,8 +37,11 @@ export default function Page() {
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Intermedio"
       index={1} total={3}
       title="¿Enfoque centrado en las personas?"
-      instruction={'Para cada situación, identifique si aplica o no un enfoque centrado en las personas (human-centric): colocar los derechos, valores y necesidades de las personas en el centro del diseño y uso de la tecnología.'}
-      onNext={handleNext} nextDisabled={sel.some(s => s === null)}
+      instruction={'Para cada situación, identifique si aplica o no un enfoque centrado en las personas: colocar los derechos, valores y necesidades de las personas en el centro del diseño y uso de la tecnología.'}
+      onNext={handleNext}
+      onCheck={() => SITS.reduce((a, s, i) => a + (sel[i] === s.correct ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextDisabled={sel.some(s => s === null)}
     >
       <p className="text-sm text-gray-600 mb-3" aria-live="polite">
         {sel.filter(s => s !== null).length} de {SITS.length} situaciones respondidas

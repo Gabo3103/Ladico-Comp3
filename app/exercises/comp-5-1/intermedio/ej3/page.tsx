@@ -75,7 +75,11 @@ export default function Page() {
       index={3} total={3}
       title="Configuraciones preventivas del teléfono"
       instruction={"Desea optimizar el funcionamiento y la seguridad de su teléfono con ajustes preventivos. En cada sección de Ajustes, toque la opción más adecuada. Puede tocar de nuevo una opción para deseleccionarla."}
-      onNext={handleNext} nextLabel="Finalizar" nextDisabled={ans.some(a => a === null)}
+      onNext={handleNext}
+      onCheck={() => SECS.reduce((acc, s, i) => acc + (ans[i] === s.correct ? 1 : 0), 0) >= 2}
+      checkDisabled={false}
+      nextLabel="Finalizar"
+      nextDisabled={ans.some(a => a === null)}
     >
       <div className="mx-auto w-full max-w-[380px] rounded-[2.6rem] border-[10px] border-gray-900 bg-black overflow-hidden shadow-2xl">
         <div className="bg-gray-900 text-white flex items-center justify-between px-6 py-1.5 text-xs">

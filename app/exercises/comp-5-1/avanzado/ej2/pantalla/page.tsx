@@ -92,6 +92,8 @@ export default function Page() {
       title="Guiar paso a paso a otra persona"
       instruction={'Su madre le muestra su teléfono. En WhatsApp puede ver mensajes de texto recibidos anteriormente, pero las fotografías y los audios quedan pendientes de descarga. Guíela con una instrucción en cada paso. Su madre ejecutará la acción que usted elija y la pantalla mostrará el resultado; luego la simulación avanzará al siguiente paso. Elija con cuidado: en cada paso solo puede dar una instrucción.'}
       onNext={handleNext}
+      onCheck={() => solved && correct >= 3}
+      checkDisabled={false}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 items-stretch">
         <PhoneSimulation choiceId={lastChoice} result={last} />

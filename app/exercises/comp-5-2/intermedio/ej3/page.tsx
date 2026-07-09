@@ -11,8 +11,8 @@ const PREFIX = "session:5.2:Intermedio"
 const OPTIONS = [
   "Configurar respuestas rápidas o atajos de texto para reutilizar mensajes frecuentes dirigidos a clientes.",
   "Guardar ubicaciones frecuentes en la aplicación de mapas y usar comandos de voz para iniciar la navegación rápidamente.",
-  "Mantener el procedimiento manual actual, intentando reducir tiempos mediante mayor práctica y organización personal.",
-  "Reducir al mínimo las funciones automáticas del teléfono para evitar posibles errores en las tareas repetitivas.",
+  "Organizar mejor la agenda y los recordatorios personales para responder más rápido los mensajes.",
+  "Activar el asistente de voz del teléfono para dictar cada mensaje antes de enviarlo.",
 ]
 const CORRECT = new Set([0, 1])
 
@@ -45,7 +45,15 @@ export default function Page() {
       index={3} total={3}
       title="Herramientas para tareas repetitivas"
       instruction={'Un compañero pierde tiempo en tareas repetitivas (saludos a clientes vía notificación, búsqueda de rutas, registro de gastos). Seleccione las recomendaciones que aprovechan herramientas de asistencia digital para optimizarlas.'}
-      onNext={handleNext} nextLabel="Finalizar" nextDisabled={sel.size === 0}
+      onNext={handleNext}
+      onCheck={() => {
+        let ok = 0, bad = 0
+        sel.forEach(i => (CORRECT.has(i) ? ok++ : bad++))
+        return ok === 2 && bad === 0
+      }}
+      checkDisabled={false}
+      nextLabel="Finalizar"
+      nextDisabled={sel.size === 0}
     >
       <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
     </ExerciseShell>

@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { useState } from "react"
+import { useAuth } from "@/contexts/AuthContext"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp } from "lucide-react"
@@ -14,13 +15,22 @@ type Props = {
   instruction?: string
   children: ReactNode
   onNext: () => void
+  onCheck?: () => boolean
   nextLabel?: string
   nextDisabled?: boolean
+  checkDisabled?: boolean
 }
 
-export default function ExerciseShell({ label, index, total, title, instruction, children, onNext, nextLabel = "Siguiente", nextDisabled = false }: Props) {
+export default function ExerciseShell({ label, index, total, title, instruction, children, onNext, onCheck, nextLabel = "Siguiente", nextDisabled = false, checkDisabled }: Props) {
+  const { isProfesor, isAdmin } = useAuth()
+  const demoMode = isProfesor || isAdmin
   const pct = (index / total) * 100
   const [open, setOpen] = useState(true)
+  const [checkResult, setCheckResult] = useState<boolean | null>(null)
+  const handleCheck = () => {
+    if (!onCheck) return
+    setCheckResult(onCheck())
+  }
   return (
     <div className="min-h-screen bg-[#f3fbfb]">
       <div className="bg-white/10 border-b border-white/20 rounded-b-2xl">
@@ -57,8 +67,30 @@ export default function ExerciseShell({ label, index, total, title, instruction,
               </div>
             )}
             <div className="mt-3">{children}</div>
-            <div className="mt-4 flex justify-end">
-              <Button onClick={onNext} disabled={nextDisabled} className="min-h-12 px-10 bg-[#286575] rounded-xl font-semibold text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">{nextLabel}</Button>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <Button asChild className="min-h-12 px-8 bg-[#286575] rounded-xl font-semibold text-white shadow-lg hover:bg-[#3a7d89] focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">
+                <Link href="/dashboard">Terminar</Link>
+              </Button>
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                {demoMode && onCheck && (
+                  <>
+                    {checkResult !== null && (
+                      <span className={`text-xs font-semibold rounded-full px-3 py-1 ${checkResult ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                        {checkResult ? "Correcto" : "Revisar respuesta"}
+                      </span>
+                    )}
+                    <Button
+                      variant="outline"
+                      onClick={handleCheck}
+                      disabled={checkDisabled ?? nextDisabled}
+                      className="min-h-12 px-8 rounded-xl border-[#286575] text-[#286575] font-semibold shadow-sm hover:bg-[#e4f3f5] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Comprobar
+                    </Button>
+                  </>
+                )}
+                <Button onClick={onNext} disabled={nextDisabled} className="min-h-12 px-10 bg-[#286575] rounded-xl font-semibold text-white shadow-lg hover:bg-[#3a7d89] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">{nextLabel}</Button>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -12,8 +12,8 @@ const OPTIONS = [
   "Aprender a usar, paso a paso, la aplicación para pagar y hacer los trámites por sí mismo.",
   "Aprender a reconocer si una pantalla de pago es segura antes de ingresar sus datos.",
   "Aprender a recuperar el acceso si olvida la contraseña, para no quedar bloqueado.",
-  "Aprender a personalizar el fondo de pantalla y los tonos de notificación.",
-  "Pedir a otra persona que haga los trámites por usted.",
+  "Aprender a cambiar el idioma y la apariencia de la aplicación de trámites.",
+  "Guardar el número de un familiar para pedirle ayuda cada vez que deba hacer un trámite.",
 ]
 const CORRECT = new Set([0, 1, 2])
 
@@ -38,7 +38,14 @@ export default function Page() {
       index={2} total={3}
       title="Reunir aprendizajes según un propósito"
       instruction={'Usted define un propósito concreto: "Quiero manejar yo mismo mis trámites y pagos desde el teléfono, sin depender de nadie". Según ese propósito, marque los aprendizajes que conviene reunir para lograrlo.'}
-      onNext={handleNext} nextDisabled={sel.size === 0}
+      onNext={handleNext}
+      onCheck={() => {
+        let ok = 0, bad = 0
+        sel.forEach(i => (CORRECT.has(i) ? ok++ : bad++))
+        return ok >= 2 && bad === 0
+      }}
+      checkDisabled={false}
+      nextDisabled={sel.size === 0}
     >
       <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
     </ExerciseShell>

@@ -41,7 +41,10 @@ export default function Page() {
       index={2} total={3}
       title="Ordenar la respuesta ante un aviso de cargo sospechoso"
       instruction={'Recibe un mensaje de texto que dice que se hizo una compra por $189.990 con su tarjeta terminada en **4532 y le pide ingresar a un enlace. Usted no ha realizado ninguna compra por ese monto.\n\nArrastre las acciones para ordenarlas por prioridad (1 = primera, 5 = última).'}
-      onNext={handleNext} nextDisabled={!hasMoved}
+      onNext={handleNext}
+      onCheck={() => order.reduce((acc, id, pos) => acc + (id === pos + 1 ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextDisabled={!hasMoved}
     >
       <OrderingList
         items={STEPS}

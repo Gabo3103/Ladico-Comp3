@@ -40,7 +40,10 @@ export default function Page() {
       index={2} total={3}
       title="Configurar avisos de un medicamento"
       instruction={'Debe configurar avisos automáticos de un medicamento (08:00, 14:00 y 21:00), visibles y sonoros. Arrastre las cinco acciones para ordenarlas (1 = primera, 5 = última).'}
-      onNext={handleNext} nextDisabled={!hasMoved}
+      onNext={handleNext}
+      onCheck={() => order.reduce((acc, id, pos) => acc + (id === pos + 1 ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextDisabled={!hasMoved}
     >
       <OrderingList
         items={STEPS}

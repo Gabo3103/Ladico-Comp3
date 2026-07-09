@@ -47,8 +47,17 @@ export default function Page() {
       index={3} total={3}
       title="¿Qué aprender para vender en línea?"
       instruction={'Tiene un pequeño negocio de productos caseros y quiere empezar a vender por internet y recibir pagos. Para cada necesidad, elija el tipo de aprendizaje o apoyo más proporcional a su complejidad.'}
-      onNext={handleNext} nextLabel="Finalizar" nextDisabled={sel.some(s => s === null)}
+      onNext={handleNext}
+      onCheck={() => ROWS.reduce((a, r, i) => a + (sel[i] === r.correct ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextLabel="Finalizar"
+      nextDisabled={sel.some(s => s === null)}
     >
+      <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 space-y-1">
+        <p><b className="text-gray-800">Demostración breve:</b> le muestran una vez cómo se hace.</p>
+        <p><b className="text-gray-800">Guía para practicar:</b> instrucciones paso a paso para que lo practique solo/a.</p>
+        <p><b className="text-gray-800">Curso o apoyo más completo:</b> aprendizaje guiado y repetido por su complejidad o riesgo.</p>
+      </div>
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} filas respondidas</p>
       <div className="space-y-3">
         {ROWS.map((r, i) => (

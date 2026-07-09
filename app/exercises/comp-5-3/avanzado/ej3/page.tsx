@@ -15,27 +15,38 @@ const DIMS = [
   { id: "gestion", label: "Gestión de pedidos" },
   { id: "comunicacion", label: "Comunicación" },
 ]
-type Action = { id: string; label: string; dim: string; bad?: boolean }
+type Action = { id: string; label: string; dim: string; ok?: boolean; bad?: boolean }
 type Tool = { id: string; name: string; icon: any; actions: Action[] }
 const TOOLS: Tool[] = [
   { id: "ventas", name: "Tienda / venta en línea", icon: ShoppingBag, actions: [
-    { id: "perfil", label: "Crear un perfil de negocio gratuito para mostrar los productos.", dim: "presencia" },
-    { id: "app", label: "Encargar el desarrollo de una aplicación de venta a medida.", dim: "presencia", bad: true },
+    { id: "perfil", label: "Crear un perfil de negocio gratuito y publicar los productos con su precio.", dim: "presencia", ok: true },
+    { id: "sinprecio", label: "Crear el perfil, pero dejar los productos sin precio ni descripción.", dim: "presencia" },
+    { id: "app", label: "Encargar el desarrollo de una app de venta a medida.", dim: "presencia", bad: true },
   ] },
   { id: "diseno", name: "App de diseño (tipo Canva)", icon: Palette, actions: [
-    { id: "fotos", label: "Preparar fotos y descripciones atractivas de los productos.", dim: "visual" },
+    { id: "fotos", label: "Preparar fotos claras y descripciones atractivas de cada producto.", dim: "visual", ok: true },
+    { id: "unafoto", label: "Usar una sola foto general para todos los productos.", dim: "visual" },
+    { id: "logo", label: "Diseñar un logo elaborado antes de fotografiar los productos.", dim: "visual" },
   ] },
   { id: "planilla", name: "Planilla de cálculo", icon: Table, actions: [
-    { id: "inv", label: "Llevar el control de costos, inventario y pedidos.", dim: "gestion" },
+    { id: "inv", label: "Registrar costos, inventario y pedidos en una planilla ordenada.", dim: "gestion", ok: true },
+    { id: "totales", label: "Anotar solo las ventas totales de cada día.", dim: "gestion" },
+    { id: "notas", label: "Guardar los pedidos en notas sueltas del teléfono.", dim: "gestion" },
   ] },
   { id: "mensajeria", name: "Mensajería (WhatsApp)", icon: MessageCircle, actions: [
-    { id: "clientes", label: "Atender consultas y coordinar entregas con los clientes.", dim: "comunicacion" },
+    { id: "atender", label: "Atender las consultas y coordinar las entregas con los clientes.", dim: "comunicacion", ok: true },
+    { id: "cuando", label: "Responder solo cuando hay tiempo, sin un horario definido.", dim: "comunicacion" },
+    { id: "estado", label: "Publicar el catálogo en el estado y no responder los mensajes.", dim: "comunicacion" },
   ] },
   { id: "calendario", name: "Calendario / agenda", icon: Calendar, actions: [
-    { id: "despacho", label: "Agendar y coordinar los días de despacho.", dim: "gestion" },
+    { id: "despacho", label: "Agendar y coordinar los días de despacho de los pedidos.", dim: "gestion", ok: true },
+    { id: "sinplan", label: "Despachar los pedidos en cuanto llegan, sin planificar.", dim: "gestion" },
+    { id: "cuaderno", label: "Anotar las entregas en un cuaderno aparte.", dim: "gestion" },
   ] },
   { id: "redes", name: "Redes sociales", icon: Share2, actions: [
-    { id: "perfilRed", label: "Crear un perfil de negocio en una red social para mostrar los productos.", dim: "presencia" },
+    { id: "perfilRed", label: "Crear un perfil de negocio y publicar los productos con precio y forma de compra.", dim: "presencia", ok: true },
+    { id: "personal", label: "Publicar los productos en el perfil personal, mezclados con contenido propio.", dim: "presencia" },
+    { id: "muchas", label: "Abrir cuentas en muchas redes a la vez sin poder mantenerlas.", dim: "presencia" },
   ] },
 ]
 
@@ -53,11 +64,12 @@ export default function Page() {
 
   const actionOf = (t: Tool) => t.actions.find(a => a.id === chosen[t.id])
   const usedTools = TOOLS.filter(t => chosen[t.id])
-  const coveredDims = new Set(usedTools.map(t => actionOf(t)!.dim))
-  const notSustainable = usedTools.some(t => actionOf(t)!.bad)
+  const goodTools = TOOLS.filter(t => actionOf(t)?.ok)
+  const coveredDims = new Set(goodTools.map(t => actionOf(t)!.dim))
+  const notSustainable = TOOLS.some(t => actionOf(t)?.bad)
 
   const handleNext = async () => {
-    const variety = usedTools.length >= 4 ? 1 : 0
+    const variety = goodTools.length >= 4 ? 1 : 0
     const sustain = notSustainable ? 0 : 1
     const coverage = DIMS.every(d => coveredDims.has(d.id)) ? 1 : 0
     const point: 0 | 1 = variety + sustain + coverage >= 2 ? 1 : 0
@@ -80,7 +92,15 @@ export default function Page() {
       index={3} total={3}
       title="Estrategia digital para vender en línea"
       instruction={'Su vecina es artesana del cuero y solo vende en ferias los fines de semana. Quiere empezar a vender por Internet, invirtiendo lo mínimo y con una solución que pueda mantener sola. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo presencia digital, material visual, gestión de pedidos y comunicación. Para cada herramienta, abra y elija una acción.'}
-      onNext={handleNext} nextLabel="Finalizar"
+      onNext={handleNext}
+      onCheck={() => {
+        const variety = goodTools.length >= 4 ? 1 : 0
+        const sustain = notSustainable ? 0 : 1
+        const coverage = DIMS.every(d => coveredDims.has(d.id)) ? 1 : 0
+        return variety + sustain + coverage >= 2
+      }}
+      checkDisabled={false}
+      nextLabel="Finalizar"
       nextDisabled={usedTools.length < 4}
     >
       <div className="max-w-3xl mx-auto mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 flex flex-wrap items-center gap-x-5 gap-y-2">

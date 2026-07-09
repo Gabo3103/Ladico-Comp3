@@ -13,25 +13,25 @@ const ENUNCIADOS = [
   {
     q: "Enunciado 1: \"Una fortaleza de usar IA para generar borradores de informes es _____; una debilidad es _____.\"",
     opts: [
-      "Que elimina la necesidad de revisión humana / Que ocupa mucho espacio en el dispositivo.",
-      "Que reduce el tiempo de redacción inicial / Que el contenido puede contener datos incorrectos o desactualizados que requieren verificación humana.",
-      "Que siempre genera contenido original / Que funciona solo con conexión a Internet.",
+      "Que elimina la necesidad de revisar el texto / Que ocupa mucho espacio en el dispositivo.",
+      "Que acelera la redacción inicial del informe / Que puede incluir datos incorrectos que hay que verificar.",
+      "Que garantiza contenido siempre original / Que solo funciona con conexión a Internet.",
     ], correct: 1,
   },
   {
     q: "Enunciado 2: \"Una consideración ética al usar IA para seleccionar candidatos en un proceso de contratación es _____.\"",
     opts: [
-      "Que el sistema podría reproducir sesgos discriminatorios presentes en los datos con los que fue entrenado, afectando la equidad del proceso.",
-      "Que el sistema es más lento que la revisión manual de currículos.",
-      "Que los candidatos podrían no saber usar inteligencia artificial.",
+      "Que puede reproducir sesgos de los datos con que fue entrenado, afectando la equidad del proceso.",
+      "Que suele ser más lento que revisar las hojas de vida a mano en un proceso grande.",
+      "Que algunos candidatos podrían no estar familiarizados con el uso de la IA.",
     ], correct: 0,
   },
   {
     q: "Enunciado 3: \"Al evaluar si usar una herramienta de diseño con IA para crear material publicitario, una debilidad relevante es _____.\"",
     opts: [
-      "Que las imágenes generadas son siempre de baja resolución.",
-      "Que la herramienta solo funciona en computadores de escritorio.",
-      "Que las imágenes generadas pueden infringir derechos de autor o parecerse a obras existentes sin atribución.",
+      "Que las imágenes generadas suelen tener una resolución demasiado baja para imprimir.",
+      "Que la herramienta solo puede utilizarse desde un computador de escritorio.",
+      "Que las imágenes pueden infringir derechos de autor o parecerse a obras existentes.",
     ], correct: 2,
   },
 ]
@@ -56,7 +56,10 @@ export default function Page() {
       index={2} total={3}
       title="Fortalezas, debilidades y ética de la IA"
       instruction={'En su equipo de trabajo evalúan si incorporar herramientas de inteligencia artificial para distintas tareas. Identifique correctamente las fortalezas, debilidades y consideraciones éticas en cada caso.'}
-      onNext={handleNext} nextDisabled={ans.some(a => a === null)}
+      onNext={handleNext}
+      onCheck={() => ENUNCIADOS.reduce((a, e, i) => a + (ans[i] === e.correct ? 1 : 0), 0) >= 2}
+      checkDisabled={false}
+      nextDisabled={ans.some(a => a === null)}
     >
       <div className="space-y-6">
         {ENUNCIADOS.map((e, i) => (

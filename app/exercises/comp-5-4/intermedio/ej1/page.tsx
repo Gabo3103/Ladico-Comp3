@@ -43,7 +43,10 @@ export default function Page() {
       index={1} total={3}
       title="¿Qué necesita aprender para evitar el problema?"
       instruction={'En las últimas semanas cometió errores con herramientas digitales que le obligaron a repetir trabajo. Para cada caso, identifique el aprendizaje que necesita desarrollar para evitar que el mismo problema vuelva a ocurrir.'}
-      onNext={handleNext} nextDisabled={sel.some(s => s === null)}
+      onNext={handleNext}
+      onCheck={() => ROWS.reduce((a, r, i) => a + (sel[i] === r.correct ? 1 : 0), 0) >= 3}
+      checkDisabled={false}
+      nextDisabled={sel.some(s => s === null)}
     >
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} casos respondidos</p>
       <div className="space-y-4">

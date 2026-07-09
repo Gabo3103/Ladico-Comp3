@@ -56,7 +56,11 @@ export default function Page() {
       index={3} total={3}
       title="Ajustar el panel de apoyo de una solicitud en línea"
       instruction={'Una persona con poca experiencia debe completar una solicitud de varios pasos y teme perder su avance. Ajuste el panel: active los apoyos que la protegen y desactive las opciones riesgosas. Algunas opciones ya vienen activadas.'}
-      onNext={handleNext} nextLabel="Finalizar" nextDisabled={!hasAdjusted}
+      onNext={handleNext}
+      onCheck={() => riskyOn === 0 && supportsOn >= 5}
+      checkDisabled={false}
+      nextLabel="Finalizar"
+      nextDisabled={!hasAdjusted}
     >
       <div className="max-w-2xl mx-auto rounded-2xl border-2 border-gray-300 bg-white overflow-hidden shadow-lg">
         <div className="bg-gray-100 border-b px-4 py-2 flex items-center gap-2">

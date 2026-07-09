@@ -15,27 +15,38 @@ const DIMS = [
   { id: "transparencia", label: "Transparencia" },
   { id: "comunicacion", label: "Comunicación" },
 ]
-type Action = { id: string; label: string; dim: string; bad?: boolean }
+type Action = { id: string; label: string; dim: string; ok?: boolean; bad?: boolean }
 type Tool = { id: string; name: string; icon: any; actions: Action[] }
 const TOOLS: Tool[] = [
   { id: "redes", name: "Redes sociales", icon: Share2, actions: [
-    { id: "conv", label: "Publicar una convocatoria general de la campaña, sin revelar datos médicos.", dim: "difusion" },
-    { id: "detalle", label: "Publicar la historia clínica detallada para generar más empatía.", dim: "difusion", bad: true },
+    { id: "conv", label: "Publicar una convocatoria clara con la fecha, el objetivo y los medios de aporte, sin datos de salud.", dim: "difusion", ok: true },
+    { id: "imagen", label: "Publicar una imagen impactante de la beneficiaria, con los datos de aporte en un comentario.", dim: "difusion" },
+    { id: "clinica", label: "Publicar la historia clínica detallada para explicar por qué se necesita ayuda.", dim: "difusion", bad: true },
   ] },
   { id: "recauda", name: "Plataforma de recaudación", icon: DollarSign, actions: [
-    { id: "crear", label: "Crear una campaña de recaudación en línea con meta y una descripción respetuosa.", dim: "recaudacion" },
+    { id: "meta", label: "Crear una campaña con meta clara, plazo y una descripción respetuosa del caso.", dim: "recaudacion", ok: true },
+    { id: "sinmeta", label: "Crear una campaña sin meta ni plazo, solo con un texto general pidiendo ayuda.", dim: "recaudacion" },
+    { id: "varias", label: "Crear varias campañas paralelas en distintas plataformas para recaudar más.", dim: "recaudacion" },
   ] },
   { id: "planilla", name: "Planilla de cálculo", icon: Table, actions: [
-    { id: "registro", label: "Llevar un registro compartido y transparente de lo recaudado.", dim: "transparencia" },
+    { id: "registro", label: "Registrar cada aporte con fecha y destino en una planilla compartida con el equipo.", dim: "transparencia", ok: true },
+    { id: "total", label: "Anotar solo el total recaudado al final de cada semana.", dim: "transparencia" },
+    { id: "personal", label: "Llevar el registro en la planilla personal de un solo integrante.", dim: "transparencia" },
   ] },
   { id: "mensajeria", name: "Mensajería grupal", icon: MessageCircle, actions: [
-    { id: "coord", label: "Coordinar al equipo y mantener informada a la beneficiaria.", dim: "comunicacion" },
+    { id: "coord", label: "Coordinar las tareas del equipo y mantener informada a la beneficiaria de los avances.", dim: "comunicacion", ok: true },
+    { id: "soloeq", label: "Coordinar solo entre el equipo, sin incluir a la beneficiaria en las decisiones.", dim: "comunicacion" },
+    { id: "recorda", label: "Enviar recordatorios diarios a todos los contactos para que aporten.", dim: "comunicacion" },
   ] },
   { id: "diseno", name: "Canva / app de diseño", icon: Palette, actions: [
-    { id: "afiche", label: "Diseñar un afiche atractivo para difundir la campaña.", dim: "difusion" },
+    { id: "afiche", label: "Diseñar un afiche con la fecha, el objetivo y los medios de aporte, fácil de leer.", dim: "difusion", ok: true },
+    { id: "llamativo", label: "Diseñar un afiche muy llamativo centrado en una imagen, con los datos en letra pequeña.", dim: "difusion" },
+    { id: "logo", label: "Diseñar solo el logo de la campaña para reforzar su identidad visual.", dim: "difusion" },
   ] },
   { id: "correo", name: "Correo electrónico", icon: Mail, actions: [
-    { id: "boletin", label: "Enviar un boletín a contactos externos para ampliar el alcance.", dim: "difusion" },
+    { id: "info", label: "Enviar un correo a los contactos con la información de la campaña y cómo aportar.", dim: "comunicacion", ok: true },
+    { id: "cc", label: "Enviar el correo con copia visible (CC) a todos los destinatarios a la vez.", dim: "comunicacion" },
+    { id: "cadena", label: "Reenviar cadenas de correo a listas compradas para llegar a más gente.", dim: "comunicacion" },
   ] },
 ]
 
@@ -54,11 +65,12 @@ export default function Page() {
 
   const actionOf = (t: Tool) => t.actions.find(a => a.id === chosen[t.id])
   const usedTools = TOOLS.filter(t => chosen[t.id])
-  const coveredDims = new Set(usedTools.map(t => actionOf(t)!.dim))
-  const violation = usedTools.some(t => actionOf(t)!.bad)
+  const goodTools = TOOLS.filter(t => actionOf(t)?.ok)
+  const coveredDims = new Set(goodTools.map(t => actionOf(t)!.dim))
+  const violation = TOOLS.some(t => actionOf(t)?.bad)
 
   const handleNext = async () => {
-    const variety = usedTools.length >= 4 ? 1 : 0
+    const variety = goodTools.length >= 4 ? 1 : 0
     const ethics = violation ? 0 : 1
     const coverage = DIMS.every(d => coveredDims.has(d.id)) ? 1 : 0
     const point: 0 | 1 = variety + ethics + coverage >= 2 ? 1 : 0
@@ -74,6 +86,13 @@ export default function Page() {
       title="Estrategia digital de una campaña solidaria"
       instruction={'Unos colegas quieren organizar una campaña para apoyar a una compañera con un tratamiento costoso. Ella consintió la campaña, pero pidió no publicar detalles de su diagnóstico. Use las herramientas del computador y ejecute al menos 4 acciones, cada una con una función distinta, cubriendo difusión, recaudación, transparencia y comunicación. Para cada herramienta, abra y elija una acción.'}
       onNext={handleNext}
+      onCheck={() => {
+        const variety = goodTools.length >= 4 ? 1 : 0
+        const ethics = violation ? 0 : 1
+        const coverage = DIMS.every(d => coveredDims.has(d.id)) ? 1 : 0
+        return variety + ethics + coverage >= 2
+      }}
+      checkDisabled={false}
       nextDisabled={usedTools.length < 4}
     >
       {/* Barra de progreso de dimensiones */}
