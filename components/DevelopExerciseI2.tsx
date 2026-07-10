@@ -75,7 +75,7 @@ const BANK: Scenario[] = [
             "Debes crear una infografía usando plantillas, recursos visuales y revisión asistida para comunicar datos clave",
         steps: [
             { id: "g1", text: "Definir tema, datos principales y objetivo comunicativo" },
-            { id: "g2", text: "Elegir tamaño, plantilla, paleta y estilo visual apropiado" },
+            { id: "g2", text: "Elegir tamaño, plantilla, colores y estilo visual apropiado" },
             { id: "g3", text: "Integrar textos, iconos, gráficos y sugerencias visuales de la herramienta" },
             { id: "g4", text: "Revisar exactitud de datos, jerarquía visual y comprensión del mensaje" },
             { id: "g5", text: "Exportar como imagen o PDF según el uso final" },

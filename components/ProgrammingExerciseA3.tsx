@@ -360,7 +360,7 @@ const ProgrammingExerciseA3 = forwardRef<ProgrammingExerciseA3Handle, Props>(
                         Parte B · Ordenamiento
                     </p>
                     <h3 className="mt-1 text-sm font-semibold text-slate-800">
-                        Ordena las etapas del proceso, del paso 1 al paso 6
+                        Ordena las etapas del proceso, del paso 1 al paso 5
                     </h3>
 
                     <ol className="mt-3 space-y-3">

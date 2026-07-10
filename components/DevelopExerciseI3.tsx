@@ -92,7 +92,7 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
         id: "poster",
         title: "Afiche para campaña escolar",
         description:
-            "Preparas un afiche digital para una campaña de convivencia. La herramienta sugiere paletas, tipografías, imágenes y una versión con más efectos visuales.",
+            "Preparas un afiche digital para una campaña de convivencia. La herramienta sugiere colores, tipografías, imágenes y una versión con más efectos visuales.",
         options: [
             { id: "a-contrast", label: "Verificar que el llamado principal se distinga también en una vista previa pequeña", isCorrect: true },
             { id: "a-font", label: "Mantener una tipografía decorativa en el título si el resto del texto usa una fuente simple", isCorrect: false },

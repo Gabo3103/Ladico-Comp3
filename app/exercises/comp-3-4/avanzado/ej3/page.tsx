@@ -13,7 +13,7 @@ import { getPoint, getProgress, isLevelPassed, levelPoints, setPoint } from "@/l
 import { getOrCreateSeed } from "@/lib/caseSeed"
 
 const SCENARIO =
-    "La Dirección de Asuntos Estudiantiles de una universidad recibió 8.000 respuestas abiertas de estudiantes de primer año sobre su proceso de adaptación. Antes de desplegar el proceso de análisis, el equipo debe decidir qué parte de cada tarea conviene automatizar con Python o IA, y en qué punto es necesaria la revisión humana para evitar errores antes de publicar el informe final."
+    "La Dirección de Asuntos Estudiantiles de una universidad recibió 8.000 respuestas abiertas de estudiantes de primer año sobre su proceso de adaptación. Antes de desplegar el proceso de análisis, el equipo debe decidir qué parte de cada tarea conviene automatizar con código o IA, y en qué punto es necesaria la revisión humana para evitar errores antes de publicar el informe final."
 const TITLE = "Análisis responsable de respuestas estudiantiles"
 
 const COMPETENCE = "3.4"
