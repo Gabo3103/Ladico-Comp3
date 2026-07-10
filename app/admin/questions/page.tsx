@@ -45,7 +45,7 @@ export default function QuestionsAdminPage() {
       const querySnapshot = await getDocs(collection(db, "questions"))
       const loadedQuestions: Question[] = []
       querySnapshot.forEach((doc) => {
-        loadedQuestions.push({ id: doc.id, ...doc.data() } as Question)
+        loadedQuestions.push({ ...doc.data(), id: doc.id } as Question)
       })
       setQuestions(loadedQuestions)
     } catch (error) {

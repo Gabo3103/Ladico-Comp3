@@ -125,7 +125,8 @@ export default function AdminPanel() {
 
       let addedCount = 0;
       for (const question of validQuestions) {
-        await addDoc(collection(db, "questions"), { ...question });
+        const { id: _ignoredId, ...questionData } = question;
+        await addDoc(collection(db, "questions"), questionData);
         addedCount++;
       }
 

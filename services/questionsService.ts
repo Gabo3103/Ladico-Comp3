@@ -235,8 +235,8 @@ export async function loadQuestionsByCompetence(
     )
     const querySnapshot = await getDocs(qAll)
     const loadedQuestions: Question[] = querySnapshot.docs.map(doc => ({
-      id: doc.id,
       ...(doc.data() as any),
+      id: doc.id,
     }))
 
     if (loadedQuestions.length >= count) {
@@ -253,8 +253,8 @@ export async function loadQuestionsByCompetence(
     )
     const fallbackSnapshot = await getDocs(fallbackQuery)
     const fallbackQuestions: Question[] = fallbackSnapshot.docs.map(doc => ({
-      id: doc.id,
       ...(doc.data() as any),
+      id: doc.id,
     }))
 
     if (fallbackQuestions.length >= count) {
