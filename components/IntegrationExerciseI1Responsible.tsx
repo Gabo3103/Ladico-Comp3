@@ -452,6 +452,10 @@ const IntegrationExerciseI1Responsible = forwardRef<
 
                 <div className="relative flex aspect-square flex-col items-center justify-center gap-3 bg-slate-100 px-6 py-6">
 
+                    <span className="absolute left-2 top-2 rounded-full bg-white/70 px-2 py-0.5 text-[9px] font-medium text-slate-500">
+                        Publicación referencial
+                    </span>
+
                     {theme.format === "instagram" && (
                         <span
                             className="absolute right-2 top-1/2 flex h-7 w-5 -translate-y-1/2 items-center justify-end text-2xl font-bold leading-none"
@@ -568,12 +572,14 @@ const IntegrationExerciseI1Responsible = forwardRef<
                 </div>
 
 
-                {/* Evidencias */}
+                {/* Descripción de la publicación (estilo caption real) */}
 
                 <div className="space-y-2 border-t px-3.5 py-3">
 
-                    <p className="ml-3 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                        Dentro del {theme.format === "instagram" ? "post" : "afiche"}:
+                    <p className="text-xs">
+                        <span className="font-semibold text-slate-800">
+                            Descripción
+                        </span>
                     </p>
 
                     {clues.map((clue) => (
@@ -607,7 +613,7 @@ const IntegrationExerciseI1Responsible = forwardRef<
             <div className="rounded-2xl border bg-white p-4 shadow-sm">
 
                 <h4 className="font-semibold text-slate-800">
-                    Selecciona todas las prácticas de integración responsable que NO se evidencian.
+                    Según la descripción de la publicación, selecciona todas las prácticas de integración responsable que NO se evidencian.
                 </h4>
 
                 <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">

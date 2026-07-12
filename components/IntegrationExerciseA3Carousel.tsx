@@ -301,7 +301,7 @@ const IntegrationExerciseA3Carousel = forwardRef<IntegrationExerciseA3CarouselHa
             <section className="space-y-4">
                 <div className="rounded-2xl border bg-white p-4 shadow-sm">
                     <p className="mt-2 text-sm leading-relaxed  text-slate-800 font-bold">
-                        Debes transformar {scenario.sourceFormat} en {scenario.targetFormat},
+                        Vas a transformar {scenario.sourceFormat} en {scenario.targetFormat},
                         dirigido a {scenario.audience}.
                     </p>
                     <ul className="mt-3 grid grid-cols-1 gap-1 text-sm leading-relaxed text-slate-600 sm:grid-cols-2">

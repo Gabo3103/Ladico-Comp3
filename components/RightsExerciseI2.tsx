@@ -114,11 +114,14 @@ const RightsExerciseI2 = forwardRef<RightsExerciseI2Handle, Props>(
 
         return (
             <div className="space-y-5 rounded-2xl border bg-white p-6">
+                <h4 className="font-semibold text-slate-800">
+                    Para cada caso, decide cuál es la forma correcta de usar o compartir el recurso
+                </h4>
                 <p className="text-sm leading-relaxed text-gray-600">
-                    Usar cada recurso significa incorporarlo directamente
-                    al post que vas a publicar: por eso, las condiciones de la licencia
+                    Las condiciones de la licencia
                     aplican desde que decides usarlo, no solo al momento de compartirlo.
                 </p>
+
 
                 <div className="rounded-xl border p-4">
                     <div className="mb-3">

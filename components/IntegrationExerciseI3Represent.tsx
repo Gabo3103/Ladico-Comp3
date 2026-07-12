@@ -151,7 +151,7 @@ const VARIANTS: Variant[] = [
                 id: "q2",
                 context:
                     "Al cargar los datos de visitas, una herramienta sugiere automáticamente un tipo de gráfico distinto al que se pensaba usar.",
-                prompt: "¿Qué refleja un uso crítico de esa sugerencia?",
+                prompt: "¿Qué refleja un uso crítico de esta sugerencia?",
                 options: [
                     { id: "a", label: "Adoptarla, porque suele ajustarse mejor al tipo de datos cargados" },
                     { id: "b", label: "Compararla con la idea original y quedarse con la que comunique mejor la tendencia" },

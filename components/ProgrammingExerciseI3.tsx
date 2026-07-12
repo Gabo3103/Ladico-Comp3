@@ -236,7 +236,10 @@ const ProgrammingExerciseI3 = forwardRef<ProgrammingExerciseI3Handle, Props>(
                                 </p>
                             </div>
 
-                            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                            <h4 className="mt-4 font-semibold text-slate-800">
+                                Clasifica el caso según cómo funciona el sistema
+                            </h4>
+                            <div className="mt-2 grid gap-2 sm:grid-cols-3">
                                 {CATEGORIES.map((category) => {
                                     const selected = answers[item.id] === category.id
 

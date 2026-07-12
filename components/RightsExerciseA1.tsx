@@ -358,6 +358,9 @@ const RightsExerciseA1 = forwardRef<RightsExerciseA1Handle, Props>(
                     </p>
                 </div>
 
+                <h4 className="font-semibold text-slate-800">
+                    Marca solo las decisiones que cumplen con la licencia y descarta los usos incompatibles
+                </h4>
                 <div className="space-y-2">
                     {options.map((opt) => {
                         const ok = checked ? isCorrectChoice(opt.id) : null

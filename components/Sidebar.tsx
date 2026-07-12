@@ -28,7 +28,7 @@ const AREA3_DEMO_COMPETENCES = [
   { id: "3.1", label: "Desarrollo de contenidos digitales" },
   { id: "3.2", label: "Integración y reelaboración" },
   { id: "3.3", label: "Derechos de autor y licencias" },
-  { id: "3.4", label: "Pensamiento computacional" },
+  { id: "3.4", label: "Pensamiento computacional y programación" },
 ] as const
 
 const AREA5_DEMO_COMPETENCES = [

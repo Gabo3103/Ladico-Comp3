@@ -343,23 +343,6 @@ export default function TestInterface({
     })
   }
 
-  const handlePrev = () => {
-    clearAllTimers()
-    violationCooldownRef.current = 0
-    invalidatedRef.current = false
-
-    const prevIndex = Math.max(currentIndex - 1, 0)
-    if (prevIndex !== currentIndex) {
-      setCurrentIndex(prevIndex)
-      setSelectedAnswer(testSession.answers[prevIndex] ?? null)
-      setAttemptsLeft(3)
-      setShowWarning(false)
-      setInvalidated(false)
-      setCheckResult(null)
-      startTimer()
-    }
-  }
-
   // ------- Render -------
   const isLastQuestion = currentIndex === totalQuestions - 1
   const isBasicLevel = testSession.level?.toString().toLowerCase?.().startsWith("b")
@@ -583,15 +566,6 @@ export default function TestInterface({
                     className="flex-1 sm:flex-none px-6 py-2.5 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white shadow-lg hover:bg-[#3a7d89] transition-all text-sm"
                   >
                     <Link href="/dashboard">Terminar</Link>
-                  </Button>
-                )}
-                {currentIndex > 0 && (
-                  <Button
-                    onClick={handlePrev}
-                    variant="outline"
-                    className="flex-1 sm:flex-none px-6 py-2.5 bg-transparent border-2 border-gray-300 hover:border-gray-400 rounded-xl sm:rounded-2xl font-medium transition-all text-sm"
-                  >
-                    Anterior
                   </Button>
                 )}
               </div>

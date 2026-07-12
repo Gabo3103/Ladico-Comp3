@@ -90,7 +90,7 @@ const SCENARIOS: Scenario[] = [
         id: "social-networks",
         title: "Uso responsable de redes sociales",
         context:
-            "Debes crear un recurso para estudiantes de primer año que recién comienzan a usar redes académicas y personales con mayor autonomía.",
+            "Vas a crear un recurso para estudiantes de primer año que recién comienzan a usar redes académicas y personales con mayor autonomía.",
         criteria: [
             "Debe priorizar ejemplos cercanos y acciones concretas.",
             "Debe explicar pocas ideas por pieza para facilitar la retención.",
@@ -127,7 +127,7 @@ const SCENARIOS: Scenario[] = [
         id: "fake-news",
         title: "Detección de noticias falsas",
         context:
-            "Debes diseñar un recurso para una comunidad escolar que necesita reconocer señales básicas de desinformación en mensajes, imágenes y titulares.",
+            "Vas a diseñar un recurso para una comunidad escolar que necesita reconocer señales básicas de desinformación en mensajes, imágenes y titulares.",
         criteria: [
             "Debe mostrar señales observables sin depender de teoría compleja.",
             "Debe ayudar a comparar la noticia con fuentes confiables.",
@@ -164,7 +164,7 @@ const SCENARIOS: Scenario[] = [
         id: "cyberbullying",
         title: "Prevención del ciberacoso",
         context:
-            "Debes preparar un recurso para adolescentes que necesitan reconocer situaciones de riesgo y saber dónde pedir ayuda.",
+            "Vas a preparar un recurso para adolescentes que necesitan reconocer situaciones de riesgo y saber dónde pedir ayuda.",
         criteria: [
             "Debe usar situaciones reconocibles para la audiencia.",
             "Debe mostrar señales de alerta sin normalizar la agresión.",

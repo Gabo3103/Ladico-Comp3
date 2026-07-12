@@ -113,7 +113,7 @@ const SCENARIOS: Scenario[] = [
         id: "cybersecurity-guide",
         title: "Guía de ciberseguridad básica",
         context:
-            "Debes crear una guía para estudiantes que usarán por primera vez varias plataformas institucionales. La guía debe explicar riesgos comunes y dejar pasos aplicables.",
+            "Vas a crear una guía para estudiantes que usarán por primera vez varias plataformas institucionales. La guía debe explicar riesgos comunes y dejar pasos aplicables.",
         tools: [
             {
                 id: "tool-a",
@@ -168,7 +168,7 @@ const SCENARIOS: Scenario[] = [
         id: "school-campaign",
         title: "Campaña de convivencia digital",
         context:
-            "Debes preparar una campaña escolar con afiche, publicación y guía breve. El equipo docente quiere revisar los mensajes antes de que las piezas salgan publicadas.",
+            "Vas a preparar una campaña escolar con afiche, publicación y guía breve. El equipo docente quiere revisar los mensajes antes de que las piezas salgan publicadas.",
         tools: [
             {
                 id: "tool-a",

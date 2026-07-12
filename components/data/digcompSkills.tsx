@@ -55,12 +55,12 @@ export const skillsInfo: Record<string, { title: string; description: string }> 
         "Modificar, perfeccionar, mejorar e integrar información y contenido en un cuerpo de conocimiento existente para crear contenidos nuevos, originales y relevantes."
     },
     "3.3": {
-      title: "Derechos de autor (Copyright) y Licencias de propiedad Intelectual",
+      title: "Derechos de autor y licencias",
       description:
         "Entender cómo solicitar datos, informaciones y contenidos digitales con derechos de autor y licencias de propiedad intelectual."
     },
     "3.4": {
-      title: "Programación",
+      title: "Pensamiento computacional y programación",
       description:
         "Desarrollar secuencias de instrucciones aplicables a sistemas computacionales para solucionar un problema dado o ejecutar una tarea determinada."
     },

@@ -46,14 +46,14 @@ export default function PageEj2_33_Intermedio() {
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
             <div className="rounded-b-xl border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                <div className="mx-auto max-w-6xl px-4 py-3">
+                <div className="mx-auto max-w-6xl px-4 py-1.5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <Link href="/dashboard" className="shrink-0">
                                 <img
                                     src="/ladico_green.png"
                                     alt="Ladico Logo"
-                                    className="h-24 w-24 cursor-pointer object-contain transition-opacity hover:opacity-80"
+                                    className="h-9 w-9 cursor-pointer object-contain transition-opacity hover:opacity-80"
                                 />
                             </Link>
 
@@ -66,18 +66,11 @@ export default function PageEj2_33_Intermedio() {
             </div>
 
             <div className="mx-auto max-w-6xl px-4 pb-8 pt-4">
-                <div className="mb-4">
-                    <div className="mb-2 flex items-center justify-between">
-                        <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-[#286575] sm:text-sm">
-                            Ejercicio 2 de 3
-                        </span>
-                        <div className="flex space-x-2">
-                            <div className="h-3 w-3 rounded-full bg-[#286575]" />
-                            <div className="h-3 w-3 rounded-full bg-[#286575]" />
-                            <div className="h-3 w-3 rounded-full bg-[#dde3e8]" />
-                        </div>
-                    </div>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-[#dde3e8]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-[#286575] sm:text-sm">
+                        Ejercicio 2 de 3
+                    </span>
+                    <div className="h-2 w-28 overflow-hidden rounded-full bg-[#dde3e8] sm:w-36">
                         <div
                             className="h-full rounded-full bg-[#286575] transition-all duration-500"
                             style={{ width: `${progressPct}%` }}
@@ -91,12 +84,6 @@ export default function PageEj2_33_Intermedio() {
                             <p className="font-medium text-gray-700">{SCENARIO}</p>
                         </div>
 
-                        <div className="mb-6">
-                            <p className="mt-2 inline-block rounded-full bg-blue-50 px-4 py-2 text-sm text-gray-600">
-                                Para cada caso, <b>decide</b> cuál es la forma correcta de
-                                usar o compartir el recurso.
-                            </p>
-                        </div>
 
                         <RightsExerciseI2 ref={exRef} onReadyChange={setReady} />
 

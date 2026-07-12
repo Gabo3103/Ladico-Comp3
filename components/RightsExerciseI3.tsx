@@ -351,6 +351,9 @@ const RightsExerciseI3 = forwardRef<RightsExerciseI3Handle, Props>(
                                 </p>
                             </div>
 
+                            <h4 className="mb-2 font-semibold text-slate-800">
+                                Lee el caso y marca si no hay conflicto relevante, si existe un desafío ético, legal o ambos
+                            </h4>
                             <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                                 {CONFLICT_ORDER.map((conflict) => {
                                     const isPicked = selected.includes(conflict)

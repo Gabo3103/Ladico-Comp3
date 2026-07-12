@@ -2,9 +2,17 @@
 
 import type { Competence } from "@/types"
 import { useRouter } from "next/navigation"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Rocket, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useMemo, useState } from "react"
 import { firstExerciseRoute, type LevelSlug } from "@/lib/firstExerciseRoute"
 
@@ -44,6 +52,7 @@ export default function CompetenceCard({
   const router = useRouter()
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [locallyStarted, setLocallyStarted] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const hasEnoughQuestions = questionCount >= 3
 
@@ -119,32 +128,28 @@ export default function CompetenceCard({
     return "Bloqueado"
   })()
 
-  const handleStartOrContinue = () => {
-    if (!canStartOrContinue) return
+  const targetLevelNumber = canAdvanceToNextLevel ? levelNumber + 1 : levelNumber
+  const levelMap: Record<number, "Básico" | "Intermedio" | "Avanzado"> = { 1: "Básico", 2: "Intermedio", 3: "Avanzado" }
+  const targetLevelName = levelMap[targetLevelNumber]
 
-    const targetLevelNumber = canAdvanceToNextLevel ? levelNumber + 1 : levelNumber
-    const levelMap: Record<number, "Básico" | "Intermedio" | "Avanzado"> = { 1: "Básico", 2: "Intermedio", 3: "Avanzado" }
-    const targetLevelName = levelMap[targetLevelNumber]
-
+  const evalInfo = useMemo(() => {
     const dimensionName = getDimensionName(competence.dimension)
     const competenceNumber = competence.code.split(".")[1]
     const areaNumber = competence.code.split(".")[0]
     const totalInArea = areaNumber === "1" ? 3 : areaNumber === "2" ? 6 : 4
     const currentPosition = Number.parseInt(competenceNumber)
+    const intro = canAdvanceToNextLevel ? `Avanzar al nivel ${targetLevelNumber}` : `Evaluación: "${competence.name}"`
 
-    const intro = canAdvanceToNextLevel ? `🚀 AVANZAR AL NIVEL ${targetLevelNumber}` : `🎯 EVALUACIÓN: "${competence.name}"`
+    return { dimensionName, totalInArea, currentPosition, intro }
+  }, [competence, canAdvanceToNextLevel, targetLevelNumber])
 
-    const confirmed = confirm(
-      `${intro}\n\n` +
-        `📍 Área: ${dimensionName}\n` +
-        `📊 Posición: ${currentPosition}/${totalInArea} competencias del área\n` +
-        `🎯 Nivel a realizar: ${targetLevelName}\n` +
-        `📝 Preguntas: 3\n` +
-        `⏱️ Tiempo estimado: 5-10 minutos\n\n` +
-        `¿Deseas continuar?`
-    )
+  const handleStartOrContinue = () => {
+    if (!canStartOrContinue) return
+    setConfirmOpen(true)
+  }
 
-    if (!confirmed) return
+  const handleConfirmStart = () => {
+    setConfirmOpen(false)
     setLocallyStarted(true)
 
     // 🔑 Solo usamos startOrContinueUrl si REALMENTE hay una sesión en progreso.
@@ -162,6 +167,7 @@ export default function CompetenceCard({
   }
 
   return (
+    <>
     <div className="relative bg-white rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group border border-gray-200 h-[300px] max-h-[300px] flex flex-col">
       <div className="overflow-hidden rounded-2xl bg-white h-full flex flex-col">
         <div className="h-6 rounded-t-2xl" style={{ backgroundColor: getCompetenceSpecificColor() }} />
@@ -241,5 +247,52 @@ export default function CompetenceCard({
         </div>
       </div>
     </div>
+
+    <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <AlertDialogContent className="max-w-md rounded-3xl border-0 bg-white p-6 shadow-2xl ring-2 ring-[#286575] ring-opacity-30">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e4f3f5] text-[#286575]">
+            {canAdvanceToNextLevel ? <Rocket className="h-5 w-5" /> : <Target className="h-5 w-5" />}
+          </div>
+          <AlertDialogTitle className="pt-1.5 text-base font-bold text-[#286575]">
+            {evalInfo.intro}
+          </AlertDialogTitle>
+        </div>
+
+        <div className="mt-4 space-y-2 rounded-2xl bg-gray-50 p-4 text-sm text-gray-700">
+          <p>
+            <span className="font-semibold text-gray-900">Área:</span> {evalInfo.dimensionName}
+          </p>
+          <p>
+            <span className="font-semibold text-gray-900">Posición:</span> {evalInfo.currentPosition}/
+            {evalInfo.totalInArea} competencias del área
+          </p>
+          <p>
+            <span className="font-semibold text-gray-900">Nivel a realizar:</span> {targetLevelName}
+          </p>
+          <p>
+            <span className="font-semibold text-gray-900">Preguntas:</span> 3
+          </p>
+          <p>
+            <span className="font-semibold text-gray-900">Tiempo estimado:</span> 5-10 minutos
+          </p>
+        </div>
+
+        <p className="mt-4 text-sm font-medium text-gray-800">¿Deseas continuar?</p>
+
+        <AlertDialogFooter className="mt-5">
+          <AlertDialogCancel className="rounded-xl border-gray-300 text-gray-600 hover:bg-gray-50">
+            Cancelar
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirmStart}
+            className="rounded-xl bg-[#286675] text-white hover:bg-[#1e4a56]"
+          >
+            Aceptar
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   )
 }

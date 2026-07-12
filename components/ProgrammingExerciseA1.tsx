@@ -552,6 +552,9 @@ export type ProgrammingExerciseA1Handle = {
                 </button>
             </div>
             </div>
+            <p className="text-sm text-gray-600 mb-2 shrink-0">
+                Revisa la propuesta inicial cargada en el editor, corrígela y complétala. Luego presiona <b>Ejecutar</b> en el laberinto.
+            </p>
             <div
             ref={blocklyDivRef}
             className="w-full flex-1 min-h-[200px] border bg-[#f9fafb] rounded-xl overflow-hidden"

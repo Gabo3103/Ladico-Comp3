@@ -61,14 +61,14 @@ export default function PageEj3_32_Avanzado() {
     return (
         <div className="min-h-screen bg-[#f3fbfb]">
             <div className="rounded-b-xl border-b border-white/10 bg-white/20 backdrop-blur-sm">
-                <div className="mx-auto max-w-6xl px-4 py-3">
+                <div className="mx-auto max-w-6xl px-4 py-1.5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <Link href="/dashboard" className="shrink-0">
                                 <img
                                     src="/ladico_green.png"
                                     alt="Ladico Logo"
-                                    className="h-24 w-24 cursor-pointer object-contain transition-opacity hover:opacity-80"
+                                    className="h-9 w-9 cursor-pointer object-contain transition-opacity hover:opacity-80"
                                 />
                             </Link>
                             <span className="rounded-full bg-white/10 px-2 py-1 text-center text-[#2e6372] opacity-80 sm:px-3 sm:text-sm">
@@ -81,19 +81,11 @@ export default function PageEj3_32_Avanzado() {
             </div>
 
             <div className="mx-auto max-w-6xl px-4 pb-8 pt-4">
-                <div className="mb-4">
-                    <div className="mb-2 flex items-center justify-between">
-                        <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-[#286575] sm:text-sm">
-                            Ejercicio 3 de 3
-                        </span>
-                        <div className="flex space-x-2" aria-hidden>
-                            <div className="h-3 w-3 rounded-full bg-[#286575]" />
-                            <div className="h-3 w-3 rounded-full bg-[#286575]" />
-                            <div className="h-3 w-3 rounded-full bg-[#286575]" />
-                        </div>
-                    </div>
-
-                    <div className="h-2.5 overflow-hidden rounded-full bg-[#dde3e8]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-[#286575] sm:text-sm">
+                        Ejercicio 3 de 3
+                    </span>
+                    <div className="h-2 w-28 overflow-hidden rounded-full bg-[#dde3e8] sm:w-36">
                         <div
                             className="h-full rounded-full bg-[#286575] transition-all duration-500"
                             style={{ width: `${progressPct}%` }}
@@ -105,15 +97,11 @@ export default function PageEj3_32_Avanzado() {
                     <CardContent className="space-y-6 p-6 lg:p-8">
                         <div className="rounded-2xl border-l-4 border-[#286575] bg-gray-50 p-6">
                             <p className="text-gray-700">
-                                Debes ajustar o integrar contenido digital para cumplir requisitos
-                                complejos de formato, estructura y audiencia, transformando un
-                                contenido existente en un nuevo recurso digital.
+                                Debes adaptar un contenido extenso a un formato breve y visual.
+                                Responde qué contenido conservar, cómo estructurarlo, qué elementos
+                                visuales incorporar y cómo usar las herramientas de apoyo.
                             </p>
                         </div>
-
-                        <p className="inline-block rounded-full bg-blue-50 px-4 py-2 text-sm text-gray-600">
-                            <b>Decide</b> qué mantener, resumir, reorganizar o destacar para el nuevo recurso.
-                        </p>
 
                         <IntegrationExerciseA3Carousel
                             ref={exRef}

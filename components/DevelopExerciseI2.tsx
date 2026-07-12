@@ -33,7 +33,7 @@ const BANK: Scenario[] = [
         id: "S_VIDEO",
         title: "Video breve para redes",
         description:
-            "Debes crear un video informativo corto y usar ayudas digitales para acelerar subtítulos, cortes y revisión final",
+            "Vas a preparar un video informativo corto, apoyándote en herramientas digitales para agilizar subtítulos, cortes y revisión final",
         steps: [
             { id: "v1", text: "Definir objetivo, audiencia, duración y formato del video" },
             { id: "v2", text: "Preparar guion breve, clips, imágenes y recursos visuales necesarios" },
@@ -46,7 +46,7 @@ const BANK: Scenario[] = [
         id: "S_PRESENTATION",
         title: "Presentación para clase",
         description:
-            "Debes crear una presentación clara, combinando contenido propio con sugerencias automáticas de diseño",
+            "Vas a preparar una presentación clara, combinando contenido propio con sugerencias automáticas de diseño",
         steps: [
             { id: "p1", text: "Definir tema, público objetivo y mensaje principal de la presentación" },
             { id: "p2", text: "Organizar las ideas en una estructura de inicio, desarrollo y cierre" },
@@ -59,7 +59,7 @@ const BANK: Scenario[] = [
         id: "S_REPORT",
         title: "Informe digital",
         description:
-            "Debes producir un informe breve y usar herramientas de apoyo para ordenar, revisar y mejorar la redacción",
+            "Vas a producir un informe breve, apoyándote en herramientas digitales para ordenar, revisar y mejorar la redacción",
         steps: [
             { id: "r1", text: "Definir propósito, destinatario y estructura del informe" },
             { id: "r2", text: "Reunir información, registrar fuentes y preparar un primer borrador" },
@@ -72,7 +72,7 @@ const BANK: Scenario[] = [
         id: "S_INFOGRAPHIC",
         title: "Infografía educativa",
         description:
-            "Debes crear una infografía usando plantillas, recursos visuales y revisión asistida para comunicar datos clave",
+            "Vas a preparar una infografía apoyándote en plantillas, recursos visuales y revisión asistida para comunicar datos clave",
         steps: [
             { id: "g1", text: "Definir tema, datos principales y objetivo comunicativo" },
             { id: "g2", text: "Elegir tamaño, plantilla, colores y estilo visual apropiado" },
@@ -85,7 +85,7 @@ const BANK: Scenario[] = [
         id: "S_GUIDE",
         title: "Guía paso a paso",
         description:
-            "Debes crear una guía digital para explicar un procedimiento y apoyarte en herramientas de edición y revisión",
+            "Vas a preparar una guía digital para explicar un procedimiento, apoyándote en herramientas de edición y revisión",
         steps: [
             { id: "d1", text: "Definir qué procedimiento se explicará y quién usará la guía" },
             { id: "d2", text: "Dividir el procedimiento en pasos breves y ordenados" },
@@ -98,7 +98,7 @@ const BANK: Scenario[] = [
         id: "S_POSTER",
         title: "Afiche digital",
         description:
-            "Debes diseñar un afiche para una campaña escolar usando recursos visuales y apoyo automático de composición",
+            "Vas a diseñar un afiche para una campaña escolar, apoyándote en recursos visuales y composición automática",
         steps: [
             { id: "a1", text: "Definir mensaje, público y llamado a la acción del afiche" },
             { id: "a2", text: "Seleccionar imágenes, colores, tipografías y recursos permitidos" },

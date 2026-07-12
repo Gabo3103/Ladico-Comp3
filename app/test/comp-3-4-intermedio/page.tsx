@@ -156,7 +156,7 @@ function ResultsIntermedioContent() {
                     </p>
 
                     <div className="mt-2 text-xs text-gray-500">
-                    Competencia {data.competence} – Programación · Nivel{" "}
+                    Competencia {data.competence} – Pensamiento computacional y programación · Nivel{" "}
                     {data.level.charAt(0).toUpperCase() + data.level.slice(1)}
                     </div>
                 </div>
