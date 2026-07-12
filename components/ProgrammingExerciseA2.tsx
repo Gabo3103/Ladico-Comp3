@@ -647,7 +647,10 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
                         style={{ gridTemplateRows: openPanel === 3 ? "1fr" : "0fr" }}
                     >
                         <div className="overflow-hidden">
-                        <div className="grid grid-cols-1 gap-3 border-t p-4 lg:grid-cols-2">
+                        <p className="border-t px-4 pt-4 text-sm text-gray-600">
+                            Presiona <b>Ejecutar</b> para correr tu consulta SQL sobre la tabla FLORES. El contador junto a "Tabla FLORES" se actualizará mostrando cuántas filas devolvió — escribe ese mismo número como respuesta abajo.
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 p-4 lg:grid-cols-2">
                             <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
                                 <div className="flex items-center justify-between border-b p-2.5">
                                     <h4 className="text-sm font-semibold text-slate-800">

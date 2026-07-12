@@ -96,7 +96,7 @@ export type ProgrammingExerciseA1Handle = {
     { onFinish, onAttemptsExhausted, onReadyChange, seed },
     ref
     ) {
-    const MAX_ATTEMPTS = 3
+    const MAX_ATTEMPTS = 5
     const [attempts, setAttempts] = useState(0)
     const blocklyDivRef = useRef<HTMLDivElement | null>(null)
     const workspaceRef = useRef<any>(null)
@@ -372,13 +372,14 @@ export type ProgrammingExerciseA1Handle = {
         workspace.addChangeListener(onChange)
 
         const resizeBlockly = () => {
-            if (!blocklyDivRef.current || !workspace) return
-            const h = Math.max(320, Math.min(window.innerHeight - 280, 640))
-            blocklyDivRef.current.style.height = `${h}px`
+            if (!workspace) return
             Blockly.svgResize(workspace)
         }
         resizeBlockly()
         window.addEventListener("resize", resizeBlockly)
+
+        const blocklyRo = new ResizeObserver(resizeBlockly)
+        if (blocklyDivRef.current) blocklyRo.observe(blocklyDivRef.current)
 
         try {
             const initialXml = INITIAL_PROPOSALS[labyrinthIndex]
@@ -397,6 +398,7 @@ export type ProgrammingExerciseA1Handle = {
         const cleanup = () => {
             try { workspace && workspace.removeChangeListener(onChange) } catch {}
             window.removeEventListener("resize", resizeBlockly)
+            blocklyRo.disconnect()
             try { workspace && workspace.dispose() } catch {}
         }
         ;(workspaceRef as any)._cleanup = cleanup
@@ -552,9 +554,19 @@ export type ProgrammingExerciseA1Handle = {
                 </button>
             </div>
             </div>
-            <p className="text-sm text-gray-600 mb-2 shrink-0">
+            <p className="text-sm text-gray-600 mb-1.5 shrink-0">
                 Revisa la propuesta inicial cargada en el editor, corrígela y complétala. Luego presiona <b>Ejecutar</b> en el laberinto.
             </p>
+            <details className="mb-2 shrink-0 rounded-xl border bg-[#f9fafb] px-3 py-2 text-xs text-gray-600">
+                <summary className="cursor-pointer select-none font-medium text-gray-700">
+                    Cómo usar el editor
+                </summary>
+                <ul className="mt-1.5 list-disc space-y-0.5 pl-5">
+                    <li>El robot va de A (celeste) a B (verde), sin atravesar paredes (negras) ni salir del tablero</li>
+                    <li>Arrastra bloques de la paleta y encájalos en orden: avanzar, girar izquierda/derecha, o <b>repetir</b> para no duplicarlos</li>
+                    <li>Presiona <b>Ejecutar</b> para probar, arrastra un bloque a la papelera para quitarlo, o usa <b>Limpiar</b> para borrar todo</li>
+                </ul>
+            </details>
             <div
             ref={blocklyDivRef}
             className="w-full flex-1 min-h-[200px] border bg-[#f9fafb] rounded-xl overflow-hidden"
@@ -579,14 +591,9 @@ export type ProgrammingExerciseA1Handle = {
             <p className="text-sm text-gray-600 mt-3 min-h-[24px]">{msg}</p>
             {attemptsExhausted && !reached && (
                 <p className="text-sm font-medium text-rose-600 mt-1">
-                    Agotaste los 3 intentos disponibles. Pasando al siguiente ejercicio...
+                    Agotaste los {MAX_ATTEMPTS} intentos disponibles. Pasando al siguiente ejercicio...
                 </p>
             )}
-            <ul className="text-xs text-gray-500 mt-2 list-disc ml-5">
-            <li>El robot inicia en A (celda celeste). Debe llegar a B (celda verde)</li>
-            <li>No puede atravesar paredes (bloques negros) ni salir del tablero</li>
-            <li>Bloques disponibles: avanzar, girar izquierda/derecha y repetir</li>
-            </ul>
         </div>
         </div>
     )
