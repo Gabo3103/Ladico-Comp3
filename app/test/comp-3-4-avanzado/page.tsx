@@ -205,7 +205,7 @@ function ResultsAvanzadoContent() {
                     >
                     <div className="flex items-center gap-2 text-gray-800">
                         {data.q3 ? <CheckCircle className="w-5 h-5 text-green-700" /> : <XIcon className="w-5 h-5 text-red-700" />}
-                        <span>Ejercicio 3 (Avanzado): Terminal — rutas y mv</span>
+                        <span>Ejercicio 3 (Avanzado): Automatización del análisis de encuestas (código, IA o revisión humana)</span>
                     </div>
                     <span className={`font-semibold ${data.q3 ? "text-green-700" : "text-red-700"}`}>
                         {data.q3 ? "Correcta" : "Incorrecta"}

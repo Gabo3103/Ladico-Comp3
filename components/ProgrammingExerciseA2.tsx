@@ -659,8 +659,9 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
                                     {loading ? (
                                         <span className="text-xs text-slate-500">Cargando...</span>
                                     ) : (
-                                        <span className="text-xs text-slate-500">
-                                            {filteredRows.length}/{rows.length} filas
+                                        <span className="text-sm">
+                                            <b className="font-bold text-[#286575]">{filteredRows.length}</b>
+                                            <span className="text-slate-500">/{rows.length} filas obtenidas</span>
                                         </span>
                                     )}
                                 </div>

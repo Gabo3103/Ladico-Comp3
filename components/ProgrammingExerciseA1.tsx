@@ -557,9 +557,9 @@ export type ProgrammingExerciseA1Handle = {
             <p className="text-sm text-gray-600 mb-1.5 shrink-0">
                 Revisa la propuesta inicial cargada en el editor, corrígela y complétala. Luego presiona <b>Ejecutar</b> en el laberinto.
             </p>
-            <details className="mb-2 shrink-0 rounded-xl border bg-[#f9fafb] px-3 py-2 text-xs text-gray-600">
-                <summary className="cursor-pointer select-none font-medium text-gray-700">
-                    Cómo usar el editor
+            <details className="mb-2 shrink-0 rounded-xl border border-[#286575]/30 bg-[#e4f3f5] px-3 py-2 text-xs text-[#286575]">
+                <summary className="cursor-pointer select-none font-medium text-[#286575]">
+                    Cómo usar el editor (instrucciones)
                 </summary>
                 <ul className="mt-1.5 list-disc space-y-0.5 pl-5">
                     <li>El robot va de A (celeste) a B (verde), sin atravesar paredes (negras) ni salir del tablero</li>

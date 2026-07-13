@@ -207,7 +207,7 @@ function ResultsIntermedioContent() {
                         ) : (
                         <XIcon className="w-5 h-5 text-red-700" />
                         )}
-                        <span>Ejercicio 1: Orden de instrucciones (tipos de datos y suma en JS)</span>
+                        <span>Ejercicio 1: Ordenar instrucciones de código para resolver un problema</span>
                     </div>
                     <span className={`font-semibold ${data.q1 ? "text-green-700" : "text-red-700"}`}>
                         {data.q1 ? "Correcta" : "Incorrecta"}
@@ -225,7 +225,7 @@ function ResultsIntermedioContent() {
                         ) : (
                         <XIcon className="w-5 h-5 text-red-700" />
                         )}
-                        <span>Ejercicio 2: Pseudocódigo — predicción de salidas</span>
+                        <span>Ejercicio 2: Orden de las etapas de desarrollo de un proyecto digital</span>
                     </div>
                     <span className={`font-semibold ${data.q2 ? "text-green-700" : "text-red-700"}`}>
                         {data.q2 ? "Correcta" : "Incorrecta"}
@@ -243,7 +243,7 @@ function ResultsIntermedioContent() {
                         ) : (
                         <XIcon className="w-5 h-5 text-red-700" />
                         )}
-                        <span>Ejercicio 3: HTML/CSS — revisión de clases y encabezado</span>
+                        <span>Ejercicio 3: Clasificación de sistemas según cómo funcionan (IA, reglas o ninguno)</span>
                     </div>
                     <span className={`font-semibold ${data.q3 ? "text-green-700" : "text-red-700"}`}>
                         {data.q3 ? "Correcta" : "Incorrecta"}

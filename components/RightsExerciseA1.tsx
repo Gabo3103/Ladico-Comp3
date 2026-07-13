@@ -7,6 +7,7 @@ import React, {
     useMemo,
     useState,
 } from "react"
+import { Info } from "lucide-react"
 
 export type A1Quality = "good" | "partial" | "bad"
 
@@ -347,6 +348,10 @@ const RightsExerciseA1 = forwardRef<RightsExerciseA1Handle, Props>(
                             >
                                 {profile.short}
                             </a>
+                            <Info
+                                className="ml-1 inline-block h-3.5 w-3.5 shrink-0 text-[#286575]"
+                                aria-hidden="true"
+                            />
                             <span
                                 id="license-tooltip"
                                 role="tooltip"

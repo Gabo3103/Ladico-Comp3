@@ -188,6 +188,16 @@ export default function TestInterface({
     ? selectedAnswer.length > 0
     : selectedAnswer !== null
 
+  // Copia local de todas las respuestas, actualizada de forma síncrona en cada
+  // selección. onAnswerSubmit persiste en Firestore de forma asíncrona (sin
+  // await) y el prop testSession solo se actualiza cuando ese round-trip
+  // vuelve; si la red va lenta, al llegar a la última pregunta ese prop puede
+  // no reflejar aún respuestas previas, causando que se cuenten como "sin
+  // responder" al calificar. Este ref no depende de esa latencia.
+  const localAnswersRef = useRef<(number | number[] | null)[]>(
+    Array.from({ length: totalQuestions }, (_, i) => testSession.answers?.[i] ?? null)
+  )
+
   const handleAnswerSelect = (answerIndex: number) => {
     setCheckResult(null)
     if (currentQuestion?.type === "multiple-response") {
@@ -196,12 +206,14 @@ export default function TestInterface({
         const next = selected.includes(answerIndex)
           ? selected.filter((index) => index !== answerIndex)
           : [...selected, answerIndex]
+        localAnswersRef.current[currentIndex] = next
         onAnswerSubmit(next, currentIndex)
         return next
       })
       return
     }
 
+    localAnswersRef.current[currentIndex] = answerIndex
     setSelectedAnswer(answerIndex)
     onAnswerSubmit(answerIndex, currentIndex)
   }
@@ -315,6 +327,7 @@ export default function TestInterface({
     setCurrentIndex((prevIndex) => {
       // Registrar respuesta salvo que venga de invalidación
       if (!fromInvalidation && selectedAnswer !== null) {
+        localAnswersRef.current[prevIndex] = selectedAnswer
         onAnswerSubmit(selectedAnswer, prevIndex)
       }
 
@@ -323,7 +336,7 @@ export default function TestInterface({
         const finalSession: TestSession = {
           ...testSession,
           currentQuestionIndex: prevIndex,
-          answers: testSession.answers.map((answer, idx) =>
+          answers: localAnswersRef.current.map((answer, idx) =>
             idx === prevIndex ? (fromInvalidation ? answer : selectedAnswer) : answer
           ),
         }

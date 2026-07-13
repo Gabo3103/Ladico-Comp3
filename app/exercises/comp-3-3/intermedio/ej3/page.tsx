@@ -18,7 +18,7 @@ const LEVEL = "intermedio";
 const PREFIX = "session:3.3:Intermedio";
 
 const SCENARIO =
-    "Estás analizando cómo se entrenan distintos sistemas de IA. Debes identificar qué situaciones presentan desafíos relacionados con derechos, permisos, sesgos, daños o transparencia en el uso de obras, imágenes, textos o datos.";
+    "Estás analizando cómo se entrenan distintos sistemas de IA, debes identificar qué situaciones presentan desafíos relacionados con derechos, permisos, sesgos, daños o transparencia en el uso de obras, imágenes, textos o datos. Lee cada caso y marca si no hay conflicto relevante, si existe un desafío ético, legal o ambos.";
 
 export default function PageEj3_33_Intermedio() {
     const router = useRouter();
