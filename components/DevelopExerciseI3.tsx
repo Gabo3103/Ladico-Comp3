@@ -215,8 +215,11 @@ const DevelopExerciseI3 = forwardRef<DevelopExerciseI3Handle, Props>(
         function evaluate(opts?: { silent?: boolean }) {
             const missing = correctIds.filter((id) => !chosen.includes(id));
             const wrong = wrongIds.filter((id) => chosen.includes(id));
+            const correctPicked = correctIds.length - missing.length;
             const score = calculateScore();
-            const ok = missing.length === 0 && wrong.length === 0;
+            // Aprueba con al menos 1 opción correcta marcada y ninguna incorrecta
+            // (no exige marcar absolutamente todas las correctas).
+            const ok = correctPicked >= 1 && wrong.length === 0;
 
             if (opts?.silent) {
                 onEvaluate?.(ok ? 1 : 0);

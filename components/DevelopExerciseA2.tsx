@@ -294,7 +294,8 @@ const DevelopExerciseA2 = forwardRef<DevelopExerciseA2Handle, Props>(
 
         function evaluate(opts?: { silent?: boolean }) {
             const correct = totalCorrect();
-            const ok = correct === scenario.decisions.length;
+            // Aprueba con al menos 2 de las 3 decisiones correctas (no exige las 3).
+            const ok = correct >= Math.max(1, scenario.decisions.length - 1);
 
             if (opts?.silent) {
                 onEvaluate?.(ok ? 1 : 0);

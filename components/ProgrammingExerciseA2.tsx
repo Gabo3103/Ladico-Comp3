@@ -45,8 +45,6 @@ const DATASET_FILES = [
     "/datasets/flores_dataset_3.csv",
 ]
 
-const MAX_VISIBLE_ROWS = 10
-
 const ROUTINE_CASES: RoutineCase[] = [
     {
         id: "premium-report",
@@ -410,12 +408,13 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
         }
 
         function checkNow(opts?: { silent?: boolean }) {
-            const { reasoningScore, validationScore, total } = calculateScore()
-            // Para aprobar se exige razonamiento correcto (elegir bien instrucción y
-            // salida) Y validación empírica correcta (ejecutar y contar bien) por
-            // separado, no solo un puntaje total: así elegir bien la salida no
-            // garantiza por sí solo el resto del puntaje.
-            const ok = reasoningScore === 2 && validationScore === 2
+            const { reasoningScore, validationScore, total, promptOk, outputOk, resultOk, countOk } = calculateScore()
+            // El número de filas ingresado (countOk) es obligatorio siempre: es la
+            // evidencia de que efectivamente ejecutó y leyó el resultado. Las otras
+            // 3 dimensiones (instrucción, salida elegida, resultado exacto de la
+            // consulta) admiten un error entre las tres.
+            const otherCorrect = Number(promptOk) + Number(outputOk) + Number(resultOk)
+            const ok = countOk && otherCorrect >= 2
 
             if (!opts?.silent) {
                 setLastCorrect(ok)
@@ -661,7 +660,7 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
                                     ) : (
                                         <span className="text-sm">
                                             <b className="font-bold text-[#286575]">{filteredRows.length}</b>
-                                            <span className="text-slate-500">/{rows.length} filas obtenidas</span>
+                                            <span className="text-slate-500"> filas obtenidas</span>
                                         </span>
                                     )}
                                 </div>
@@ -670,33 +669,28 @@ const ProgrammingExerciseA2 = forwardRef<ProgrammingExerciseA2Handle, Props>(
                                         <thead className="sticky top-0 bg-slate-50">
                                             <tr>
                                                 <th className="border-b px-3 py-2 text-left">id</th>
-                                                <th className="border-b px-3 py-2 text-left">nombre</th>
-                                                <th className="border-b px-3 py-2 text-left">precio</th>
+                                                <th className="border-b px-3 py-2 text-right">nombre</th>
+                                                <th className="border-b px-3 py-2 text-right">precio</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {!loading &&
-                                                filteredRows.slice(0, MAX_VISIBLE_ROWS).map((row) => (
+                                                filteredRows.map((row) => (
                                                     <tr
                                                         key={row.id}
                                                         className="odd:bg-white even:bg-slate-50"
                                                     >
                                                         <td className="border-b px-3 py-2">{row.id}</td>
-                                                        <td className="border-b px-3 py-2">
+                                                        <td className="border-b px-3 py-2 text-right">
                                                             {row.nombre}
                                                         </td>
-                                                        <td className="border-b px-3 py-2">
+                                                        <td className="border-b px-3 py-2 text-right">
                                                             {row.precio}
                                                         </td>
                                                     </tr>
                                                 ))}
                                         </tbody>
                                     </table>
-                                    {!loading && filteredRows.length > MAX_VISIBLE_ROWS && (
-                                        <p className="border-t bg-slate-50 px-3 py-2 text-center text-xs text-slate-500">
-                                            Mostrando {MAX_VISIBLE_ROWS} de {filteredRows.length} filas
-                                        </p>
-                                    )}
                                 </div>
                                 {error && (
                                     <div className="border-t border-red-200 bg-red-50 p-3 text-sm text-red-700">

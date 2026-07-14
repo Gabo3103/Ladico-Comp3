@@ -201,21 +201,14 @@ const IntegrationExerciseA2Simulator = forwardRef<
         const qualityControl = qualityOptions.every((o) => selected[o.id]);
         const criticalJudgment = excludeOptions.every((o) => !selected[o.id]);
 
-        let total =
+        const total =
             Number(selectiveUse) +
             Number(transparency) +
             Number(qualityControl) +
             Number(criticalJudgment);
 
-        // Penalización: si marca todas las alternativas del caso (estrategia de
-        // "marcar todo para asegurar puntos"), se resta 1 punto.
-        const markedAll = Object.values(selected).filter(Boolean).length === scenario.options.length;
-        if (markedAll) {
-            total = Math.max(0, total - 1);
-        }
-
         let quality: ExerciseQuality = "bad";
-        if (total === 4) quality = "good";
+        if (total >= 3) quality = "good";
         else if (total >= 2) quality = "partial";
 
         return { selectiveUse, transparency, qualityControl, criticalJudgment, total, quality };

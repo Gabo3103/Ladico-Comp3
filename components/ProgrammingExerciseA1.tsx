@@ -532,22 +532,14 @@ export type ProgrammingExerciseA1Handle = {
             <div className="flex items-center justify-between mb-2 shrink-0">
             <h2 className="text-lg font-semibold">Laberinto 6×6</h2>
             <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600">
-                Bloques restantes: <b>{remaining}</b>
-                </span>
-                <span
-                    className={`text-sm ${
-                        attemptsExhausted ? "text-rose-600 font-semibold" : "text-gray-600"
-                    }`}
-                >
-                Intentos: <b>{attempts}/{MAX_ATTEMPTS}</b>
-                </span>
                 <button
                 onClick={run}
                 disabled={!isReady || isRunning || attemptsExhausted}
-                className="px-3 py-2 rounded-xl bg-[#3a7d89] text-white disabled:opacity-50"
+                className={`px-2 py-2 rounded-xl text-white disabled:opacity-50 ${
+                    attemptsExhausted ? "bg-rose-600" : "bg-[#3a7d89]"
+                }`}
                 >
-                Ejecutar
+                Ejecutar {Math.min(attempts + 1, MAX_ATTEMPTS)} de {MAX_ATTEMPTS}
                 </button>
                 <button onClick={clearBlocks} className="px-3 py-2 rounded-xl bg-gray-100">
                 Limpiar
@@ -555,10 +547,10 @@ export type ProgrammingExerciseA1Handle = {
             </div>
             </div>
             <p className="text-sm text-gray-600 mb-1.5 shrink-0">
-                Revisa la propuesta inicial cargada en el editor, corrígela y complétala. Luego presiona <b>Ejecutar</b> en el laberinto.
+                Revisa la propuesta inicial cargada en el editor y complétala. Luego presiona <b>Ejecutar</b> en el laberinto.
             </p>
             <details className="mb-2 shrink-0 rounded-xl border border-[#286575]/30 bg-[#e4f3f5] px-3 py-2 text-xs text-[#286575]">
-                <summary className="cursor-pointer select-none font-medium text-[#286575]">
+                <summary className="cursor-pointer select-none font-medium text-[#286575] underline">
                     Cómo usar el editor (instrucciones)
                 </summary>
                 <ul className="mt-1.5 list-disc space-y-0.5 pl-5">

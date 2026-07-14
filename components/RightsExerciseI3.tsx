@@ -161,7 +161,7 @@ const CASE_BANK: Array<{
         id: "case12",
         title: "Reconocimiento facial en control policial",
         description:
-            "Un sistema de reconocimiento facial usado en controles policiales identifica con mucha mayor frecuencia como 'posible sospechoso' a personas de ciertos rasgos físicos o tonos de piel, porque fue entrenado con conjuntos de datos con escasa diversidad racial. El sesgo no fue detectado ni informado antes de su despliegue.",
+            "Un sistema de reconocimiento facial usado en controles policiales identifica con mucha mayor frecuencia como 'posible sospechoso' a personas de ciertos rasgos físicos o tonos de piel, porque fue entrenado con conjuntos de datos con escasa diversidad racial.",
         correct: ["ETHICAL", "LEGAL"],
         explanation:
             "El desafío es ético por sesgo racializado con consecuencias graves para personas identificadas injustamente, y legal porque el uso discriminatorio de datos puede vulnerar normativas de igualdad y protección de datos personales.",
