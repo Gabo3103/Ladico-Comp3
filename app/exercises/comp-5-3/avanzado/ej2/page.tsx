@@ -1,10 +1,16 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Monitor, ChevronRight, Check, Globe, Mail, Folder, Lock, Plus, FileText, Video, MessageCircle } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+
+function shuffle<T>(arr: T[]): T[] {
+  const r = [...arr]
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = r[i]; r[i] = r[j]; r[j] = t }
+  return r
+}
 
 const COMPETENCE = "5.3"
 const PREFIX = "session:5.3:Avanzado"
@@ -181,6 +187,7 @@ export default function Page() {
     router.push("/exercises/comp-5-3/avanzado/ej3")
   }
 
+  const shuffledSteps = useMemo(() => STEPS.map(s => shuffle(s.options)), [])
   const cur = STEPS[Math.min(step, STEPS.length - 1)]
 
   return (
@@ -229,7 +236,7 @@ export default function Page() {
               {STEPS.map((_, i) => (<span key={i} className={`h-1.5 flex-1 rounded-full ${i < step ? "bg-[#286575]" : i === step ? "bg-[#286575]/50" : "bg-gray-200"}`} />))}
             </div>
             <div className="space-y-3">
-              {cur.options.map(o => (
+              {shuffledSteps[Math.min(step, STEPS.length - 1)].map(o => (
                 <button key={o.id} onClick={() => choose(o)} className="w-full text-left p-3.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-[#286575]/40 transition text-sm flex items-start gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-1">
                   <ChevronRight className="w-4 h-4 text-[#286575] shrink-0 mt-0.5" /><span className="text-gray-700">{o.label}</span>
                 </button>

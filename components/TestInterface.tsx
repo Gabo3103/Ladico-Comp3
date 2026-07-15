@@ -225,6 +225,7 @@ export default function TestInterface({
   const [timeoutBanner, setTimeoutBanner] = useState(false)
 
   const violationCooldownRef = useRef<number>(0)
+  const graceRef = useRef<number>(0)
   const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const invalidatedRef = useRef<boolean>(false)
 
@@ -254,6 +255,7 @@ export default function TestInterface({
   const startTimer = () => {
     clearAllTimers()
     setTimeoutBanner(false)
+    graceRef.current = Date.now() + 1200
     setTimeLeft(QUESTION_TIME)
     timerIntervalRef.current = window.setInterval(() => {
       setTimeLeft((prev) => {
@@ -265,7 +267,6 @@ export default function TestInterface({
             setShowWarning(false)
             setTimeoutBanner(true)
             clearAllTimers()
-            autoAdvanceTimerRef.current = setTimeout(() => handleNext(true), 3000)
           }
           return 0
         }
@@ -276,6 +277,9 @@ export default function TestInterface({
 
   const registerViolation = () => {
     const now = Date.now()
+    // Gracia tras cambiar de pregunta: no penaliza si el mouse aún no está
+    // dentro del recuadro blanco al aparecer la nueva pregunta.
+    if (now < graceRef.current) return
     if (now - violationCooldownRef.current < 1500 || invalidatedRef.current) return
     violationCooldownRef.current = now
 
@@ -287,7 +291,6 @@ export default function TestInterface({
         setInvalidated(true)
         setShowWarning(false)
         clearAllTimers()
-        autoAdvanceTimerRef.current = setTimeout(() => handleNext(true), 3000)
         return 0
       }
       return next
@@ -299,13 +302,9 @@ export default function TestInterface({
       if (document.hidden) registerViolation()
     }
     const onBlur = () => registerViolation()
-    const onMouseOut = (e: MouseEvent) => {
-      if (!e.relatedTarget) registerViolation()
-    }
 
     document.addEventListener("visibilitychange", onVisibility)
     window.addEventListener("blur", onBlur)
-    document.addEventListener("mouseout", onMouseOut)
 
     // iniciar timer en la primera pregunta
     startTimer()
@@ -313,8 +312,7 @@ export default function TestInterface({
     return () => {
       document.removeEventListener("visibilitychange", onVisibility)
       window.removeEventListener("blur", onBlur)
-      document.removeEventListener("mouseout", onMouseOut)
-      clearAllTimers()
+        clearAllTimers()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -455,8 +453,8 @@ export default function TestInterface({
             <AlertTriangle className="h-4 w-4 text-amber-600" />
             <AlertDescription className="text-amber-800 text-sm flex items-center justify-between">
               <span>
-                ⚠️ Has salido de la página o pestaña. Intentos restantes: <b>{attemptsLeft}</b>.{" "}
-                Permanece dentro para continuar.
+                ⚠️ Saliste del recuadro de la pregunta o cambiaste de ventana. Intentos restantes: <b>{attemptsLeft}</b>.{" "}
+                Mantén el cursor dentro del recuadro blanco.
               </span>
               <button
                 className="ml-3 rounded p-1 hover:bg-amber-100"
@@ -470,35 +468,39 @@ export default function TestInterface({
         </div>
       )}
 
-      {timeoutBanner && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-2">
-          <Alert className="border-red-300 bg-red-50">
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800 text-sm">
-              ⏳ Tiempo agotado. La pregunta se ha invalidado. Avanzando…
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
 
-      {invalidated && !timeoutBanner && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-2">
-          <Alert className="border-red-300 bg-red-50 animate-pulse">
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800 text-sm">
-              ❌ Esta pregunta fue invalidada por exceder los 3 intentos. Avanzando automáticamente…
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
+
+
       <div className="h-5 sm:h-6" aria-hidden />
 
       {/* Tarjeta de pregunta */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6 sm:pb-8">
-        <Card className="bg-white shadow-2xl rounded-2xl sm:rounded-3xl border-0 transition-all duration-300 relative ring-2 ring-[#286575] ring-opacity-30 shadow-[#286575]/10">
+        <Card onMouseLeave={(e) => { if (e.clientY <= e.currentTarget.getBoundingClientRect().top) return; registerViolation() }} className="bg-white shadow-2xl rounded-2xl sm:rounded-3xl border-0 transition-all duration-300 relative ring-2 ring-[#286575] ring-opacity-30 shadow-[#286575]/10">
+          {(timeoutBanner || invalidated) && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center rounded-2xl sm:rounded-3xl bg-white/85 backdrop-blur-sm p-6">
+              <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white shadow-xl p-6 text-center">
+                <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <p className="text-sm text-gray-700 mb-5">
+                  {timeoutBanner
+                    ? "Se acabó el tiempo de esta pregunta."
+                    : "Saliste de la ventana varias veces y esta pregunta quedó invalidada."}
+                </p>
+                <button
+                  onClick={() => handleNext(true)}
+                  className="w-full rounded-xl bg-[#286575] px-4 py-2.5 text-white text-sm font-medium shadow hover:bg-[#3a7d89]"
+                >
+                  Continuar a la siguiente pregunta
+                </button>
+              </div>
+            </div>
+          )}
           <CardContent className="p-4 sm:p-6">
-            {/* Timer circular */}
-            <CircularTimer timeLeft={timeLeft} total={QUESTION_TIME} invalidated={invalidated} />
+            {/* Timer circular (se oculta mientras aparece el pop-up de invalidación/tiempo) */}
+            {!(timeoutBanner || invalidated) && (
+              <CircularTimer timeLeft={timeLeft} total={QUESTION_TIME} invalidated={invalidated} />
+            )}
             {/* (opcional) separador visual para que no choque con el contenido */}
             <div className="h-5" />
             {/* Escenario */}
@@ -550,15 +552,15 @@ export default function TestInterface({
                         className="sr-only"
                       />
                       <div
-                        className={`w-4 h-4 rounded-full border-2 transition-all ${
+                        className={`w-4 h-4 border-2 transition-all flex items-center justify-center ${currentQuestion.type === "multiple-response" ? "rounded-[4px]" : "rounded-full"} ${
                            isSelected
                             ? "border-[#286575] bg-[#286575]"
                             : "border-gray-300"
                         }`}
                       >
-                        {isSelected && (
-                          <div className="w-2 h-2 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-                        )}
+                        {isSelected && (currentQuestion.type === "multiple-response"
+                          ? <svg viewBox="0 0 24 24" className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth={3}><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                          : <div className="w-2 h-2 bg-white rounded-full" />)}
                       </div>
                     </div>
                     <span className="text-gray-700 leading-snug flex-1 text-sm">
@@ -578,7 +580,7 @@ export default function TestInterface({
                     asChild
                     className="flex-1 sm:flex-none px-6 py-2.5 bg-[#286675] rounded-xl sm:rounded-2xl font-medium text-white shadow-lg hover:bg-[#3a7d89] transition-all text-sm"
                   >
-                    <Link href="/dashboard">Terminar</Link>
+                    <Link href="/dashboard">Salir</Link>
                   </Button>
                 )}
               </div>

@@ -54,28 +54,23 @@ export default function Page() {
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Avanzado"
       index={3} total={3}
       title="Transmitir fotos a la Smart TV"
-      instruction={'Quiere mostrar las fotos del viaje en la Smart TV, pero al abrir "Transmitir pantalla" aparece "No se encontraron televisores." La TV está encendida y con pantalla compartida activa. Observe la TV y el router, opere su celular y logre la transmisión.'}
+      instruction={'Quiere mostrar las fotos del viaje en la Smart TV, pero al abrir "Transmitir pantalla" en su celular aparece "No se encontraron televisores". La TV está encendida y lista para recibir. Revise en la tarjeta de la TV y del router a qué red WiFi están conectados; luego ajuste su celular para dejarlo en esa misma red y, cuando estén conectados, transmita las fotos a la TV.'}
       onNext={handleNext}
       onCheck={() => transmitted}
       checkDisabled={false}
       nextDisabled={!transmitted}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
-        {/* IZQUIERDA: Smart TV + Router (apilados) */}
         <div className="space-y-4">
-                {/* IZQUIERDA: Smart TV (imagen + config) */}
         <InfoCard title="Smart TV"
           screen={<div className={`h-28 bg-gray-900 border-4 flex flex-col items-center justify-center text-white/80 text-center px-3 ${transmitted ? "border-emerald-500" : "border-gray-800"}`}><Tv className="w-9 h-9" /><span className="text-[10px] mt-1 text-white/70">{transmitted ? "Conectado a su teléfono · transmitiendo fotos" : "No se encontraron dispositivos disponibles para transmitir"}</span><span className="text-[10px] mt-1 text-white/40">Red: MiRedCasa</span></div>}
           note='Encendida. Conectada a la red "MiRedCasa". Pantalla compartida activa: esperando un dispositivo en la misma red.' />
-                {/* DERECHA: Router (imagen + config) */}
         <InfoCard title="Router WiFi"
           screen={<div className="h-28 bg-gray-100 border flex flex-col items-center justify-center text-[#286575]"><RouterIcon className="w-9 h-9" /><span className="text-[10px] mt-1 text-gray-500">2 redes activas</span></div>}
           note='Encendido. Emite "MiRedCasa" y "MiRedCasa_5G". Funcionando con normalidad.' />
         </div>
 
-        {/* DERECHA: celular interactivo */}
         <div className="flex justify-center lg:justify-end">
-                {/* CENTRO: celular INTERACTIVO */}
         <div className="mx-auto w-full max-w-[300px] rounded-[1.8rem] border-8 border-gray-800 bg-white overflow-hidden shadow-xl">
           <div className="bg-gray-800 h-4" />
           <div className="h-[420px] overflow-y-auto bg-[#eef3f6]">
@@ -95,7 +90,6 @@ export default function Page() {
         </div>
         </div>
       </div>
-
     </FullScreenShell>
   )
 }

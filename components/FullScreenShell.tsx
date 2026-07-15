@@ -63,7 +63,7 @@ export default function FullScreenShell({ label, index, total, title, instructio
       <footer className="bg-white border-t border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
           <Button asChild className="px-8 py-2.5 bg-[#286575] rounded-xl font-medium text-white shadow hover:bg-[#3a7d89] focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">
-            <Link href="/dashboard">Terminar</Link>
+            <Link href="/dashboard">Salir</Link>
           </Button>
           <div className="flex flex-wrap items-center justify-end gap-3">
             {demoMode && onCheck && (

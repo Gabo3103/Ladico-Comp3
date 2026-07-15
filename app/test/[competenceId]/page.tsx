@@ -36,7 +36,7 @@ function formatAnswer(answer: Answer, options: string[]): string {
 export default function TestPage() {
   const params = useParams()
   const router = useRouter()
-  const { user, userData } = useAuth()
+  const { user, userData, isProfesor, isAdmin } = useAuth()
   const { toast } = useToast()
   const searchParams = useSearchParams()
 
@@ -65,7 +65,8 @@ export default function TestPage() {
 
       const comps = await loadCompetences()
 
-      if (currentUserData.completedCompetences.includes(competenceId)) {
+      // Bypass demo: profesor/admin siempre pueden recorrer la prueba, aunque ya esté completada.
+      if (!isProfesor && !isAdmin && currentUserData.completedCompetences.includes(competenceId)) {
         router.push(`/test/${competenceId}/results?completed=true&score=100&passed=true&correct=3&level=${levelParam}`)
         return
       }
@@ -85,7 +86,12 @@ export default function TestPage() {
       setQuestions(loadedQuestions)
 
       const { session } = await getOrCreateActiveSession(currentUser.uid, competenceId, levelParam, loadedQuestions)
-      setTestSession(session)
+      // Demo profesor/admin: siempre empezar desde la pregunta 1 con respuestas en blanco.
+      const startSession =
+        isProfesor || isAdmin
+          ? { ...session, currentQuestionIndex: 0, answers: new Array(loadedQuestions.length).fill(null), endTime: undefined }
+          : session
+      setTestSession(startSession)
     } catch (e) {
       console.error("Error inicializando test:", e)
       toast({

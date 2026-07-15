@@ -1,10 +1,16 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ShoppingBag, Palette, Table, MessageCircle, Calendar, Share2, Check, ChevronDown, X, Monitor } from "lucide-react"
 import FullScreenShell from "@/components/FullScreenShell"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+
+function shuffle<T>(arr: T[]): T[] {
+  const r = [...arr]
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = r[i]; r[i] = r[j]; r[j] = t }
+  return r
+}
 
 const COMPETENCE = "5.3"
 const PREFIX = "session:5.3:Avanzado"
@@ -55,6 +61,7 @@ export default function Page() {
   const { sessionId, mark } = useLadicoSession(COMPETENCE, "Avanzado", PREFIX)
   const [open, setOpen] = useState<string | null>(null)
   const [chosen, setChosen] = useState<Record<string, string>>({})
+  const shuf = useMemo(() => Object.fromEntries(TOOLS.map(t => [t.id, shuffle(t.actions)])) as Record<string, typeof TOOLS[number]["actions"]>, [])
   const pick = (t: string, a: string) => setChosen(p => {
     const n = { ...p }
     if (n[t] === a) delete n[t]
@@ -163,7 +170,7 @@ export default function Page() {
               </div>
               <p className="text-xs text-gray-400 mb-3">Elija una acción. Tóquela de nuevo para quitarla.</p>
               <div className="space-y-2">
-                {t.actions.map(a => {
+                {(shuf[t.id] ?? t.actions).map(a => {
                   const sel = chosen[t.id] === a.id
                   return (
                     <button key={a.id} type="button" onClick={() => pick(t.id, a.id)}

@@ -20,10 +20,10 @@ const P1_CORRECT = 0
 const MENU = ["Demostración breve", "Práctica guiada acompañada", "Apoyo más extenso o repetido"]
 type Row = { need: string; correct: number }
 const ROWS: Row[] = [
-  { need: "Contestar una videollamada entrante.", correct: 0 },
-  { need: "Iniciar una videollamada buscando el contacto correcto.", correct: 1 },
-  { need: "Enviar fotos seleccionándolas desde la galería.", correct: 1 },
-  { need: "Reconocer y no aceptar videollamadas de números desconocidos.", correct: 2 },
+  { need: "Que el adulto mayor conteste una videollamada entrante.", correct: 0 },
+  { need: "Que el adulto mayor inicie una videollamada buscando el contacto en la agenda.", correct: 1 },
+  { need: "Que el adulto mayor seleccione fotos de la galería y las envíe.", correct: 1 },
+  { need: "Que el adulto mayor reconozca y rechace videollamadas de números desconocidos.", correct: 2 },
 ]
 
 export default function Page() {
@@ -36,8 +36,8 @@ export default function Page() {
   const handleNext = async () => {
     const p1ok = p1 === P1_CORRECT ? 1 : 0
     const rowsOk = ROWS.reduce((a, r, i) => a + (rows[i] === r.correct ? 1 : 0), 0)
-    const total = p1ok + rowsOk // máx 5
-    const point: 0 | 1 = total >= 3 ? 1 : 0
+    // Aprueba solo si la Parte 1 es correcta Y al menos 3 de 4 filas de la Parte 2
+    const point: 0 | 1 = p1ok === 1 && rowsOk >= 3 ? 1 : 0
     setPoint(COMPETENCE, "avanzado", 3, point)
     await mark(2, point === 1)
     const prog = getProgress(COMPETENCE, "avanzado")
@@ -56,12 +56,12 @@ export default function Page() {
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Avanzado"
       index={3} total={3}
       title="Apoyo proporcional a un familiar mayor"
-      instruction={'Usted acompaña a un familiar mayor que quiere "Hacer su vida más fácil" usando el teléfono para videollamadas y enviar fotos a la familia, ganando autonomía. Identifique la verdadera necesidad de aprendizaje y, para cada tarea, elija el tipo de apoyo proporcional a su complejidad.'}
+      instruction={'Usted acompaña a un familiar adulto mayor que quiere usar el teléfono por su cuenta para hacer videollamadas y enviar fotos a la familia, ganando autonomía. Parte 1: identifique cuál es su verdadera necesidad de aprendizaje. Parte 2: para cada tarea, elija el tipo de apoyo proporcional a su dificultad.'}
       onNext={handleNext}
       onCheck={() => {
         const p1ok = p1 === P1_CORRECT ? 1 : 0
         const rowsOk = ROWS.reduce((a, r, i) => a + (rows[i] === r.correct ? 1 : 0), 0)
-        return p1ok + rowsOk >= 3
+        return p1ok === 1 && rowsOk >= 3
       }}
       checkDisabled={false}
       nextLabel="Finalizar"

@@ -69,7 +69,7 @@ export default function ExerciseShell({ label, index, total, title, instruction,
             <div className="mt-3">{children}</div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <Button asChild className="min-h-12 px-8 bg-[#286575] rounded-xl font-semibold text-white shadow-lg hover:bg-[#3a7d89] focus-visible:ring-2 focus-visible:ring-[#286575] focus-visible:ring-offset-2">
-                <Link href="/dashboard">Terminar</Link>
+                <Link href="/dashboard">Salir</Link>
               </Button>
               <div className="flex flex-wrap items-center justify-end gap-3">
                 {demoMode && onCheck && (

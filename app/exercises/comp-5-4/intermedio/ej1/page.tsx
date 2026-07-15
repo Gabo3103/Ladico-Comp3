@@ -52,7 +52,7 @@ export default function Page() {
       <div className="space-y-4">
         {ROWS.map((r, i) => (
           <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
-            <p className="text-[13px] text-gray-800 mb-2.5"><span className="text-xs font-semibold text-[#286575] mr-2">Caso {i + 1}.</span>{r.caso}</p>
+            <p className="text-[15px] leading-relaxed text-gray-800 mb-2.5"><span className="text-sm font-semibold text-[#286575] mr-2">Caso {i + 1}.</span>{r.caso}</p>
             <div className="grid sm:grid-cols-2 gap-2" role="radiogroup" aria-label={`Caso ${i + 1}`}>
               {r.opts.map((o, j) => (
                 <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={sel[i] === j} onClick={() => pick(i, j)}>{o}</Choice>
