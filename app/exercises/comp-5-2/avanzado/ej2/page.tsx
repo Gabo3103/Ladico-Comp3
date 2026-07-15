@@ -1,10 +1,11 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Mic, Video, MessageSquare, Settings2, PhoneOff, Users, Check, X, Type, Languages, Smartphone, Image as ImageIcon, Volume2, Bell, Camera, Smile , Lock } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { shuffle } from "@/lib/shuffle"
 
 const COMPETENCE = "5.2"
 const PREFIX = "session:5.2:Avanzado"
@@ -59,6 +60,8 @@ export default function Page() {
 
   useEffect(() => { setApp(APPS[Math.floor(Math.random() * APPS.length)]) }, [])
   const toggle = (id: string) => setOn(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n })
+  // Orden del menú de apoyos aleatorizado (selección por id, no afecta el puntaje).
+  const menuView = useMemo(() => (app ? shuffle(app.menu) : []), [app])
 
   const handleNext = async () => {
     let point: 0 | 1 = 0
@@ -132,7 +135,7 @@ export default function Page() {
                 <button onClick={() => setMenu(false)}><X className="w-4 h-4" /></button>
               </div>
               <div className="divide-y overflow-y-auto">
-                {app.menu.map(o => {
+                {menuView.map(o => {
                   const active = on.has(o.id)
                   const Icon = o.icon
                   return (

@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndicesNotIdentity } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import OrderingList from "@/components/OrderingList"
@@ -17,12 +18,13 @@ const STEPS = [
   { id: 4, text: "Verificar que los tres avisos quedaron registrados." },
   { id: 5, text: "Comprobar que cada aviso suene y se vea con el celular bloqueado." },
 ]
-const INITIAL = [3, 1, 5, 2, 4]
 
 export default function Page() {
   const router = useRouter()
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
-  const [order, setOrder] = useState<number[]>(INITIAL)
+  // Orden inicial aleatorio en cada carga (nunca ya ordenado).
+  const initialOrder = useMemo(() => shuffledIndicesNotIdentity(STEPS.length).map((i) => i + 1), [])
+  const [order, setOrder] = useState<number[]>(initialOrder)
   const [hasMoved, setHasMoved] = useState(false)
 
   const handleNext = async () => {

@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { Choice } from "@/components/Choice"
@@ -23,6 +24,8 @@ export default function Page() {
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const [sel, setSel] = useState<(0 | 1 | null)[]>(Array(SITS.length).fill(null))
   const pick = (i: number, v: 0 | 1) => setSel(p => { const n = [...p]; n[i] = v; return n })
+  // Orden de las situaciones aleatorizado (índice original conservado).
+  const sitOrder = useMemo(() => shuffledIndices(SITS.length), [])
 
   const handleNext = async () => {
     const ok = SITS.reduce((a, s, i) => a + (sel[i] === s.correct ? 1 : 0), 0)
@@ -47,16 +50,19 @@ export default function Page() {
         {sel.filter(s => s !== null).length} de {SITS.length} situaciones respondidas
       </p>
       <div className="space-y-4">
-        {SITS.map((s, i) => (
+        {sitOrder.map((i, pos) => {
+          const s = SITS[i]
+          return (
           <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">
-            <p className="text-sm text-gray-800 mb-3"><span className="text-xs font-semibold text-[#286575] mr-2">Situación {i + 1}.</span>{s.text}</p>
+            <p className="text-sm text-gray-800 mb-3"><span className="text-xs font-semibold text-[#286575] mr-2">Situación {pos + 1}.</span>{s.text}</p>
             <div className="grid sm:grid-cols-2 gap-2">
               {LABELS.map((l, j) => (
                 <Choice key={j} variant="radio" selected={sel[i] === j} onClick={() => pick(i, j as 0 | 1)}>{l}</Choice>
               ))}
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     </ExerciseShell>
   )

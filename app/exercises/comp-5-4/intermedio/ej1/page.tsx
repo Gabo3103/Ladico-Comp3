@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { Choice } from "@/components/Choice"
@@ -28,6 +29,8 @@ export default function Page() {
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const [sel, setSel] = useState<(number | null)[]>(Array(ROWS.length).fill(null))
   const pick = (r: number, o: number) => setSel(p => { const n = [...p]; n[r] = o; return n })
+  const rowOrder = useMemo(() => shuffledIndices(ROWS.length), [])
+  const optOrders = useMemo(() => ROWS.map(r => shuffledIndices(r.opts.length)), [])
 
   const handleNext = async () => {
     const ok = ROWS.reduce((a, r, i) => a + (sel[i] === r.correct ? 1 : 0), 0)
@@ -50,16 +53,19 @@ export default function Page() {
     >
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} casos respondidos</p>
       <div className="space-y-4">
-        {ROWS.map((r, i) => (
+        {rowOrder.map((i, pos) => {
+          const r = ROWS[i]
+          return (
           <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
-            <p className="text-[15px] leading-relaxed text-gray-800 mb-2.5"><span className="text-sm font-semibold text-[#286575] mr-2">Caso {i + 1}.</span>{r.caso}</p>
-            <div className="grid sm:grid-cols-2 gap-2" role="radiogroup" aria-label={`Caso ${i + 1}`}>
-              {r.opts.map((o, j) => (
-                <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={sel[i] === j} onClick={() => pick(i, j)}>{o}</Choice>
+            <p className="text-[15px] leading-relaxed text-gray-800 mb-2.5"><span className="text-sm font-semibold text-[#286575] mr-2">Caso {pos + 1}.</span>{r.caso}</p>
+            <div className="grid sm:grid-cols-2 gap-2" role="radiogroup" aria-label={`Caso ${pos + 1}`}>
+              {optOrders[i].map((j, p2) => (
+                <Choice key={j} variant="radio" letter={String.fromCharCode(65 + p2)} selected={sel[i] === j} onClick={() => pick(i, j)}>{r.opts[j]}</Choice>
               ))}
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     </ExerciseShell>
   )

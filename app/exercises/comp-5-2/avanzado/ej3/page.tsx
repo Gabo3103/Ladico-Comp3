@@ -1,10 +1,11 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Lock } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { shuffle } from "@/lib/shuffle"
 
 const COMPETENCE = "5.2"
 const PREFIX = "session:5.2:Avanzado"
@@ -27,6 +28,8 @@ export default function Page() {
   const router = useRouter()
   const { sessionId, mark } = useLadicoSession(COMPETENCE, "Avanzado", PREFIX)
   const [on, setOn] = useState<Set<string>>(new Set(DEFAULT_ON))
+  // Orden de los ajustes aleatorizado (selección por id, no afecta el puntaje).
+  const optsView = useMemo(() => shuffle(OPTS), [])
   const [hasAdjusted, setHasAdjusted] = useState(false)
   const toggle = (id: string) => {
     setHasAdjusted(true)
@@ -69,7 +72,7 @@ export default function Page() {
         </div>
         <div className="px-5 py-3 bg-gray-50 border-b text-sm font-semibold text-gray-700">Ajustes de apoyo de la solicitud</div>
         <div className="divide-y">
-          {OPTS.map(o => {
+          {optsView.map(o => {
             const active = on.has(o.id)
             return (
               <div key={o.id} className="flex items-center justify-between px-5 py-3 gap-3">

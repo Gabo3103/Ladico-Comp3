@@ -5,6 +5,8 @@ type Props = {
   selected: ReadonlySet<number>
   onToggle: (index: number) => void
   ariaLabel?: string
+  // Orden de presentación (índices originales). Si se omite, usa el orden natural.
+  order?: readonly number[]
 }
 
 export default function MultipleSelectionGrid({
@@ -12,12 +14,15 @@ export default function MultipleSelectionGrid({
   selected,
   onToggle,
   ariaLabel = "Opciones de respuesta (puede marcar más de una)",
+  order,
 }: Props) {
+  const view = order ?? options.map((_, i) => i)
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2" role="group" aria-label={ariaLabel}>
-      {options.map((option, index) => {
+      {view.map((index, pos) => {
+        const option = options[index]
         const isChecked = selected.has(index)
-        const isLastOnOwnRow = options.length % 2 !== 0 && index === options.length - 1
+        const isLastOnOwnRow = view.length % 2 !== 0 && pos === view.length - 1
 
         return (
           <label

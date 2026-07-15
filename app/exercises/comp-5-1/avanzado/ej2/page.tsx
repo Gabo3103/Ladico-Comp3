@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffle } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import { Check, ChevronRight, ArrowRight } from "lucide-react"
 import ExerciseShell from "@/components/ExerciseShell"
@@ -82,7 +83,9 @@ export default function Page() {
     router.push("/exercises/comp-5-1/avanzado/ej3")
   }
 
-  const cur = STEPS[Math.min(step, STEPS.length - 1)]
+  // Opciones mezcladas por paso (conserva o.correct para el puntaje).
+  const shuffledSteps = useMemo(() => STEPS.map(s => ({ ...s, options: shuffle(s.options) })), [])
+  const cur = shuffledSteps[Math.min(step, STEPS.length - 1)]
   const finalOk = correct >= 3
 
   return (

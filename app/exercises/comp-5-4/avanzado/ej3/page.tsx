@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { Choice, SegChoice } from "@/components/Choice"
@@ -32,6 +33,9 @@ export default function Page() {
   const [p1, setP1] = useState<number | null>(null)
   const [rows, setRows] = useState<(number | null)[]>(Array(ROWS.length).fill(null))
   const pickRow = (r: number, o: number) => setRows(p => { const n = [...p]; n[r] = o; return n })
+  // P1: se mezclan las opciones (índice original conservado). P2: se mezcla el orden de las filas; la escala de apoyo se mantiene.
+  const p1Order = useMemo(() => shuffledIndices(P1_OPTS.length), [])
+  const rowOrder = useMemo(() => shuffledIndices(ROWS.length), [])
 
   const handleNext = async () => {
     const p1ok = p1 === P1_CORRECT ? 1 : 0
@@ -71,8 +75,8 @@ export default function Page() {
         <div>
           <p className="text-base font-semibold text-gray-800 mb-2">Parte 1 — ¿Cuál es la verdadera necesidad de aprendizaje?</p>
           <div className="space-y-2" role="radiogroup" aria-label="Parte 1: Verdadera necesidad de aprendizaje">
-            {P1_OPTS.map((o, j) => (
-              <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={p1 === j} onClick={() => setP1(j)}>{o}</Choice>
+            {p1Order.map((j, pos) => (
+              <Choice key={j} variant="radio" letter={String.fromCharCode(65 + pos)} selected={p1 === j} onClick={() => setP1(j)}>{P1_OPTS[j]}</Choice>
             ))}
           </div>
         </div>
@@ -84,7 +88,9 @@ export default function Page() {
             <p><b className="text-gray-800">Apoyo más extenso o repetido:</b> acompañamiento sostenido por la dificultad de la tarea.</p>
           </div>
           <div className="space-y-3">
-            {ROWS.map((r, i) => (
+            {rowOrder.map((i) => {
+              const r = ROWS[i]
+              return (
               <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">
                 <p className="text-sm text-gray-800 mb-3">{r.need}</p>
                 <div className="grid sm:grid-cols-3 gap-2" role="radiogroup" aria-label={r.need}>
@@ -93,7 +99,8 @@ export default function Page() {
                   ))}
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>

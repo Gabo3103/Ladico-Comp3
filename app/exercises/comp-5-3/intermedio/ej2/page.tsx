@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { Choice } from "@/components/Choice"
@@ -41,6 +42,8 @@ export default function Page() {
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const [ans, setAns] = useState<(number | null)[]>([null, null, null])
   const set = (i: number, v: number) => setAns(p => { const n = [...p]; n[i] = v; return n })
+  // Orden de opciones aleatorizado por enunciado (índice original conservado).
+  const optOrders = useMemo(() => ENUNCIADOS.map(e => shuffledIndices(e.opts.length)), [])
 
   const handleNext = async () => {
     const ok = ENUNCIADOS.reduce((a, e, i) => a + (ans[i] === e.correct ? 1 : 0), 0)
@@ -66,8 +69,8 @@ export default function Page() {
           <div key={i}>
             <p className="font-medium text-gray-800 text-sm mb-2">{e.q}</p>
             <div className="space-y-2" role="radiogroup">
-              {e.opts.map((o, j) => (
-                <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={ans[i] === j} onClick={() => set(i, j)}>{o}</Choice>
+              {optOrders[i].map((j, pos) => (
+                <Choice key={j} variant="radio" letter={String.fromCharCode(65 + pos)} selected={ans[i] === j} onClick={() => set(i, j)}>{e.opts[j]}</Choice>
               ))}
             </div>
           </div>

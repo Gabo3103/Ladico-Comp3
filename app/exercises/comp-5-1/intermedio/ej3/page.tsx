@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
@@ -50,6 +51,8 @@ export default function Page() {
   const router = useRouter()
   const { sessionId, mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const [ans, setAns] = useState<(number | null)[]>([null, null, null])
+  // Orden de opciones aleatorizado por sección (conserva el índice original).
+  const optOrders = useMemo(() => SECS.map(s => shuffledIndices(s.opts.length)), [])
   // Toca para elegir; toca la misma opción de nuevo para quitarla.
   const set = (i: number, v: number) => setAns(p => { const n = [...p]; n[i] = n[i] === v ? null : v; return n })
 
@@ -101,7 +104,8 @@ export default function Page() {
                   </div>
                   <p className="text-[11px] text-gray-500 mb-2 leading-snug">{s.ask}</p>
                   <div className="space-y-1.5">
-                    {s.opts.map((o, j) => {
+                    {optOrders[i].map((j) => {
+                      const o = s.opts[j]
                       const selected = ans[i] === j
                       return (
                         <button key={j} type="button" onClick={() => set(i, j)}

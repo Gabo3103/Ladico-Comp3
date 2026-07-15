@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndicesNotIdentity } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import OrderingList from "@/components/OrderingList"
@@ -17,13 +18,12 @@ const STEPS = [
   { id: 4, text: "Solicitar el bloqueo inmediato de la tarjeta si se confirma que la operación es fraudulenta." },
   { id: 5, text: "Cambiar las contraseñas de acceso a su banca en línea y activar las notificaciones de seguridad." },
 ]
-// orden inicial mezclado
-const INITIAL = [3, 1, 5, 2, 4]
-
 export default function Page() {
   const router = useRouter()
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
-  const [order, setOrder] = useState<number[]>(INITIAL)
+  // Orden inicial aleatorio en cada carga (nunca ya ordenado).
+  const initialOrder = useMemo(() => shuffledIndicesNotIdentity(STEPS.length).map((i) => i + 1), [])
+  const [order, setOrder] = useState<number[]>(initialOrder)
   const [hasMoved, setHasMoved] = useState(false)
 
   const handleNext = async () => {

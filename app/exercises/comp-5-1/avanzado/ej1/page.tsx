@@ -5,6 +5,7 @@ import { Bell, Camera, Settings, ChevronLeft, HardDrive, Trash2, Image as ImageI
 import ExerciseShell from "@/components/ExerciseShell"
 import { setPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { shuffle } from "@/lib/shuffle"
 
 const COMPETENCE = "5.1"
 const PREFIX = "session:5.1:Avanzado"
@@ -36,6 +37,8 @@ export default function Page() {
   const cameraOk = freeGB >= NEED_FREE
   const removedWrong = APPS.some(a => a.keep && removed.has(a.id))
   const uninstall = (id: AppId) => setRemoved(prev => new Set(prev).add(id))
+  // Orden de apps aleatorizado para la vista (no afecta el cálculo de espacio).
+  const appsView = useMemo(() => shuffle(APPS), [])
 
   const handleNext = async () => {
     const point: 0 | 1 = cameraOk && !removedWrong ? 1 : 0
@@ -44,7 +47,7 @@ export default function Page() {
     router.push("/exercises/comp-5-1/avanzado/ej2")
   }
 
-  const homeApps = APPS.filter(a => !removed.has(a.id))
+  const homeApps = appsView.filter(a => !removed.has(a.id))
   const Bar = ({ t, back }: { t: string; back?: () => void }) => (
     <div className="flex items-center gap-2 bg-[#286575] text-white px-4 py-3 text-base font-medium">{back && <button onClick={back}><ChevronLeft className="w-6 h-6" /></button>}{t}</div>
   )
@@ -119,7 +122,7 @@ export default function Page() {
                 <div className="text-sm text-gray-600 mb-1">Usado {used.toFixed(1)} GB de {CAP} GB</div>
                 <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-4"><div className="h-full bg-[#286575]" style={{ width: `${(used / CAP) * 100}%` }} /></div>
                 <ul className="space-y-2">
-                  {APPS.filter(a => !removed.has(a.id)).map(a => (
+                  {appsView.filter(a => !removed.has(a.id)).map(a => (
                     <li key={a.id} className="flex items-center gap-3 bg-white rounded-xl border p-3 text-sm">
                       <a.icon className="w-6 h-6 text-gray-500" />
                       <div className="flex-1"><div className="font-medium text-gray-800">{a.name}</div><div className="text-gray-500 text-xs">{a.size} GB · último uso: {a.use}</div></div>

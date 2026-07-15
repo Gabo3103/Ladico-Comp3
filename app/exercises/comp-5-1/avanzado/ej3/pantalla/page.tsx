@@ -1,10 +1,11 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Smartphone, Tv, Router as RouterIcon, Settings, Wifi, WifiOff, Check, ChevronLeft, Cast, Image as ImageIcon, MessageCircle, Bluetooth, Plane, Signal, ChevronRight, Sun, Volume2, BatteryCharging, HardDrive, Grid3x3 } from "lucide-react"
 import FullScreenShell from "@/components/FullScreenShell"
 import { setPoint, getProgress, levelPoints, isLevelPassed, getPoint } from "@/lib/levelProgress"
 import { useLadicoSession } from "@/hooks/useLadicoSession"
+import { shuffle } from "@/lib/shuffle"
 
 const COMPETENCE = "5.1"
 const PREFIX = "session:5.1:Avanzado"
@@ -26,6 +27,8 @@ export default function Page() {
 
   const toggleWifi = () => setWifiOn(v => { if (v) { setNet(null); setTransmitted(false) } return !v })
   const connect = (n: string) => { setNet(n); if (n !== "MiRedCasa") setTransmitted(false) }
+  // Orden de redes WiFi aleatorizado (selección por nombre).
+  const netsView = useMemo(() => shuffle(NETS), [])
   const doCast = () => { if (net === "MiRedCasa") setTransmitted(true) }
 
   const handleNext = async () => {
@@ -77,7 +80,7 @@ export default function Page() {
             {ps === "home" && (<div className="p-5"><div className="text-xs text-gray-500 mb-4 text-center">Su celular · Pantalla de inicio</div><div className="grid grid-cols-3 gap-4">{[["Ajustes", Settings, () => setPs("ajustes")], ["Transmitir", Cast, () => setPs("cast")], ["Fotos", ImageIcon, () => setPs("fotos")], ["Mensajes", MessageCircle, () => setPs("mensajes")]].map(([l, I, f]: any, i) => (<button key={i} onClick={f} className="flex flex-col items-center gap-1 text-gray-700"><span className="w-14 h-14 rounded-2xl bg-white border shadow-sm flex items-center justify-center text-[#286575]"><I className="w-7 h-7" /></span><span className="text-[10px]">{l}</span></button>))}</div></div>)}
             {ps === "ajustes" && (<div><Bar t="Ajustes" back={() => setPs("home")} /><SetRow icon={Wifi} label="Conexiones" onClick={() => setPs("conexiones")} /><SetRow icon={Sun} label="Pantalla" onClick={() => setPs("pantalla")} /><SetRow icon={Volume2} label="Sonido y vibración" onClick={() => setPs("sonido")} /><SetRow icon={BatteryCharging} label="Batería" onClick={() => setPs("bateria")} /><SetRow icon={HardDrive} label="Almacenamiento" onClick={() => setPs("almacen")} /><SetRow icon={Grid3x3} label="Aplicaciones" onClick={() => setPs("apps")} /></div>)}
             {ps === "conexiones" && (<div><Bar t="Conexiones" back={() => setPs("ajustes")} /><SetRow icon={wifiOn ? Wifi : WifiOff} label="WiFi" right={wifiOn ? (net ?? "Activado") : "Desactivado"} onClick={() => setPs("wifi")} /><ToggleRow icon={Signal} label="Datos móviles" on={data} set={() => setData(v => !v)} /><ToggleRow icon={Bluetooth} label="Bluetooth" on={bt} set={() => setBt(v => !v)} /><ToggleRow icon={Plane} label="Modo avión" on={air} set={() => setAir(v => !v)} /></div>)}
-            {ps === "wifi" && (<div><Bar t="WiFi" back={() => setPs("conexiones")} /><div className="p-3"><div className="flex items-center justify-between bg-white rounded-xl border p-3 mb-3"><span className="text-sm text-gray-700">WiFi</span><Toggle on={wifiOn} set={toggleWifi} /></div>{!wifiOn ? <p className="text-xs text-gray-500">WiFi desactivado · No conectado.</p> : (<ul className="space-y-2">{NETS.map(n => (<li key={n}><button onClick={() => connect(n)} className={`w-full flex items-center justify-between rounded-xl border p-2.5 text-sm ${net === n ? "border-[#286575] bg-[#e8f3f4]" : "bg-white hover:bg-gray-50"}`}><span className="flex items-center gap-2"><Wifi className="w-4 h-4 text-[#286575]" />{n}</span>{net === n && <Check className="w-4 h-4 text-emerald-600" />}</button></li>))}</ul>)}</div></div>)}
+            {ps === "wifi" && (<div><Bar t="WiFi" back={() => setPs("conexiones")} /><div className="p-3"><div className="flex items-center justify-between bg-white rounded-xl border p-3 mb-3"><span className="text-sm text-gray-700">WiFi</span><Toggle on={wifiOn} set={toggleWifi} /></div>{!wifiOn ? <p className="text-xs text-gray-500">WiFi desactivado · No conectado.</p> : (<ul className="space-y-2">{netsView.map(n => (<li key={n}><button onClick={() => connect(n)} className={`w-full flex items-center justify-between rounded-xl border p-2.5 text-sm ${net === n ? "border-[#286575] bg-[#e8f3f4]" : "bg-white hover:bg-gray-50"}`}><span className="flex items-center gap-2"><Wifi className="w-4 h-4 text-[#286575]" />{n}</span>{net === n && <Check className="w-4 h-4 text-emerald-600" />}</button></li>))}</ul>)}</div></div>)}
             {ps === "cast" && (<div><Bar t="Transmitir pantalla" back={() => setPs("home")} /><div className="p-4 text-center">{net === "MiRedCasa" ? (transmitted ? <p className="text-sm text-emerald-700">Transmitiendo a "Smart TV (sala)" ✓</p> : <button onClick={doCast} className="w-full rounded-xl border border-[#286575] bg-white hover:bg-[#e8f3f4] p-3 text-sm flex items-center justify-center gap-2"><Tv className="w-4 h-4 text-[#286575]" /> Smart TV (sala)</button>) : (<><p className="text-sm text-gray-500 mb-3">Buscando dispositivos… No se encontraron televisores.</p><button className="text-xs text-[#286575] underline">Buscar de nuevo</button></>)}</div></div>)}
             {ps === "fotos" && (<div><Bar t="Fotos" back={() => setPs("home")} /><div className="p-2 grid grid-cols-3 gap-2">{PHOTOS.map((g, i) => (<div key={i} className={`aspect-square rounded-lg bg-gradient-to-br ${g}`} />))}</div></div>)}
             {ps === "mensajes" && (<div><Bar t="Mensajes" back={() => setPs("home")} />{[["Familia", "Nos vemos el domingo"], ["Banco", "Su clave temporal es 4821"], ["Farmacia", "Su pedido está listo"]].map(([n, m], i) => (<div key={i} className="flex items-center gap-2 px-3 py-2.5 border-b bg-white"><div className="w-8 h-8 rounded-full bg-[#286575]/20 flex items-center justify-center text-[#286575] text-xs">{(n as string)[0]}</div><div className="text-xs"><div className="font-medium text-gray-800">{n}</div><div className="text-gray-500">{m}</div></div></div>))}</div>)}

@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { SegChoice } from "@/components/Choice"
@@ -24,6 +25,8 @@ export default function Page() {
   const { sessionId, mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const [sel, setSel] = useState<(number | null)[]>(Array(ROWS.length).fill(null))
   const pick = (r: number, o: number) => setSel(p => { const n = [...p]; n[r] = o; return n })
+  // Se mezcla el orden de las filas; la escala de apoyo (MENU) se mantiene por su orden.
+  const rowOrder = useMemo(() => shuffledIndices(ROWS.length), [])
 
   const handleNext = async () => {
     const ok = ROWS.reduce((a, r, i) => a + (sel[i] === r.correct ? 1 : 0), 0)
@@ -60,7 +63,9 @@ export default function Page() {
       </div>
       <p className="text-xs text-gray-500 mb-3" aria-live="polite">{sel.filter(s => s !== null).length} de {ROWS.length} filas respondidas</p>
       <div className="space-y-3">
-        {ROWS.map((r, i) => (
+        {rowOrder.map((i) => {
+          const r = ROWS[i]
+          return (
           <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
             <p className="text-[13px] text-gray-800 mb-2.5">{r.need}</p>
             <div className="grid sm:grid-cols-3 gap-2" role="radiogroup" aria-label={r.need}>
@@ -69,7 +74,8 @@ export default function Page() {
               ))}
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     </ExerciseShell>
   )

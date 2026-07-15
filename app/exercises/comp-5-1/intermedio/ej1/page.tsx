@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import MultipleSelectionGrid from "@/components/MultipleSelectionGrid"
@@ -21,6 +22,7 @@ const CORRECT = new Set([0, 1, 2, 5])
 export default function Page() {
   const router = useRouter()
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
+  const order = useMemo(() => shuffledIndices(OPTIONS.length), [])
   const [sel, setSel] = useState<Set<number>>(new Set())
 
   const toggle = (i: number) =>
@@ -50,7 +52,7 @@ export default function Page() {
       checkDisabled={false}
       nextDisabled={sel.size === 0}
     >
-      <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} />
+      <MultipleSelectionGrid options={OPTIONS} selected={sel} onToggle={toggle} order={order} />
     </ExerciseShell>
   )
 }

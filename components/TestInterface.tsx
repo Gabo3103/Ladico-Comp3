@@ -1,7 +1,7 @@
 // components/TestInterface.tsx
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { TestSession } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -175,6 +175,17 @@ export default function TestInterface({
 
   const [currentIndex, setCurrentIndex] = useState(safeInitialIndex)
   const currentQuestion = questions[currentIndex]
+  // Orden de opciones aleatorizado por pregunta: la correcta no queda siempre en el mismo lugar.
+  const displayOrder = useMemo(() => {
+    const n = currentQuestion?.options?.length ?? 0
+    const arr = Array.from({ length: n }, (_, i) => i)
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    return arr
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestion?.id])
   const [selectedAnswer, setSelectedAnswer] = useState<number | number[] | null>(
     currentQuestion?.type === "multiple-response"
       ? (Array.isArray(initialStored) ? [...initialStored] : [])   // MR: array (vacío si no hay)
@@ -525,7 +536,8 @@ export default function TestInterface({
 
               {/* Opciones */}
               <div className="space-y-2.5">
-                {currentQuestion?.options?.map((option: string, index: number) => {
+                {displayOrder.map((index: number) => {
+                  const option = currentQuestion?.options?.[index] ?? ""
                   const isSelected = Array.isArray(selectedAnswer)
                     ? selectedAnswer.includes(index)
                     : selectedAnswer === index

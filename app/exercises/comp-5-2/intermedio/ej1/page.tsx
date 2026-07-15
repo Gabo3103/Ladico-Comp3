@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { shuffledIndices } from "@/lib/shuffle"
 import { useRouter } from "next/navigation"
 import ExerciseShell from "@/components/ExerciseShell"
 import { Choice } from "@/components/Choice"
@@ -28,6 +29,9 @@ export default function Page() {
   const { mark } = useLadicoSession(COMPETENCE, "Intermedio", PREFIX)
   const [sel, setSel] = useState<(number | null)[]>(Array(ROWS.length).fill(null))
   const pick = (r: number, o: number) => setSel(p => { const n = [...p]; n[r] = o; return n })
+  // Orden de filas y de opciones por fila, aleatorizado (índices originales conservados).
+  const rowOrder = useMemo(() => shuffledIndices(ROWS.length), [])
+  const optOrders = useMemo(() => ROWS.map(r => shuffledIndices(r.opts.length)), [])
 
   const handleNext = async () => {
     const ok = ROWS.reduce((a, r, i) => a + (sel[i] === r.correct ? 1 : 0), 0)
@@ -52,16 +56,19 @@ export default function Page() {
         {sel.filter(s => s !== null).length} de {ROWS.length} casos respondidos
       </p>
       <div className="space-y-4">
-        {ROWS.map((r, i) => (
+        {rowOrder.map((i) => {
+          const r = ROWS[i]
+          return (
           <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4">
             <p className="text-sm text-gray-800 mb-3"><span className="inline-block text-xs font-semibold text-[#286575] bg-[#e8f3f4] rounded-full px-2 py-0.5 mr-2">{r.ctx}</span>{r.sit}</p>
             <div className="grid sm:grid-cols-2 gap-2">
-              {r.opts.map((o, j) => (
-                <Choice key={j} variant="radio" letter={String.fromCharCode(65 + j)} selected={sel[i] === j} onClick={() => pick(i, j)}>{o}</Choice>
+              {optOrders[i].map((j, pos) => (
+                <Choice key={j} variant="radio" letter={String.fromCharCode(65 + pos)} selected={sel[i] === j} onClick={() => pick(i, j)}>{r.opts[j]}</Choice>
               ))}
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     </ExerciseShell>
   )
