@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, type ReactNode } from "react"
-import { Flag, ChevronDown, HelpCircle, Calendar, User, Lock, CheckCircle, ArrowDownToLine } from "lucide-react"
+import { Flag, ChevronDown, HelpCircle, Calendar, User, Lock, CheckCircle } from "lucide-react"
 
 const KEY = "ladico:5.2:avanzado:ej1:marks"
 
@@ -54,13 +54,13 @@ export default function PortalPage() {
             {/* facilitador: control de tamaño de texto */}
             <Z id="texto" className="px-2.5 py-1.5 bg-white/15 rounded text-sm font-medium">A+ / A−</Z>
             {/* facilitador: enlace de ayuda descriptivo */}
-            <Z id="ayuda" className="px-2.5 py-1.5 rounded text-sm flex items-center gap-1"><HelpCircle className="w-4 h-4" /> Ayuda</Z>
+            <Z id="ayuda" className="px-2.5 py-1.5 rounded text-sm flex items-center gap-1"><HelpCircle className="w-4 h-4" /> Ayuda para completar el formulario</Z>
           </div>
         </div>
 
         <div className="p-6 sm:p-8 space-y-6">
           {/* facilitador: enlace de saltar al contenido */}
-          <Z id="saltar" className="inline-flex items-center gap-1 text-sm text-[#0b4f6c] underline"><ArrowDownToLine className="w-4 h-4" /> Saltar al contenido principal</Z>
+          <Z id="saltar" className="inline-block text-sm text-[#0b4f6c] underline">Saltar al contenido principal</Z>
 
           {/* BARRERA: texto de bajo contraste (gris claro casi ilegible) */}
           <Z id="contraste" className="block">
@@ -73,18 +73,35 @@ export default function PortalPage() {
             <span className="block text-[12px] text-gray-400 mt-1">Desplegable que solo se abre y navega con el mouse.</span>
           </Z>
 
-          {/* BARRERA: información dada solo por color */}
+          {/* BARRERA: información dada solo por color (WCAG 1.4.1 Uso del color) — disponibilidad indicada solo por color, sin texto */}
           <Z id="color" className="block">
-            <span className="block text-sm text-red-500">Los campos en rojo son obligatorios.</span>
+            <span className="block text-sm text-gray-700 mb-1.5">Horas para hoy:</span>
+            <span className="flex flex-wrap gap-2">
+              <span className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm">09:00</span>
+              <span className="px-3 py-1.5 rounded-md bg-green-500 text-white text-sm">10:30</span>
+              <span className="px-3 py-1.5 rounded-md bg-red-500 text-white text-sm">12:00</span>
+              <span className="px-3 py-1.5 rounded-md bg-red-500 text-white text-sm">15:00</span>
+            </span>
           </Z>
 
+          {/* facilitador: instrucción general de campos obligatorios, buen contraste (W3C WAI Forms — overall instructions) */}
+          <p className="text-sm text-gray-700">Los campos marcados como <b>(obligatorio)</b> deben completarse.</p>
+
           <div className="grid sm:grid-cols-2 gap-5">
-            {/* facilitador: campo con etiqueta visible y clara */}
+            {/* facilitador: campos separados, con etiqueta visible y requisito indicado con texto (WCAG 3.3.2 / 1.3.1, W3C WAI Forms) */}
             <Z id="campoOk" className="block">
-              <span className="block text-sm text-gray-700 mb-1.5 font-medium">Nombre completo del paciente</span>
-              <span className="block h-10 rounded-lg border border-gray-300 bg-white" />
+              <span className="block mb-3">
+                <span className="block text-sm text-gray-700 mb-1 font-medium">Nombre <span className="text-gray-500 font-normal">(obligatorio)</span></span>
+                <span className="block text-xs text-gray-600 mb-1.5">Tal como aparece en su documento de identidad.</span>
+                <span className="block h-10 rounded-lg border border-gray-300 bg-white" />
+              </span>
+              <span className="block">
+                <span className="block text-sm text-gray-700 mb-1 font-medium">Apellidos <span className="text-gray-500 font-normal">(obligatorio)</span></span>
+                <span className="block text-xs text-gray-600 mb-1.5">Escriba sus dos apellidos si corresponde.</span>
+                <span className="block h-10 rounded-lg border border-gray-300 bg-white" />
+              </span>
             </Z>
-            {/* BARRERA: asterisco sin explicación */}
+            {/* BARRERA: fecha con asterisco sin explicación y sin indicar el formato esperado */}
             <Z id="aster" className="block">
               <span className="block text-sm text-gray-600 mb-1.5">Fecha de la hora <span className="text-red-500 font-bold">*</span></span>
               <span className="block h-10 rounded-lg border border-gray-200 bg-white" />
@@ -96,9 +113,13 @@ export default function PortalPage() {
             <span className="text-sm text-red-700">Ha ocurrido un error. Intente nuevamente.</span>
           </Z>
 
-          {/* facilitador: confirmación por canal alternativo */}
+          {/* facilitador: opción real con etiquetas claras (canal alternativo de confirmación) */}
           <Z id="confirm" className="w-full block p-4 rounded-lg border border-gray-200 bg-gray-50">
-            <span className="text-sm text-gray-700">Confirmar la reserva por SMS o por correo electrónico (elija el medio que prefiera).</span>
+            <span className="block text-sm text-gray-700 mb-2 font-medium">¿Cómo desea recibir la confirmación de la reserva?</span>
+            <span className="flex flex-wrap gap-5">
+              <span className="flex items-center gap-2 text-sm text-gray-700"><span className="w-4 h-4 rounded-full border-2 border-[#0b4f6c] inline-block" /> Por SMS</span>
+              <span className="flex items-center gap-2 text-sm text-gray-700"><span className="w-4 h-4 rounded-full border-2 border-gray-400 inline-block" /> Por correo electrónico</span>
+            </span>
           </Z>
 
           {/* BARRERA: letra diminuta */}
