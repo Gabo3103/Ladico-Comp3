@@ -59,9 +59,6 @@ export default function PortalPage() {
         </div>
 
         <div className="p-6 sm:p-8 space-y-6">
-          {/* facilitador: enlace de saltar al contenido */}
-          <Z id="saltar" className="inline-block text-sm text-[#0b4f6c] underline">Saltar al contenido principal</Z>
-
           {/* BARRERA: texto de bajo contraste (gris claro casi ilegible) */}
           <Z id="contraste" className="block">
             <span className="block text-base" style={{ color: "#cfd4d8" }}>Complete todos los campos para reservar su hora médica. Si tiene dudas, consulte la sección de ayuda.</span>

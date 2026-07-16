@@ -521,7 +521,13 @@ export default function TestInterface({
               </h2>
               <div className="bg-gray-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border-l-4 border-[#286575]">
                 <p className="text-gray-700 leading-snug font-medium text-sm">
-                  {currentQuestion?.scenario}
+                  {(() => {
+                    const s = currentQuestion?.scenario ?? ""
+                    const hasList = s.includes("\n") || (/(^|\s)1-\s/.test(s) && /(^|\s)2-\s/.test(s))
+                    if (!hasList) return s
+                    const t = s.includes("\n") ? s : s.replace(/\s+(?=\d+-\s)/g, "\n").replace(/\s+(?=¿[^?]*\?\s*$)/g, "\n")
+                    return t.split("\n").map((ln, i) => <span key={i} className="block">{ln.trim()}</span>)
+                  })()}
                 </p>
               </div>
             </div>
