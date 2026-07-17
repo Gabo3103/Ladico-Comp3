@@ -46,7 +46,7 @@ const TOOLS: Tool[] = [
   ] },
   { id: "calendario", name: "Calendario / agenda", icon: Calendar, actions: [
     { id: "despacho", label: "Agendar y coordinar los días de despacho de los pedidos.", dim: "gestion", ok: true },
-    { id: "sinplan", label: "Despachar los pedidos en cuanto llegan, sin planificar.", dim: "gestion" },
+    { id: "sinplan", label: "Despachar los pedidos en cuanto llegan.", dim: "gestion" },
     { id: "cuaderno", label: "Anotar las entregas en un cuaderno aparte.", dim: "gestion" },
   ] },
   { id: "redes", name: "Redes sociales", icon: Share2, actions: [
@@ -95,6 +95,7 @@ export default function Page() {
 
   return (
     <FullScreenShell
+      selectionType="Elija una acción por herramienta"
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Avanzado"
       index={3} total={3}
       title="Estrategia digital para vender en línea"

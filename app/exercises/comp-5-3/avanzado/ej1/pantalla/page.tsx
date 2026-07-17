@@ -45,7 +45,7 @@ const TOOLS: Tool[] = [
     { id: "recorda", label: "Enviar recordatorios diarios a todos los contactos para que aporten.", dim: "comunicacion" },
   ] },
   { id: "diseno", name: "Canva / app de diseño", icon: Palette, actions: [
-    { id: "afiche", label: "Diseñar un afiche con la fecha, el objetivo y los medios de aporte, fácil de leer.", dim: "difusion", ok: true },
+    { id: "afiche", label: "Diseñar un afiche con la fecha, el objetivo y los medios de aporte.", dim: "difusion", ok: true },
     { id: "llamativo", label: "Diseñar un afiche muy llamativo centrado en una imagen, con los datos en letra pequeña.", dim: "difusion" },
     { id: "logo", label: "Diseñar solo el logo de la campaña para reforzar su identidad visual.", dim: "difusion" },
   ] },
@@ -88,6 +88,7 @@ export default function Page() {
 
   return (
     <FullScreenShell
+      selectionType="Elija una acción por herramienta"
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Avanzado"
       index={1} total={3}
       title="Estrategia digital de una campaña solidaria"

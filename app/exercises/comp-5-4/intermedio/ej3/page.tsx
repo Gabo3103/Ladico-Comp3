@@ -46,6 +46,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por fila"
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={3} total={3}
       title="¿Qué aprender para vender en línea?"

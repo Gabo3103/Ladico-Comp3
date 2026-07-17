@@ -30,6 +30,7 @@ export default function Page() {
   const [screen, setScreen] = useState<Screen>("home")
   const [openApp, setOpenApp] = useState<AppId | null>(null)
   const [removed, setRemoved] = useState<Set<AppId>>(new Set())
+  const [photoTaken, setPhotoTaken] = useState(false)
 
   const other = 22.5
   const used = useMemo(() => other + APPS.filter(a => !removed.has(a.id)).reduce((s, a) => s + a.size, 0), [removed])
@@ -41,7 +42,7 @@ export default function Page() {
   const appsView = useMemo(() => shuffle(APPS), [])
 
   const handleNext = async () => {
-    const point: 0 | 1 = cameraOk && !removedWrong ? 1 : 0
+    const point: 0 | 1 = photoTaken && !removedWrong ? 1 : 0
     setPoint(COMPETENCE, "avanzado", 1, point)
     await mark(0, point === 1)
     router.push("/exercises/comp-5-1/avanzado/ej2/pantalla")
@@ -54,14 +55,15 @@ export default function Page() {
 
   return (
     <FullScreenShell
+      selectionType="Simulación"
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Avanzado"
       index={1} total={3}
       title="Liberar almacenamiento para usar la cámara"
       instruction={'Un familiar le pide tomarle una fotografía para un trámite urgente. Al abrir la cámara aparece un problema. Use el teléfono como lo haría normalmente, resuélvalo y tome la foto.'}
       onNext={handleNext}
-      onCheck={() => cameraOk && !removedWrong}
+      onCheck={() => photoTaken && !removedWrong}
       checkDisabled={false}
-      nextDisabled={!cameraOk || removedWrong}
+      nextDisabled={!photoTaken || removedWrong}
     >
       <div className="mx-auto w-full max-w-[360px] rounded-[2.6rem] border-[10px] border-gray-900 bg-black overflow-hidden shadow-2xl">
         <div className="bg-gray-900 text-white flex items-center justify-between px-6 py-1.5 text-xs">
@@ -83,7 +85,7 @@ export default function Page() {
                 </button>
               )}
               <div className="grid grid-cols-4 gap-5 mt-2">
-                <HomeIcon label="Cámara" icon={Camera} onClick={() => setScreen("camera")} />
+                <HomeIcon label="Cámara" icon={Camera} onClick={() => { setScreen("camera"); if (cameraOk) setPhotoTaken(true) }} />
                 <HomeIcon label="Ajustes" icon={Settings} onClick={() => setScreen("settings")} />
                 <HomeIcon label="Fotos" icon={ImageIcon} onClick={() => setScreen("fotos")} />
                 {homeApps.filter(a => !a.system).map(a => (

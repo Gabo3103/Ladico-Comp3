@@ -42,6 +42,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por caso"
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={1} total={3}
       title="¿Qué necesita aprender para evitar el problema?"

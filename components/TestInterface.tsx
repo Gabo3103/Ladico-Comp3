@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { getCompetenceTitle } from "@/components/data/digcompSkills"
 import Link from "next/link"
-import { AlertTriangle, Bot, FileText, Image as ImageIcon, Presentation, Sparkles, Wand2, X } from "lucide-react"
+import { AlertTriangle, Bot, Clock, FileText, Image as ImageIcon, Presentation, Sparkles, Wand2, X } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 
 interface TestInterfaceProps {
@@ -237,6 +237,8 @@ export default function TestInterface({
 
   const violationCooldownRef = useRef<number>(0)
   const graceRef = useRef<number>(0)
+  const [showIntro, setShowIntro] = useState(true)
+  const startedRef = useRef<boolean>(false)
   const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const invalidatedRef = useRef<boolean>(false)
 
@@ -287,6 +289,7 @@ export default function TestInterface({
   }
 
   const registerViolation = () => {
+    if (!startedRef.current) return
     const now = Date.now()
     // Gracia tras cambiar de pregunta: no penaliza si el mouse aún no está
     // dentro del recuadro blanco al aparecer la nueva pregunta.
@@ -317,9 +320,6 @@ export default function TestInterface({
     document.addEventListener("visibilitychange", onVisibility)
     window.addEventListener("blur", onBlur)
 
-    // iniciar timer en la primera pregunta
-    startTimer()
-
     return () => {
       document.removeEventListener("visibilitychange", onVisibility)
       window.removeEventListener("blur", onBlur)
@@ -327,6 +327,12 @@ export default function TestInterface({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const beginTest = () => {
+    setShowIntro(false)
+    startedRef.current = true
+    startTimer()
+  }
 
   const handleNext = (fromInvalidation = false) => {
     clearAllTimers()
@@ -374,7 +380,7 @@ export default function TestInterface({
     questionText.includes("diapositiv") ||
     questionText.includes("ia generativa") ||
     questionText.includes("inteligencia artificial")
-  const showGenerativePresentationDemo = competenceCode === "5.3" && isBasicLevel && isPresentationAiQuestion
+  const showGenerativePresentationDemo = false && competenceCode === "5.3" && isBasicLevel && isPresentationAiQuestion // simulación desactivada: no aportaba
   const showArea5DemoControls = demoMode && competenceCode?.startsWith("5.") && isBasicLevel
   const handleCheck = () => {
     const correct = currentQuestion?.correctAnswerIndex
@@ -388,6 +394,19 @@ export default function TestInterface({
 
   return (
     <div className="min-h-screen bg-[#f3fbfb]">
+      {showIntro && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-[#e8f3f4] text-[#286575] flex items-center justify-center"><Clock className="w-6 h-6" /></div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-3">Antes de comenzar</h3>
+            <ul className="space-y-2.5 text-sm text-gray-700 mb-5">
+              <li className="flex items-start gap-2"><Clock className="w-4 h-4 text-[#286575] mt-0.5 shrink-0" /><span>Cada pregunta tiene un <b>tiempo limitado</b> (unos {QUESTION_TIME} segundos). Si se acaba, la pregunta se invalida.</span></li>
+              <li className="flex items-start gap-2"><AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" /><span><b>No cambies de pestaña ni de ventana</b> durante la prueba: si sales, la pregunta puede invalidarse.</span></li>
+            </ul>
+            <button onClick={beginTest} className="w-full rounded-xl bg-[#286575] px-4 py-3 text-white font-semibold shadow hover:bg-[#3a7d89]">Comenzar</button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 rounded-b-2xl">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-2 sm:py-2.5">
@@ -486,7 +505,7 @@ export default function TestInterface({
 
       {/* Tarjeta de pregunta */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6 sm:pb-8">
-        <Card onMouseLeave={(e) => { if (e.clientY <= e.currentTarget.getBoundingClientRect().top) return; registerViolation() }} className="bg-white shadow-2xl rounded-2xl sm:rounded-3xl border-0 transition-all duration-300 relative ring-2 ring-[#286575] ring-opacity-30 shadow-[#286575]/10">
+        <Card className="bg-white shadow-2xl rounded-2xl sm:rounded-3xl border-[3px] border-[#286575] transition-all duration-300 relative ring-4 ring-[#286575]/15 shadow-[#286575]/10">
           {(timeoutBanner || invalidated) && (
             <div className="absolute inset-0 z-30 flex items-center justify-center rounded-2xl sm:rounded-3xl bg-white/85 backdrop-blur-sm p-6">
               <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white shadow-xl p-6 text-center">
@@ -532,7 +551,6 @@ export default function TestInterface({
               </div>
             </div>
 
-            {showGenerativePresentationDemo && <GenerativePresentationDemo />}
 
             {/* Título e instrucciones */}
             <div className="mb-5 sm:mb-6">

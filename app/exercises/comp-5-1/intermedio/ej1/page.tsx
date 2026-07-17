@@ -12,7 +12,7 @@ const PREFIX = "session:5.1:Intermedio"
 const OPTIONS = [
   "Abrir una página web en el navegador para verificar si el dispositivo tiene conexión a Internet.",
   "Acceder a su correo electrónico desde el navegador web (versión webmail).",
-  "Buscar en Internet el mensaje de error exacto junto con el nombre de la aplicación.",
+  "Comprobar si otras aplicaciones o páginas funcionan, para saber si el problema es solo del correo.",
   "Cambiar la frecuencia de sincronización del correo en los ajustes de la cuenta.",
   "Eliminar correos antiguos del buzón.",
   "Reiniciar el dispositivo.",
@@ -39,10 +39,11 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Selección múltiple"
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Intermedio"
       index={1} total={3}
       title="Resolver un problema de conexión de correo"
-      instruction={'Su aplicación de correo electrónico muestra el mensaje "Error de conexión con el servidor" desde hace 20 minutos. Usted espera una respuesta laboral urgente y necesita acceder a su bandeja de entrada lo antes posible.\n\nSeleccione TODAS las estrategias de resolución que considere adecuadas para este problema.'}
+      instruction={'Su aplicación de correo electrónico muestra el mensaje "Error de conexión con el servidor" desde hace 20 minutos. Usted espera una respuesta laboral urgente y necesita acceder a su bandeja de entrada lo antes posible.\n\nMarque la o las estrategias de resolución que considere adecuadas para este problema.'}
       onNext={handleNext}
       onCheck={() => {
         let ok = 0, bad = 0

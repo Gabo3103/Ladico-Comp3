@@ -50,6 +50,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Marque las barreras"
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Avanzado"
       index={1} total={3}
       title="Detectar las barreras de accesibilidad"

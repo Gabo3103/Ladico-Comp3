@@ -54,6 +54,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Simulación"
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Avanzado"
       index={3} total={3}
       title="Transmitir fotos a la Smart TV"

@@ -30,7 +30,7 @@ export default function Page() {
   const handleNext = async () => {
     let ok = 0
     order.forEach((id, pos) => { if (id === pos + 1) ok++ })
-    const point: 0 | 1 = ok >= 3 ? 1 : 0
+    const point: 0 | 1 = ok === STEPS.length ? 1 : 0
     setPoint(COMPETENCE, "intermedio", 2, point)
     await mark(1, point === 1)
     router.push("/exercises/comp-5-2/intermedio/ej3")
@@ -38,12 +38,13 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Ordene los pasos"
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Intermedio"
       index={2} total={3}
       title="Configurar avisos de un medicamento"
       instruction={'Debe configurar avisos automáticos de un medicamento (08:00, 14:00 y 21:00), visibles y sonoros. Arrastre las cinco acciones para ordenarlas (1 = primera, 5 = última).'}
       onNext={handleNext}
-      onCheck={() => order.reduce((acc, id, pos) => acc + (id === pos + 1 ? 1 : 0), 0) >= 3}
+      onCheck={() => order.reduce((acc, id, pos) => acc + (id === pos + 1 ? 1 : 0), 0) === STEPS.length}
       checkDisabled={false}
       nextDisabled={!hasMoved}
     >

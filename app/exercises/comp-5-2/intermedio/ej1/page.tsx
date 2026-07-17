@@ -43,6 +43,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por fila"
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Intermedio"
       index={1} total={3}
       title="Elegir la función digital adecuada"

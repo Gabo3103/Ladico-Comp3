@@ -20,7 +20,7 @@ const ETAPAS: Etapa[] = [
   { fin: "Paso 3 — Para prepararse para utilizar el nuevo sistema:",
     opts: ["Leer otra vez el aviso del cambio para memorizarlo.", "Configurar una contraseña más larga para la cuenta.", "Seguir las instrucciones oficiales y practicar el nuevo acceso cuando esté disponible.", "Esperar a dominarlo el día en que el cambio entre en vigencia."], correct: 2 },
   { fin: "Paso 4 — Para comprobar que sabrá hacerlo cuando llegue el cambio:",
-    opts: ["Revisar que los pasos del nuevo ingreso estén anotados.", "Confirmar que recuerda su contraseña actual.", "Probar el nuevo ingreso en un entorno de demostración.", "Esperar al primer ingreso real para ver si funciona."], correct: 2 },
+    opts: ["Revisar que los pasos del nuevo ingreso estén anotados.", "Confirmar que recuerda su contraseña actual.", "Practicar el nuevo ingreso apenas esté disponible, siguiendo los pasos anotados.", "Esperar al primer ingreso real para ver si funciona."], correct: 2 },
 ]
 
 function UpdateNoticePreview() {
@@ -74,6 +74,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por paso"
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Intermedio"
       index={2} total={3}
       title="Armar un plan ante un cambio de acceso"

@@ -118,10 +118,12 @@ export default function TestPage() {
   const handleTestComplete = async (finalSession: TestSession) => {
     try {
       let correctAnswers = 0
+      const perQuestion: boolean[] = []
 
       await Promise.all(finalSession.questions.map(async (question, index) => {
         const userAnswer = finalSession.answers[index]
         const wasCorrect = answersAreEqual(userAnswer, question.correctAnswerIndex)
+        perQuestion[index] = wasCorrect
 
         console.log(`Pregunta ${index + 1}: ${question.title}`)
         console.log(`  Usuario respondió: ${formatAnswer(userAnswer, question.options)}`)
@@ -220,7 +222,8 @@ export default function TestPage() {
       }
 
       const areaCompletedParam = justCompletedArea ? "1" : "0"
-      router.push(`/test/${params.competenceId}/results?score=${score}&passed=${passed}&correct=${correctAnswers}&areaCompleted=${areaCompletedParam}&level=${levelParam}`)
+      const qParams = `&q1=${perQuestion[0] ? "1" : "0"}&q2=${perQuestion[1] ? "1" : "0"}&q3=${perQuestion[2] ? "1" : "0"}`
+      router.push(`/test/${params.competenceId}/results?score=${score}&passed=${passed}&correct=${correctAnswers}&areaCompleted=${areaCompletedParam}&level=${levelParam}${qParams}`)
     } catch (error) {
       console.error("Error saving test results:", error)
       toast({

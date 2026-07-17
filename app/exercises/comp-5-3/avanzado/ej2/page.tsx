@@ -192,6 +192,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por paso"
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Avanzado"
       index={2} total={3}
       title="Guiar la creación de una encuesta en línea"

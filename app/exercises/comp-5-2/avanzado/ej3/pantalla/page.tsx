@@ -51,10 +51,11 @@ export default function Page() {
 
   return (
     <FullScreenShell
+      selectionType="Active o desactive"
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Avanzado"
       index={3} total={3}
       title="Ajustar el panel de apoyo de una solicitud en línea"
-      instruction={'Una persona con poca experiencia debe completar una solicitud de varios pasos y teme perder su avance. Ajuste el panel: active los apoyos que la protegen y desactive las opciones riesgosas. Algunas opciones ya vienen activadas.'}
+      instruction={'Una persona con poca experiencia debe completar una solicitud de varios pasos y teme perder su avance. Ajuste el panel: active los apoyos que la ayudan a no perder su avance y desactive las opciones que ponen en riesgo su información. Algunas opciones ya vienen activadas.'}
       onNext={handleNext}
       onCheck={() => riskyOn === 0 && supportsOn >= 5}
       checkDisabled={false}

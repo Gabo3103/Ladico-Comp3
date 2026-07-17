@@ -37,6 +37,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por situación"
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Intermedio"
       index={1} total={3}
       title="¿Enfoque centrado en las personas?"

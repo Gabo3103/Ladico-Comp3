@@ -11,6 +11,16 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Search, Users, AlertCircle, Plus, X, Trash2 } from "lucide-react"
 
+const stripAccents = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+const levelRank = (lvl: string): number => {
+  const l = stripAccents((lvl || "").toLowerCase())
+  if (l.startsWith("avanz")) return 3
+  if (l.startsWith("interm")) return 2
+  if (l.startsWith("bas")) return 1
+  return 0
+}
+const rankLabel = (r: number) => (r === 3 ? "Avanzado" : r === 2 ? "Intermedio" : r === 1 ? "Básico" : "")
+
 type UserDoc = {
   uid: string
   name?: string
@@ -19,6 +29,7 @@ type UserDoc = {
   currentLevel?: string
   LadicoScore?: number
   completedCompetences?: string[]
+  levelBadges?: { text: string; ok: boolean }[]
 }
 
 type SortMode = "default" | "completed" | "competence" | "selected"
@@ -58,6 +69,31 @@ export default function UserResultsPage() {
             : [],
         }
       })
+      try {
+        const sessSnap = await getDocs(collection(db, "testSessions"))
+        const byUser: Record<string, Record<string, { reached: number; passed: number }>> = {}
+        sessSnap.docs.forEach((d) => {
+          const s = d.data() as any
+          const uid = s?.userId as string
+          const comp = String(s?.competence || "")
+          const r = levelRank(String(s?.level || ""))
+          if (!uid || !comp || r === 0) return
+          byUser[uid] ??= {}
+          const cur = byUser[uid][comp] ?? { reached: 0, passed: 0 }
+          cur.reached = Math.max(cur.reached, r)
+          if (s?.passed === true) cur.passed = Math.max(cur.passed, r)
+          byUser[uid][comp] = cur
+        })
+        rows.forEach((u) => {
+          const m = byUser[u.uid] || {}
+          u.levelBadges = Object.keys(m).sort(compareCodes).map((c) => ({
+            text: `${c} · ${rankLabel(m[c].reached)}`,
+            ok: m[c].passed >= m[c].reached,
+          }))
+        })
+      } catch (e) {
+        console.warn("No se pudieron leer testSessions:", e)
+      }
       setUsers(rows)
     } catch (e) {
       console.error(e)
@@ -370,6 +406,7 @@ export default function UserResultsPage() {
           {/* Tabla */}
           {!loading && !error && (
             <div className="overflow-x-auto">
+              <p className="text-xs text-gray-500 mb-2">En “Hasta dónde llegó”: <span className="text-emerald-700">verde</span> = nivel aprobado; <span className="text-amber-700">ámbar</span> = llegó a ese nivel pero aún no lo aprueba.</p>
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="text-left text-gray-600">
@@ -386,7 +423,7 @@ export default function UserResultsPage() {
                     <th className="py-2 pr-4">Email</th>
                     <th className="py-2 pr-4">País</th>
                     <th className="py-2 pr-4">Nivel actual</th>
-                    <th className="py-2 pr-4">Competencias completadas</th>
+                    <th className="py-2 pr-4">Hasta dónde llegó</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -410,27 +447,25 @@ export default function UserResultsPage() {
                       <td className="py-3 pr-4 capitalize">{u.currentLevel || "-"}</td>
                       <td className="py-3 pr-4">
                         <div className="flex flex-wrap gap-1">
-                          {(u.completedCompetences ?? []).length > 0 ? (
-                            [...(u.completedCompetences ?? [])]
-                              .sort(compareCodes)
-                              .map((c) => (
-                                <span
-                                  key={`${u.uid}-${c}`}
-                                  className={`px-2 py-0.5 rounded-full text-xs border ${
-                                    selectedCompetences.includes(c)
-                                      ? "bg-indigo-50 text-indigo-700 border-indigo-200"
-                                      : "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                  }`}
-                                >
-                                  {c}
-                                </span>
-                              ))
+                          {(u.levelBadges ?? []).length > 0 ? (
+                            (u.levelBadges ?? []).map((b) => (
+                              <span
+                                key={`${u.uid}-${b.text}`}
+                                className={`px-2 py-0.5 rounded-full text-xs border ${
+                                  b.ok
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                    : "bg-amber-50 text-amber-700 border-amber-200"
+                                }`}
+                              >
+                                {b.text}{b.ok ? "" : " · sin aprobar"}
+                              </span>
+                            ))
                           ) : (
                             <span className="text-gray-400 text-xs">—</span>
                           )}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          Total: {u.completedCompetences?.length || 0}
+                          Total: {u.levelBadges?.length || 0}
                         </div>
                       </td>
                     </tr>

@@ -81,6 +81,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Active los apoyos"
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Avanzado"
       index={2} total={3}
       title="Apoyar a una persona con dificultad auditiva en una videollamada"

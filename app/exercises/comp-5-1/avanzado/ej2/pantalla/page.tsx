@@ -10,13 +10,10 @@ import PhoneSimulation from "../PhoneSimulation"
 
 const COMPETENCE = "5.1"
 const PREFIX = "session:5.1:Avanzado"
-const directLabel = (label: string) => {
-  const direct = label
-    .replace("Pedirle a la hermana que", "Solicite a su hermana que")
-    .replace("Pedirle que", "")
-    .trimStart()
-  return direct.charAt(0).toUpperCase() + direct.slice(1)
-}
+const directLabel = (label: string) =>
+  label
+    .replace(/^Pedirle a la hermana que /, "Que la hermana ")
+    .replace(/^Pedirle que /, "Que ")
 
 type Opt = { id: string; label: string; correct: boolean; result: string }
 type Step = { title: string; options: Opt[] }
@@ -90,10 +87,11 @@ export default function Page() {
 
   return (
     <FullScreenShell
+      selectionType="Una opción por paso"
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Avanzado"
       index={2} total={3}
       title="Guiar paso a paso a otra persona"
-      instruction={'Su madre le muestra su teléfono. En WhatsApp puede ver mensajes de texto recibidos anteriormente, pero las fotografías y los audios quedan pendientes de descarga. Guíela con una instrucción en cada paso. Su madre ejecutará la acción que usted elija y la pantalla mostrará el resultado; luego la simulación avanzará al siguiente paso. Elija con cuidado: en cada paso solo puede dar una instrucción.'}
+      instruction={'Su madre le muestra su teléfono. En WhatsApp puede ver mensajes de texto recibidos anteriormente, pero las fotografías y los audios quedan pendientes de descarga. El teléfono tiene espacio de almacenamiento suficiente. Guíela con una instrucción en cada paso. Su madre ejecutará la acción que usted elija y la pantalla mostrará el resultado; luego la simulación avanzará al siguiente paso. Elija con cuidado: en cada paso solo puede dar una instrucción.'}
       onNext={handleNext}
       onCheck={() => solved && correct >= 3}
       checkDisabled={false}

@@ -36,10 +36,11 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Selección múltiple"
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Avanzado"
       index={2} total={3}
       title="Reunir aprendizajes según un propósito"
-      instruction={'Usted define un propósito concreto: "Quiero manejar yo mismo mis trámites y pagos desde el teléfono, sin depender de nadie". Según ese propósito, marque los aprendizajes que conviene reunir para lograrlo.'}
+      instruction={'Usted define un propósito concreto: "Quiero manejar yo mismo mis trámites y pagos desde el teléfono, sin depender de nadie". Según ese propósito, marque el o los aprendizajes que conviene reunir para lograrlo.'}
       onNext={handleNext}
       onCheck={() => {
         let ok = 0, bad = 0

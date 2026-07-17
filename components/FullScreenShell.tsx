@@ -17,11 +17,12 @@ type Props = {
   nextLabel?: string
   nextDisabled?: boolean
   checkDisabled?: boolean
+  selectionType?: string
 }
 
 // Contraparte a "pantalla entera" de ExerciseShell: misma API, pero ocupa todo
 // el alto de la ventana con barra superior, cuerpo amplio y pie con el botón.
-export default function FullScreenShell({ label, index, total, title, instruction, children, onNext, onCheck, nextLabel = "Siguiente", nextDisabled = false, checkDisabled }: Props) {
+export default function FullScreenShell({ label, index, total, title, instruction, children, onNext, onCheck, nextLabel = "Siguiente", nextDisabled = false, checkDisabled, selectionType }: Props) {
   const { isProfesor, isAdmin } = useAuth()
   const demoMode = isProfesor || isAdmin
   const [open, setOpen] = useState(true)
@@ -55,6 +56,9 @@ export default function FullScreenShell({ label, index, total, title, instructio
           </div>
           {instruction && open && (
             <div id="exercise-instruction-fs" className="mb-4 bg-white p-3 rounded-xl border-l-4 border-[#286575]"><p className="text-gray-700 whitespace-pre-line leading-snug text-[13px]">{instruction}</p></div>
+          )}
+          {selectionType && (
+            <p className="mb-3 inline-block text-xs text-gray-600 bg-blue-50 px-3 py-1.5 rounded-full">{selectionType}</p>
           )}
           {children}
         </div>

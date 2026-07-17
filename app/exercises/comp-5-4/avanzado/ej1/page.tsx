@@ -36,10 +36,11 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Selección múltiple"
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Avanzado"
       index={1} total={3}
       title="Apoyar la autonomía digital de un adolescente"
-      instruction={'Usted acompaña a un adolescente para que aprenda a manejar de forma autónoma y segura su tiempo de pantalla y su privacidad en el teléfono. Marque qué conviene enseñarle y acordar con él para que logre esa autonomía.'}
+      instruction={'Usted acompaña a un adolescente para que aprenda a manejar de forma autónoma y segura su tiempo de pantalla y su privacidad en el teléfono. Marque la o las opciones que conviene enseñarle y acordar con él para que logre esa autonomía.'}
       onNext={handleNext}
       onCheck={() => {
         let ok = 0, bad = 0

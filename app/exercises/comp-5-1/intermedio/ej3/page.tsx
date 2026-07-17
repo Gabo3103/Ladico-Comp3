@@ -74,6 +74,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por sección"
       label="| 5.1 Identificar y resolver problemas técnicos · Nivel Intermedio"
       index={3} total={3}
       title="Configuraciones preventivas del teléfono"

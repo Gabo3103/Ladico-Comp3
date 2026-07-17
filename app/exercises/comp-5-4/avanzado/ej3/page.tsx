@@ -57,6 +57,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Selección por partes"
       label="| 5.4 Identificar y abordar necesidades de competencia digital · Nivel Avanzado"
       index={3} total={3}
       title="Apoyo proporcional a un familiar mayor"

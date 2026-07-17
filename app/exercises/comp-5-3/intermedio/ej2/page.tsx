@@ -55,6 +55,7 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Una opción por enunciado"
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Intermedio"
       index={2} total={3}
       title="Fortalezas, debilidades y ética de la IA"

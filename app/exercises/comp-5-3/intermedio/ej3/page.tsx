@@ -45,10 +45,11 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Selección múltiple"
       label="| 5.3 Uso creativo de las tecnologías digitales · Nivel Intermedio"
       index={3} total={3}
       title="Uso responsable de la tecnología en una campaña"
-      instruction={'La directiva de una junta de vecinos necesita organizar en tres días, y con poco presupuesto, una campaña para recolectar alimentos para familias afectadas por inundaciones. Seleccione TODAS las acciones que usan tecnologías digitales de forma responsable y ética para resolver el problema.'}
+      instruction={'La directiva de una junta de vecinos necesita organizar en tres días, y con poco presupuesto, una campaña para recolectar alimentos para familias afectadas por inundaciones. Marque la o las acciones que usan tecnologías digitales de forma responsable y ética para resolver el problema.'}
       onNext={handleNext}
       onCheck={() => {
         let ok = 0, bad = 0

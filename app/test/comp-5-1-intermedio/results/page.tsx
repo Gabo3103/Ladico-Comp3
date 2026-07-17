@@ -8,6 +8,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, XCircle, CheckCircle, XCircle as XIcon } from "lucide-react"
 import { finalizeSession } from "@/lib/testSession"
+import { firstExerciseRoute, type LevelSlug } from "@/lib/firstExerciseRoute"
+import { collection, getDocs, query, where } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import { useAuth } from "@/contexts/AuthContext"
+
+const rankLevel = (lvl: string): number => {
+  const l = (lvl || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  if (l.startsWith("avanz")) return 3
+  if (l.startsWith("interm")) return 2
+  if (l.startsWith("bas")) return 1
+  return 0
+}
 
 function ResultsIntermedioContent() {
   const sp = useSearchParams()
@@ -53,6 +65,29 @@ function ResultsIntermedioContent() {
 
   const handleBack = () => router.push("/dashboard")
   const handleRetry = () => router.push("/exercises/comp-5-1/intermedio/ej1")
+
+  const { user: authUser } = useAuth()
+  const AREA5 = ["5.1", "5.2", "5.3", "5.4"]
+  const hasNext = (() => { const i = AREA5.indexOf(competence); return i >= 0 && i < AREA5.length - 1 })()
+  const nextSlug: LevelSlug = level.startsWith("a") ? "avanzado" : "intermedio"
+  const priorRank = level.startsWith("a") ? 2 : 1
+  const handleNextCompetence = async () => {
+    const uid = authUser?.uid
+    const i = AREA5.indexOf(competence)
+    const candidates = i >= 0 ? AREA5.slice(i + 1) : []
+    if (uid && db) {
+      for (const comp of candidates) {
+        try {
+          const snap = await getDocs(query(collection(db, "testSessions"), where("userId", "==", uid), where("competence", "==", comp)))
+          const passed = snap.docs.filter((d) => (d.data() as any)?.passed === true).map((d) => rankLevel(String((d.data() as any)?.level || "")))
+          const ready = passed.includes(priorRank) && !passed.includes(priorRank + 1)
+          if (ready) { router.push(firstExerciseRoute(comp, nextSlug)); return }
+        } catch { /* no-op */ }
+      }
+    }
+    window.alert("No hay una competencia siguiente disponible en este nivel por ahora. Volverás al panel.")
+    router.push("/dashboard")
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -174,6 +209,11 @@ function ResultsIntermedioContent() {
 
               {/* Acciones */}
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                {hasNext && (
+                  <Button onClick={handleNextCompetence} className="flex-1 bg-[#286575] hover:bg-[#3a7d89] text-white rounded-xl py-3 shadow">
+                    Continuar con la siguiente competencia
+                  </Button>
+                )}
                 <Button
                   onClick={handleBack}
                   className="flex-1 bg-[#286575] hover:bg-[#3a7d89] text-white rounded-xl py-3 shadow"

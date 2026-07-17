@@ -43,10 +43,11 @@ export default function Page() {
 
   return (
     <ExerciseShell
+      selectionType="Selección múltiple"
       label="| 5.2 Identificación de necesidades y respuestas tecnológicas · Nivel Intermedio"
       index={3} total={3}
       title="Herramientas para tareas repetitivas"
-      instruction={'Un compañero pierde tiempo en tareas repetitivas (saludos a clientes vía notificación, búsqueda de rutas, registro de gastos). Seleccione las recomendaciones que aprovechan herramientas de asistencia digital para optimizarlas.'}
+      instruction={'Un compañero pierde tiempo en tareas repetitivas (saludos a clientes vía notificación, búsqueda de rutas, registro de gastos). Marque la o las recomendaciones que aprovechan herramientas de asistencia digital para optimizarlas.'}
       onNext={handleNext}
       onCheck={() => {
         let ok = 0, bad = 0

@@ -12,6 +12,14 @@ import { db } from "@/lib/firebase"
 import { useAuth } from "@/contexts/AuthContext"
 import type { TestSession, Question } from "@/types"
 
+const rankLevel = (lvl: string): number => {
+  const l = (lvl || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  if (l.startsWith("avanz")) return 3
+  if (l.startsWith("interm")) return 2
+  if (l.startsWith("bas")) return 1
+  return 0
+}
+
 type AnswerValue = number | number[] | null;
 
 function answersAreEqual(left: AnswerValue, right: number | number[]): boolean {
@@ -50,7 +58,12 @@ function TestResultsContent() {
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
 
   // === NUEVO: banderas q1, q2, q3 según respuestas ===
+  const qp1 = searchParams.get("q1"), qp2 = searchParams.get("q2"), qp3 = searchParams.get("q3")
   const [q1, q2, q3] = useMemo<boolean[]>(() => {
+    // Prioridad: resultado por pregunta enviado en la URL (mismo cálculo que el puntaje).
+    if ([qp1, qp2, qp3].every(v => v === "0" || v === "1")) {
+      return [qp1 === "1", qp2 === "1", qp3 === "1"]
+    }
     if (testQuestions.length >= 3 && userAnswers.length >= 3) {
       return [0, 1, 2].map(i =>
         answersAreEqual(userAnswers[i], testQuestions[i].correctAnswerIndex)
@@ -59,7 +72,7 @@ function TestResultsContent() {
     // Fallback: si no hay preguntas/respuestas en memoria,
     // marcamos como correctas las primeras "correctAnswers"
     return [0, 1, 2].map(i => i < correctAnswers)
-  }, [testQuestions, userAnswers, correctAnswers])
+  }, [testQuestions, userAnswers, correctAnswers, qp1, qp2, qp3])
 
   const loadAllAreaQuestions = async (competenceId: string) => {
     if (!user?.uid || !db) {
@@ -246,17 +259,19 @@ function TestResultsContent() {
     else router.push("/dashboard")
   }
 
-  const handleContinueToNextCompetence = () => {
-    if (nextCompetenceInfo) {
-      const confirmed = confirm(
-        `🎯 CONTINUAR EVALUACIÓN\n\n` +
-        `📍 Siguiente competencia: "${nextCompetenceInfo.name}"\n` +
-        `🎯 Nivel: ${levelParam.charAt(0).toUpperCase() + levelParam.slice(1)}\n` +
-        `📝 Preguntas: 3\n\n` +
-        `¿Deseas continuar con la evaluación de esta competencia?`
-      )
-      if (confirmed) router.push(`/test/${nextCompetenceInfo.id}?level=${levelParam}`)
+  const handleContinueToNextCompetence = async () => {
+    const comps = await loadCompetences()
+    const current = comps.find(c => c.id === (params.competenceId as string))
+    if (!current || !user?.uid || !db) { router.push("/dashboard"); return }
+    const inArea = comps.filter(c => c.dimension === current.dimension).sort((a, b) => a.code.localeCompare(b.code))
+    const idx = inArea.findIndex(c => c.id === (params.competenceId as string))
+    for (const c of inArea.slice(idx + 1)) {
+      const snap = await getDocs(query(collection(db, "testSessions"), where("userId", "==", user.uid), where("competence", "==", c.id)))
+      const passedBasico = snap.docs.some(d => { const s = d.data() as any; return s?.passed === true && rankLevel(String(s?.level || "")) === 1 })
+      if (!passedBasico) { router.push(`/test/${c.id}?level=básico`); return }
     }
+    window.alert("¡Bien! Completaste las evaluaciones básicas disponibles por ahora. Volverás al panel.")
+    router.push("/dashboard")
   }
 
   return (

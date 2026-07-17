@@ -19,9 +19,10 @@ type Props = {
   nextLabel?: string
   nextDisabled?: boolean
   checkDisabled?: boolean
+  selectionType?: string
 }
 
-export default function ExerciseShell({ label, index, total, title, instruction, children, onNext, onCheck, nextLabel = "Siguiente", nextDisabled = false, checkDisabled }: Props) {
+export default function ExerciseShell({ label, index, total, title, instruction, children, onNext, onCheck, nextLabel = "Siguiente", nextDisabled = false, checkDisabled, selectionType }: Props) {
   const { isProfesor, isAdmin } = useAuth()
   const demoMode = isProfesor || isAdmin
   const pct = (index / total) * 100
@@ -65,6 +66,9 @@ export default function ExerciseShell({ label, index, total, title, instruction,
               <div id="exercise-instruction" className="mt-2 mb-3 bg-gray-50 p-2.5 sm:p-3 rounded-xl border-l-4 border-[#286575]">
                 <p className="text-gray-700 whitespace-pre-line leading-relaxed text-sm max-w-4xl">{instruction}</p>
               </div>
+            )}
+            {selectionType && (
+              <p className="mt-3 inline-block text-xs text-gray-600 bg-blue-50 px-3 py-1.5 rounded-full">{selectionType}</p>
             )}
             <div className="mt-3">{children}</div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
