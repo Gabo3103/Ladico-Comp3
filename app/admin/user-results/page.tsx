@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { collection, getDocs } from "firebase/firestore"
+import { collection, getDocs, deleteDoc, doc, query as fbQuery, where } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -164,9 +164,14 @@ export default function UserResultsPage() {
     )
 
     if (requireAllSelected && selectedCompetences.length > 0) {
-      list = list.filter((u) =>
-        selectedCompetences.every((c) => (u.completedCompetences ?? []).includes(c))
-      )
+      const codeOf = (x: string) => x.split(/[ ·]/)[0]  // "1.1 I" / "1.1 · Intermedio" -> "1.1"
+      list = list.filter((u) => {
+        const codes = [
+          ...(u.completedCompetences ?? []),
+          ...((u.levelBadges ?? []).map((bd) => bd.text)),
+        ].map(codeOf)
+        return selectedCompetences.some((c) => codes.includes(c.trim()))
+      })
     }
 
     if (sortMode === "selected" && selectedCompetences.length > 0) {
@@ -211,25 +216,20 @@ export default function UserResultsPage() {
 
     try {
       setDeleting(true)
-      // ⚠️ Necesitas enviar un ID token de un admin en el Authorization header.
-      const idToken = await (await import("firebase/auth")).getAuth().currentUser?.getIdToken()
-      const res = await fetch("/admin/delete-users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-        },
-        body: JSON.stringify({ uids }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data?.error || "Error al eliminar usuarios")
+      if (!db) throw new Error("Base de datos no disponible")
+      for (const uid of uids) {
+        // Borra las sesiones y resultados del usuario
+        for (const col of ["testSessions", "userResults"]) {
+          const snap = await getDocs(fbQuery(collection(db, col), where("userId", "==", uid)))
+          await Promise.all(snap.docs.map((dd) => deleteDoc(dd.ref)))
+        }
+        // Borra el documento del usuario
+        await deleteDoc(doc(db, "users", uid))
       }
-      // Limpieza local: quita los eliminados de la lista y de la selección
-      const removed = new Set<string>(data.deleted ?? uids)
+      const removed = new Set<string>(uids)
       setUsers((prev) => prev.filter((u) => !removed.has(u.uid)))
       setSelectedUids(new Set())
-      alert(`Eliminadas ${removed.size} cuentas correctamente.`)
+      alert(`Eliminadas ${removed.size} cuentas correctamente. (Se borraron sus datos; el inicio de sesión de Auth no se elimina desde aquí.)`)
     } catch (e: any) {
       console.error(e)
       alert(e?.message || "Error al eliminar usuarios")
@@ -385,7 +385,7 @@ export default function UserResultsPage() {
                   onCheckedChange={(v) => setRequireAllSelected(Boolean(v))}
                 />
                 <label htmlFor="requireAll" className="text-sm text-gray-700 cursor-pointer">
-                  Mostrar solo usuarios que tienen <strong>todas</strong> las seleccionadas
+                  Mostrar solo usuarios que tienen <strong>al menos una</strong> de las escritas
                 </label>
               </div>
             </div>

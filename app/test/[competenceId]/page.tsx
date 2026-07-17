@@ -261,12 +261,16 @@ export default function TestPage() {
     )
   }
 
+  // Área 5 (competencias que empiezan con "5."): 90 s por pregunta; el resto 60 s.
+  const questionTime = String(params.competenceId).startsWith("5.") ? 90 : 60
+
   return (
     <div className="min-h-screen bg-gray-50 sm:bg-transparent">
       <TestInterface
         testSession={testSession}
         onAnswerSubmit={handleAnswerSubmit}
         onTestComplete={handleTestComplete}
+        questionTimeSeconds={questionTime}
       />
     </div>
   )
